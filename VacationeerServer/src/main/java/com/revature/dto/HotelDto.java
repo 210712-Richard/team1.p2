@@ -1,26 +1,35 @@
-package com.revature.beans;
+package com.revature.dto;
 
 import java.util.Objects;
 import java.util.UUID;
 
-public class Hotel {
+import org.springframework.data.cassandra.core.cql.Ordering;
+import org.springframework.data.cassandra.core.cql.PrimaryKeyType;
+import org.springframework.data.cassandra.core.mapping.PrimaryKeyColumn;
+import org.springframework.data.cassandra.core.mapping.Table;
+
+import com.revature.beans.Hotel;
+
+@Table("hotel")
+public class HotelDto {
+	@PrimaryKeyColumn(name = "location", ordinal = 0, type = PrimaryKeyType.PARTITIONED)
 	private String location;
+	@PrimaryKeyColumn(name = "id", ordinal = 1, type = PrimaryKeyType.CLUSTERED, ordering = Ordering.DESCENDING)
 	private UUID id;
 	private String name;
 	private Double costPerNight;
 	private Integer roomsAvailable;
 
-	public Hotel() {
+	public HotelDto() {
 		super();
 	}
 
-	public Hotel(String location, UUID id, String name, Double costPerNight, Integer roomsAvailable) {
-		super();
-		this.location = location;
-		this.id = id;
-		this.name = name;
-		this.costPerNight = costPerNight;
-		this.roomsAvailable = roomsAvailable;
+	public HotelDto(Hotel h) {
+		this.location = h.getLocation();
+		this.id = h.getId();
+		this.name = h.getName();
+		this.costPerNight = h.getCostPerNight();
+		this.roomsAvailable = h.getRoomsAvailable();
 	}
 
 	public String getLocation() {
@@ -62,6 +71,18 @@ public class Hotel {
 	public void setRoomsAvailable(Integer roomsAvailable) {
 		this.roomsAvailable = roomsAvailable;
 	}
+	
+	public Hotel getHotel() {
+		Hotel h = new Hotel();
+		
+		h.setLocation(location);
+		h.setId(id);
+		h.setName(name);
+		h.setCostPerNight(costPerNight);
+		h.setRoomsAvailable(roomsAvailable);
+		
+		return h;
+	}
 
 	@Override
 	public int hashCode() {
@@ -76,7 +97,7 @@ public class Hotel {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		Hotel other = (Hotel) obj;
+		HotelDto other = (HotelDto) obj;
 		return Objects.equals(costPerNight, other.costPerNight) && Objects.equals(id, other.id)
 				&& Objects.equals(location, other.location) && Objects.equals(name, other.name)
 				&& Objects.equals(roomsAvailable, other.roomsAvailable);
@@ -84,7 +105,7 @@ public class Hotel {
 
 	@Override
 	public String toString() {
-		return "Hotel [location=" + location + ", id=" + id + ", name=" + name + ", costPerNight=" + costPerNight
+		return "HotelDto [location=" + location + ", id=" + id + ", name=" + name + ", costPerNight=" + costPerNight
 				+ ", roomsAvailable=" + roomsAvailable + "]";
 	}
 

@@ -1,10 +1,20 @@
-package com.revature.beans;
+package com.revature.dto;
 
 import java.util.Objects;
 import java.util.UUID;
 
-public class Car {
+import org.springframework.data.cassandra.core.cql.Ordering;
+import org.springframework.data.cassandra.core.cql.PrimaryKeyType;
+import org.springframework.data.cassandra.core.mapping.PrimaryKeyColumn;
+import org.springframework.data.cassandra.core.mapping.Table;
+
+import com.revature.beans.Car;
+
+@Table("car")
+public class CarDto {
+	@PrimaryKeyColumn(name = "location", ordinal = 0, type = PrimaryKeyType.PARTITIONED)
 	private String location;
+	@PrimaryKeyColumn(name = "id", ordinal = 1, type = PrimaryKeyType.CLUSTERED, ordering = Ordering.DESCENDING)
 	private UUID id;
 	private String make;
 	private String model;
@@ -13,21 +23,19 @@ public class Car {
 	private Double costPerDay;
 	private Boolean inUse;
 
-	public Car() {
+	public CarDto() {
 		super();
 	}
 
-	public Car(String location, UUID id, String make, String model, Integer year, String rentalPlace, Double costPerDay,
-			Boolean inUse) {
-		super();
-		this.location = location;
-		this.id = id;
-		this.make = make;
-		this.model = model;
-		this.year = year;
-		this.rentalPlace = rentalPlace;
-		this.costPerDay = costPerDay;
-		this.inUse = inUse;
+	public CarDto(Car c) {
+		this.location = c.getLocation();
+		this.id = c.getId();
+		this.make = c.getMake();
+		this.model = c.getModel();
+		this.year = c.getYear();
+		this.rentalPlace = c.getRentalPlace();
+		this.costPerDay = c.getCostPerDay();
+		this.inUse = c.getInUse();
 	}
 
 	public String getLocation() {
@@ -94,6 +102,21 @@ public class Car {
 		this.inUse = inUse;
 	}
 
+	public Car getCar() {
+		Car c = new Car();
+
+		c.setLocation(location);
+		c.setId(id);
+		c.setMake(make);
+		c.setModel(model);
+		c.setYear(year);
+		c.setRentalPlace(rentalPlace);
+		c.setCostPerDay(costPerDay);
+		c.setInUse(inUse);
+
+		return c;
+	}
+
 	@Override
 	public int hashCode() {
 		return Objects.hash(costPerDay, id, inUse, location, make, model, rentalPlace, year);
@@ -107,7 +130,7 @@ public class Car {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		Car other = (Car) obj;
+		CarDto other = (CarDto) obj;
 		return Objects.equals(costPerDay, other.costPerDay) && Objects.equals(id, other.id)
 				&& Objects.equals(inUse, other.inUse) && Objects.equals(location, other.location)
 				&& Objects.equals(make, other.make) && Objects.equals(model, other.model)
@@ -116,7 +139,7 @@ public class Car {
 
 	@Override
 	public String toString() {
-		return "Car [location=" + location + ", id=" + id + ", make=" + make + ", model=" + model + ", year=" + year
+		return "CarDto [location=" + location + ", id=" + id + ", make=" + make + ", model=" + model + ", year=" + year
 				+ ", rentalPlace=" + rentalPlace + ", costPerDay=" + costPerDay + ", inUse=" + inUse + "]";
 	}
 
