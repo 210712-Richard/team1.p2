@@ -45,5 +45,5 @@ public class LoggingAspect {
 	@Pointcut("execution( * com.revature..*(..) )")
 	private void everything() {
 		/* empty method  */
-	};
+	}
 }
