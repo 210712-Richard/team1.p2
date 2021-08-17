@@ -19,7 +19,11 @@
 		1.8, we leave a pom file that will do that. -->
 	<properties>
 		<java.version>1.8</java.version>
+
+		<sonar.organization>210712-richard</sonar.organization>
+		<sonar.host.url>https://sonarcloud.io</sonar.host.url>
 	</properties>
+
 	<dependencyManagement>
 		<dependencies>
 			<dependency>
@@ -113,5 +117,6 @@
 			<artifactId>reactor-test</artifactId>
 			<scope>test</scope>
 		</dependency>
+
 	</dependencies>
 </project>

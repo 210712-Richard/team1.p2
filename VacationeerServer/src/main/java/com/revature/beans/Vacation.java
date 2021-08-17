@@ -13,6 +13,7 @@ public class Vacation {
 	private List<Flight> flights;
 	private List<Hotel> hotels;
 	private List<Car> cars;
+	private List<Activity> activities;
 	private LocalDateTime startTime;
 	private LocalDateTime endTime;
 	private Double total;
@@ -23,6 +24,7 @@ public class Vacation {
 		flights = new ArrayList<>();
 		hotels = new ArrayList<>();
 		cars = new ArrayList<>();
+		activities = new ArrayList<>();
 		total = 0.00;
 	}
 
@@ -86,6 +88,14 @@ public class Vacation {
 		this.cars = cars;
 	}
 
+	public List<Activity> getActivities() {
+		return activities;
+	}
+
+	public void setActivities(List<Activity> activities) {
+		this.activities = activities;
+	}
+
 	public LocalDateTime getStartTime() {
 		return startTime;
 	}
@@ -128,8 +138,8 @@ public class Vacation {
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(cars, destination, duration, endTime, flights, hotels, id, partySize, startTime, total,
-				username);
+		return Objects.hash(activities, cars, destination, duration, endTime, flights, hotels, id, partySize, startTime,
+				total, username);
 	}
 
 	@Override
@@ -141,19 +151,20 @@ public class Vacation {
 		if (getClass() != obj.getClass())
 			return false;
 		Vacation other = (Vacation) obj;
-		return Objects.equals(cars, other.cars) && Objects.equals(destination, other.destination)
-				&& Objects.equals(duration, other.duration) && Objects.equals(endTime, other.endTime)
-				&& Objects.equals(flights, other.flights) && Objects.equals(hotels, other.hotels)
-				&& Objects.equals(id, other.id) && Objects.equals(partySize, other.partySize)
-				&& Objects.equals(startTime, other.startTime) && Objects.equals(total, other.total)
-				&& Objects.equals(username, other.username);
+		return Objects.equals(activities, other.activities) && Objects.equals(cars, other.cars)
+				&& Objects.equals(destination, other.destination) && Objects.equals(duration, other.duration)
+				&& Objects.equals(endTime, other.endTime) && Objects.equals(flights, other.flights)
+				&& Objects.equals(hotels, other.hotels) && Objects.equals(id, other.id)
+				&& Objects.equals(partySize, other.partySize) && Objects.equals(startTime, other.startTime)
+				&& Objects.equals(total, other.total) && Objects.equals(username, other.username);
 	}
 
 	@Override
 	public String toString() {
 		return "Vacation [username=" + username + ", id=" + id + ", destination=" + destination + ", flights=" + flights
-				+ ", hotels=" + hotels + ", cars=" + cars + ", startTime=" + startTime + ", endTime=" + endTime
-				+ ", total=" + total + ", partySize=" + partySize + ", duration=" + duration + "]";
+				+ ", hotels=" + hotels + ", cars=" + cars + ", activities=" + activities + ", startTime=" + startTime
+				+ ", endTime=" + endTime + ", total=" + total + ", partySize=" + partySize + ", duration=" + duration
+				+ "]";
 	}
 
 	
