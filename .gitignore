@@ -30,3 +30,14 @@ hs_err_pid*
 **/cassandra_truststore.jks
 **/sf-class2-root.crt
 **/temp_file.der
+
+# OSX
+*/.DS_Store
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+Icon?
+ehthumbs.db
+Thumbs.db
