@@ -32,13 +32,13 @@ public class FlightDto {
 
 	public FlightDto(Flight f) {
 		this();
-		this.destination = f.getDestination();
-		this.id = f.getId();
-		this.airline = f.getAirline();
-		this.departingDate = f.getDepartingDate().toInstant(ZoneOffset.UTC);
-		this.startingLocation = f.getStartingLocation();
-		this.ticketPrice = f.getTicketPrice();
-		this.openSeats = f.getOpenSeats();
+		this.setDestination(f.getDestination());
+		this.setId(f.getId());
+		this.setAirline(f.getAirline());
+		this.setDepartingDate(f.getDepartingDate().toInstant(ZoneOffset.UTC));
+		this.setStartingLocation(f.getStartingLocation());
+		this.setTicketPrice(f.getTicketPrice());
+		this.setOpenSeats(f.getOpenSeats());
 	}
 
 	public String getDestination() {

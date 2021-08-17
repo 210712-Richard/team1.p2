@@ -20,13 +20,13 @@ public class Flight {
 	public Flight(String destination, UUID id, String airline, LocalDateTime departingDate, String startingLocation,
 			Double ticketPrice, Integer openSeats) {
 		super();
-		this.destination = destination;
-		this.id = id;
-		this.airline = airline;
-		this.departingDate = departingDate;
-		this.startingLocation = startingLocation;
-		this.ticketPrice = ticketPrice;
-		this.openSeats = openSeats;
+		this.setDestination(destination);
+		this.setId(id);
+		this.setAirline(airline);
+		this.setDepartingDate(departingDate);
+		this.setStartingLocation(startingLocation);
+		this.setTicketPrice(ticketPrice);
+		this.setOpenSeats(openSeats);
 	}
 
 	public String getDestination() {

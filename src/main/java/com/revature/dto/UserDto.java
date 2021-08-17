@@ -32,15 +32,15 @@ public class UserDto {
 	}
 
 	public UserDto(User user) {
-		this.username = user.getUsername();
-		this.password = user.getPassword();
-		this.email = user.getEmail();
-		this.firstName = user.getFirstName();
-		this.lastName = user.getLastName();
-		this.birthday = user.getBirthday();
+		this.setUsername(user.getUsername());
+		this.setPassword(user.getPassword());
+		this.setEmail(user.getEmail());
+		this.setFirstName(user.getFirstName());
+		this.setLastName(user.getLastName());
+		this.setBirthday(user.getBirthday());
 		this.vacations = new ArrayList<>();
-		user.getVacations().stream().forEach((v) -> this.vacations.add(v.getId()));
-		this.type = user.getType().toString();
+		user.getVacations().stream().forEach(v -> this.vacations.add(v.getId()));
+		this.setType(user.getType().toString());
 	}
 
 	public String getUsername() {

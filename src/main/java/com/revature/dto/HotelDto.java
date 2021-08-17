@@ -25,11 +25,11 @@ public class HotelDto {
 	}
 
 	public HotelDto(Hotel h) {
-		this.location = h.getLocation();
-		this.id = h.getId();
-		this.name = h.getName();
-		this.costPerNight = h.getCostPerNight();
-		this.roomsAvailable = h.getRoomsAvailable();
+		this.setLocation(h.getLocation());
+		this.setId(h.getId());
+		this.setName(h.getName());
+		this.setCostPerNight(h.getCostPerNight());
+		this.setRoomsAvailable(h.getRoomsAvailable());
 	}
 
 	public String getLocation() {

@@ -21,7 +21,7 @@ import com.revature.services.UserServiceImpl;
 @RestController
 @RequestMapping("/users")
 public class UserControllerImpl {
-	private static Logger log = LogManager.getLogger(UserServiceImpl.class);
+	private static Logger log = LogManager.getLogger(UserControllerImpl.class);
 	
 	UserService userService;
 	
