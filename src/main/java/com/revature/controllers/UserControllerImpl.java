@@ -16,7 +16,6 @@ import org.springframework.web.server.WebSession;
 
 import com.revature.beans.User;
 import com.revature.services.UserService;
-import com.revature.services.UserServiceImpl;
 
 @RestController
 @RequestMapping("/users")
