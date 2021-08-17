@@ -1,6 +1,8 @@
 package com.revature.dto;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -33,7 +35,7 @@ public class ActivityDto {
 		this.setName(a.getName());
 		this.setDescription(a.getDescription());
 		this.setCost(a.getCost());
-		this.setDate(a.getDate());
+		this.setDate(a.getDate().toInstant(ZoneOffset.UTC));
 		this.setMaxParticipants(a.getMaxParticipants());
 	}
 
@@ -101,7 +103,7 @@ public class ActivityDto {
 		a.setName(name);
 		a.setDescription(description);
 		a.setCost(cost);
-		a.setDate(date);
+		a.setDate(LocalDateTime.ofInstant(date, ZoneOffset.UTC));
 		a.setMaxParticipants(maxParticipants);
 
 		return a;

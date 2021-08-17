@@ -1,6 +1,7 @@
 package com.revature.beans;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -10,22 +11,22 @@ public class Activity {
 	private String name;
 	private String description;
 	private Double cost;
-	private Instant date;
+	private LocalDateTime date;
 	private Integer maxParticipants;
 	
 	public Activity() {
 		super();
 	}
-	public Activity(String location, UUID id, String name, String description, Double cost, Instant date,
+	public Activity(String location, UUID id, String name, String description, Double cost, LocalDateTime date,
 			Integer maxParticipants) {
 		super();
-		this.location = location;
-		this.id = id;
-		this.name = name;
-		this.description = description;
-		this.cost = cost;
-		this.date = date;
-		this.maxParticipants = maxParticipants;
+		this.setLocation(location);
+		this.setId(id);
+		this.setName(name);
+		this.setDescription(description);
+		this.setCost(cost);
+		this.setDate(date);
+		this.setMaxParticipants(maxParticipants);
 	}
 	public String getLocation() {
 		return location;
@@ -57,10 +58,10 @@ public class Activity {
 	public void setCost(Double cost) {
 		this.cost = cost;
 	}
-	public Instant getDate() {
+	public LocalDateTime getDate() {
 		return date;
 	}
-	public void setDate(Instant date) {
+	public void setDate(LocalDateTime date) {
 		this.date = date;
 	}
 	public Integer getMaxParticipants() {
