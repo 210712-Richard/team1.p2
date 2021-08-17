@@ -21,14 +21,14 @@ public class User {
 	
 	public User(String username, String password, String email, String firstName, String lastName, LocalDate birthday,
 			UserType type) {
-		super();
-		this.username = username;
-		this.password = password;
-		this.email = email;
-		this.firstName = firstName;
-		this.lastName = lastName;
-		this.birthday = birthday;
-		this.type = type;
+		this();
+		this.setUsername(username);
+		this.setPassword(password);
+		this.setEmail(email);
+		this.setFirstName(firstName);
+		this.setLastName(lastName);
+		this.setBirthday(birthday);
+		this.setType(type);
 	}
 
 	public String getUsername() {

@@ -1,78 +1,119 @@
-package com.revature.beans;
+package com.revature.dto;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.Objects;
 import java.util.UUID;
 
-public class Activity {
+import org.springframework.data.cassandra.core.cql.Ordering;
+import org.springframework.data.cassandra.core.cql.PrimaryKeyType;
+import org.springframework.data.cassandra.core.mapping.PrimaryKeyColumn;
+import org.springframework.data.cassandra.core.mapping.Table;
+
+import com.revature.beans.Activity;
+
+@Table("activity")
+public class ActivityDto {
+	@PrimaryKeyColumn(name = "location", ordinal = 0, type = PrimaryKeyType.PARTITIONED)
 	private String location;
+	@PrimaryKeyColumn(name = "id", ordinal = 1, type = PrimaryKeyType.CLUSTERED, ordering = Ordering.DESCENDING)
 	private UUID id;
 	private String name;
 	private String description;
 	private Double cost;
-	private LocalDateTime date;
+	private Instant date;
 	private Integer maxParticipants;
-	
-	public Activity() {
+
+	public ActivityDto() {
 		super();
 	}
-	public Activity(String location, UUID id, String name, String description, Double cost, LocalDateTime date,
-			Integer maxParticipants) {
-		super();
-		this.setLocation(location);
-		this.setId(id);
-		this.setName(name);
-		this.setDescription(description);
-		this.setCost(cost);
-		this.setDate(date);
-		this.setMaxParticipants(maxParticipants);
+
+	public ActivityDto(Activity a) {
+		this.setLocation(a.getLocation());
+		this.setId(a.getId());
+		this.setName(a.getName());
+		this.setDescription(a.getDescription());
+		this.setCost(a.getCost());
+		this.setDate(a.getDate().toInstant(ZoneOffset.UTC));
+		this.setMaxParticipants(a.getMaxParticipants());
 	}
+
 	public String getLocation() {
 		return location;
 	}
+
 	public void setLocation(String location) {
 		this.location = location;
 	}
+
 	public UUID getId() {
 		return id;
 	}
+
 	public void setId(UUID id) {
 		this.id = id;
 	}
+
 	public String getName() {
 		return name;
 	}
+
 	public void setName(String name) {
 		this.name = name;
 	}
+
 	public String getDescription() {
 		return description;
 	}
+
 	public void setDescription(String description) {
 		this.description = description;
 	}
+
 	public Double getCost() {
 		return cost;
 	}
+
 	public void setCost(Double cost) {
 		this.cost = cost;
 	}
-	public LocalDateTime getDate() {
+
+	public Instant getDate() {
 		return date;
 	}
-	public void setDate(LocalDateTime date) {
+
+	public void setDate(Instant date) {
 		this.date = date;
 	}
+
 	public Integer getMaxParticipants() {
 		return maxParticipants;
 	}
+
 	public void setMaxParticipants(Integer maxParticipants) {
 		this.maxParticipants = maxParticipants;
 	}
+
+	public Activity getActivity() {
+		Activity a = new Activity();
+
+		a.setLocation(location);
+		a.setId(id);
+		a.setName(name);
+		a.setDescription(description);
+		a.setCost(cost);
+		a.setDate(LocalDateTime.ofInstant(date, ZoneOffset.UTC));
+		a.setMaxParticipants(maxParticipants);
+
+		return a;
+	}
+
 	@Override
 	public int hashCode() {
 		return Objects.hash(cost, date, description, id, location, maxParticipants, name);
 	}
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
@@ -81,17 +122,17 @@ public class Activity {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		Activity other = (Activity) obj;
+		ActivityDto other = (ActivityDto) obj;
 		return Objects.equals(cost, other.cost) && Objects.equals(date, other.date)
 				&& Objects.equals(description, other.description) && Objects.equals(id, other.id)
 				&& Objects.equals(location, other.location) && Objects.equals(maxParticipants, other.maxParticipants)
 				&& Objects.equals(name, other.name);
 	}
+
 	@Override
 	public String toString() {
-		return "Activity [location=" + location + ", id=" + id + ", name=" + name + ", description=" + description
+		return "ActivityDto [location=" + location + ", id=" + id + ", name=" + name + ", description=" + description
 				+ ", cost=" + cost + ", date=" + date + ", maxParticipants=" + maxParticipants + "]";
 	}
-	
-	
+
 }

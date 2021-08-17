@@ -15,19 +15,20 @@ public class Car {
 
 	public Car() {
 		super();
+		this.setInUse(false);
 	}
 
-	public Car(String location, UUID id, String make, String model, Integer year, String rentalPlace, Double costPerDay,
-			Boolean inUse) {
-		super();
-		this.location = location;
-		this.id = id;
-		this.make = make;
-		this.model = model;
-		this.year = year;
-		this.rentalPlace = rentalPlace;
-		this.costPerDay = costPerDay;
-		this.inUse = inUse;
+	public Car(String location, UUID id, String make, String model, Integer year, String rentalPlace,
+			Double costPerDay) {
+		this();
+		this.setLocation(location);
+		this.setId(id);
+		this.setMake(make);
+		this.setModel(model);
+		this.setYear(year);
+		this.setRentalPlace(rentalPlace);
+		this.setCostPerDay(costPerDay);
+		
 	}
 
 	public String getLocation() {
