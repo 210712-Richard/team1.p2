@@ -1,6 +1,5 @@
 package com.revature.beans;
 
-import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.UUID;
