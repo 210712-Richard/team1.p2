@@ -16,11 +16,14 @@ import org.springframework.web.server.WebSession;
 
 import com.revature.beans.User;
 import com.revature.services.UserService;
+import com.revature.services.UserServiceImpl;
+
+import reactor.core.publisher.Mono;
 
 @RestController
 @RequestMapping("/users")
-public class UserControllerImpl {
-	private static Logger log = LogManager.getLogger(UserControllerImpl.class);
+public class UserControllerImpl implements UserController{
+	private static Logger log = LogManager.getLogger(UserServiceImpl.class);
 	
 	UserService userService;
 	
@@ -30,17 +33,17 @@ public class UserControllerImpl {
 	}
 	
 	@PostMapping
-	public ResponseEntity<User> login(@RequestBody User user, WebSession session){
+	public Mono<ResponseEntity<User>> login(@RequestBody User user, WebSession session){
 		return null;
 	}
 	
 	@DeleteMapping
-	public ResponseEntity<Void> logout(WebSession session){
+	public Mono<ResponseEntity<Void>> logout(WebSession session){
 		return null;
 	}
 	
 	@PutMapping(value="{username}", produces=MediaType.APPLICATION_NDJSON_VALUE) 
-	public ResponseEntity<User> register(@RequestBody User user, @PathVariable("username") String name){
+	public Mono<ResponseEntity<User>> register(@RequestBody User user, @PathVariable("username") String name){
 		return null;
 	}
 

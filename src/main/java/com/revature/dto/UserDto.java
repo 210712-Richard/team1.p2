@@ -18,7 +18,7 @@ import com.revature.beans.UserType;
 public class UserDto {
 	@PrimaryKeyColumn(name = "username", ordinal = 0, type = PrimaryKeyType.PARTITIONED)
 	private String username;
-	@PrimaryKeyColumn(name = "username", ordinal = 1, type = PrimaryKeyType.CLUSTERED, ordering = Ordering.DESCENDING)
+	@PrimaryKeyColumn(name = "password", ordinal = 1, type = PrimaryKeyType.CLUSTERED, ordering = Ordering.DESCENDING)
 	private String password;
 	private String email;
 	private String firstName;
