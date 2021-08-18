@@ -1,4 +1,4 @@
-package com.revature.controller;
+package com.revature.controllers;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -10,14 +10,17 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.WebSession;
 
 import com.revature.beans.User;
-import com.revature.controller.UserControllerImpl;
 import com.revature.services.UserService;
 
 import reactor.core.publisher.Mono;
 
+@RestController
+@RequestMapping("/users")
 public class UserControllerImpl {
 	@Autowired
 	private UserService userService;
@@ -53,7 +56,7 @@ public class UserControllerImpl {
 		}
 		
 		// As a user, I can register.
-		@PutMapping(value="/{username}", produces=MediaType.APPLICATION_JSON_VALUE)
+		@PutMapping("{username}")
 		public ResponseEntity<Object> register(@RequestBody User u, @PathVariable("username") String username) {
 			// check to see if that username is available
 			if (userService.checkAvailability(username)) {

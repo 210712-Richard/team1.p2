@@ -48,7 +48,7 @@ public class UserServiceTests {
 		user.setFirstName("Test");
 		user.setLastName("User");
 		user.setBirthday(LocalDate.now());
-		user.setType(UserType.VACTIONER);
+		user.setType(UserType.VACATIONER);
 	}
 	
 	@Test

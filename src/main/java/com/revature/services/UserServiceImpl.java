@@ -1,14 +1,11 @@
 package com.revature.services;
 
 import java.time.LocalDate;
-import java.util.List;
-import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 
 import com.revature.beans.User;
 import com.revature.beans.UserType;
@@ -51,7 +48,7 @@ public class UserServiceImpl implements UserService {
 	} 			
 	
 	public boolean checkAvailability(String newName) {
-		Mono<UserDto> u = userDao.findByUserName(newName);
+		Mono<UserDto> u = userDao.findByUsername(newName);
 		return (u == null) ? false : true;
 }
 }
