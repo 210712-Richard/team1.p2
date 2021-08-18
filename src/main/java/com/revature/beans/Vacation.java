@@ -31,13 +31,13 @@ public class Vacation {
 	public Vacation(String username, UUID id, String destination, LocalDateTime startTime, LocalDateTime endTime,
 			Integer partySize, Integer duration) {
 		super();
-		this.username = username;
-		this.id = id;
-		this.destination = destination;
-		this.startTime = startTime;
-		this.endTime = endTime;
-		this.partySize = partySize;
-		this.duration = duration;
+		this.setUsername(username);
+		this.setId(id);
+		this.setDestination(destination);
+		this.setStartTime(startTime);
+		this.setEndTime(endTime);
+		this.setPartySize(partySize);
+		this.setDuration(duration);
 	}
 
 	public String getUsername() {

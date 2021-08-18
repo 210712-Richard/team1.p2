@@ -32,39 +32,31 @@ public class VacationDto {
 	private Double total;
 	private Integer partySize;
 	private Integer duration;
-	
+
 	public VacationDto() {
 		flights = new ArrayList<>();
 		hotels = new ArrayList<>();
 		cars = new ArrayList<>();
 	}
-	
+
 	public VacationDto(Vacation v) {
 		this();
-		this.username = v.getUsername();
-		this.id = v.getId();
-		this.destination = v.getDestination();
-		this.startTime = v.getStartTime().toInstant(ZoneOffset.UTC);
-		this.endTime = v.getEndTime().toInstant(ZoneOffset.UTC);
-		this.total = v.getTotal();
-		this.partySize = v.getPartySize();
-		this.duration = v.getDuration();
-		
-		v.getFlights().stream().forEach((f)->{
-			this.flights.add(f.getId());
-		});
-		
-		v.getHotels().stream().forEach((h)->{
-			this.hotels.add(h.getId());
-		});
-		
-		v.getCars().stream().forEach((c)->{
-			this.cars.add(c.getId());
-		});
-		
-		v.getActivities().stream().forEach((a)->{
-			this.activities.add(a.getId());
-		});
+		this.setUsername(v.getUsername());
+		this.setId(v.getId());
+		this.setDestination(v.getDestination());
+		this.setStartTime(v.getStartTime().toInstant(ZoneOffset.UTC));
+		this.setEndTime(v.getEndTime().toInstant(ZoneOffset.UTC));
+		this.setTotal(v.getTotal());
+		this.setPartySize(v.getPartySize());
+		this.setDuration(v.getDuration());
+
+		v.getFlights().stream().forEach(f -> this.flights.add(f.getId()));
+
+		v.getHotels().stream().forEach(h -> this.hotels.add(h.getId()));
+
+		v.getCars().stream().forEach(c -> this.cars.add(c.getId()));
+
+		v.getActivities().stream().forEach(a -> this.activities.add(a.getId()));
 	}
 
 	public String getUsername() {
@@ -114,7 +106,7 @@ public class VacationDto {
 	public void setCars(List<UUID> cars) {
 		this.cars = cars;
 	}
-	
+
 	public List<UUID> getActivities() {
 		return activities;
 	}
@@ -162,10 +154,10 @@ public class VacationDto {
 	public void setDuration(Integer duration) {
 		this.duration = duration;
 	}
-	
+
 	public Vacation getVacation() {
 		Vacation v = new Vacation();
-		
+
 		v.setUsername(username);
 		v.setId(id);
 		v.setDestination(destination);
@@ -174,7 +166,7 @@ public class VacationDto {
 		v.setTotal(total);
 		v.setPartySize(partySize);
 		v.setDuration(duration);
-		
+
 		return v;
 	}
 
@@ -208,5 +200,5 @@ public class VacationDto {
 				+ startTime + ", endTime=" + endTime + ", total=" + total + ", partySize=" + partySize + ", duration="
 				+ duration + "]";
 	}
-	
+
 }

@@ -16,11 +16,11 @@ public class Hotel {
 
 	public Hotel(String location, UUID id, String name, Double costPerNight, Integer roomsAvailable) {
 		super();
-		this.location = location;
-		this.id = id;
-		this.name = name;
-		this.costPerNight = costPerNight;
-		this.roomsAvailable = roomsAvailable;
+		this.setLocation(location);
+		this.setId(id);
+		this.setName(name);
+		this.setCostPerNight(costPerNight);
+		this.setRoomsAvailable(roomsAvailable);
 	}
 
 	public String getLocation() {

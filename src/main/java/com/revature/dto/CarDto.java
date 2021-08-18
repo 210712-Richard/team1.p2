@@ -28,14 +28,14 @@ public class CarDto {
 	}
 
 	public CarDto(Car c) {
-		this.location = c.getLocation();
-		this.id = c.getId();
-		this.make = c.getMake();
-		this.model = c.getModel();
-		this.year = c.getYear();
-		this.rentalPlace = c.getRentalPlace();
-		this.costPerDay = c.getCostPerDay();
-		this.inUse = c.getInUse();
+		this.setLocation(c.getLocation());
+		this.setId(c.getId());
+		this.setMake(c.getMake());
+		this.setModel(c.getModel());
+		this.setYear(c.getYear());
+		this.setRentalPlace(c.getRentalPlace());
+		this.setCostPerDay(c.getCostPerDay());
+		this.setInUse(c.getInUse());
 	}
 
 	public String getLocation() {
