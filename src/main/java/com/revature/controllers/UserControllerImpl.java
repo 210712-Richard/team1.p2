@@ -1,4 +1,4 @@
-package com.revature.controllers;
+package com.revature.controller;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -10,41 +10,58 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.WebSession;
 
 import com.revature.beans.User;
+import com.revature.controller.UserControllerImpl;
 import com.revature.services.UserService;
-import com.revature.services.UserServiceImpl;
 
 import reactor.core.publisher.Mono;
 
-@RestController
-@RequestMapping("/users")
-public class UserControllerImpl implements UserController{
-	private static Logger log = LogManager.getLogger(UserServiceImpl.class);
-	
-	UserService userService;
-	
+public class UserControllerImpl {
 	@Autowired
-	public UserControllerImpl(UserService userService) {
-		this.userService = userService;
-	}
+	private UserService userService;
 	
-	@PostMapping
-	public Mono<ResponseEntity<User>> login(@RequestBody User user, WebSession session){
-		return null;
-	}
-	
-	@DeleteMapping
-	public Mono<ResponseEntity<Void>> logout(WebSession session){
-		return null;
-	}
-	
-	@PutMapping(value="{username}", produces=MediaType.APPLICATION_NDJSON_VALUE) 
-	public Mono<ResponseEntity<User>> register(@RequestBody User user, @PathVariable("username") String name){
-		return null;
-	}
+	private static final Logger log = LogManager.getLogger(UserControllerImpl.class);
 
+	
+	// As a user, I can log in.
+		@PostMapping // ("/users")
+		public Mono<ResponseEntity<User>> login(@RequestBody User user, WebSession session){
+			if(user == null) {
+				return Mono.just(ResponseEntity.badRequest().build());
+			}
+			
+			return userService.login(user.getUsername(), user.getPassword())
+					.single().map(u -> { 
+						if(u == null) {
+							return ResponseEntity.notFound().build();
+						}
+						
+						else {
+							session.getAttributes().put("loggedUser", u);
+							return ResponseEntity.ok(u);
+						}
+					});		
+		}
+
+		// As a user, I can log out.
+		@DeleteMapping
+		public ResponseEntity<Void> logout(WebSession session) {
+			session.invalidate();
+			return ResponseEntity.noContent().build();
+		}
+		
+		// As a user, I can register.
+		@PutMapping(value="/{username}", produces=MediaType.APPLICATION_JSON_VALUE)
+		public ResponseEntity<Object> register(@RequestBody User u, @PathVariable("username") String username) {
+			// check to see if that username is available
+			if (userService.checkAvailability(username)) {
+				// actually register the user
+				Mono<User> created = userService.register(username,u.getPassword(), u.getEmail(), u.getFirstName(), u.getLastName(), u.getBirthday(),u.getType());
+				return ResponseEntity.ok(created);
+			} else {
+				return ResponseEntity.status(409).contentType(MediaType.TEXT_HTML).body("<html><body><div>CONFLICT</div></body></html>");
+			}
+		}
 }
