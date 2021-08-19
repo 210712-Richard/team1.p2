@@ -1,5 +1,7 @@
 package com.revature.controllers;
 
+import java.util.UUID;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.WebSession;
 
+import com.revature.aspects.LoggedInMono;
 import com.revature.beans.User;
 import com.revature.beans.UserType;
 import com.revature.beans.Vacation;
@@ -34,9 +37,10 @@ public class UserControllerImpl implements UserController {
 
 	@PostMapping
 	public Mono<ResponseEntity<User>> login(@RequestBody User user, WebSession session) {
-		return null;
+		session.getAttributes().put("loggedUser", user);
+		return Mono.just(ResponseEntity.ok(user));
 	}
-
+	
 	@DeleteMapping
 	public Mono<ResponseEntity<Void>> logout(WebSession session) {
 		return null;
@@ -57,16 +61,11 @@ public class UserControllerImpl implements UserController {
 
 	}
 
+	@LoggedInMono
 	@PostMapping("{username}/vacations")
 	public Mono<ResponseEntity<Vacation>> createVacation(@RequestBody Vacation vacation,
 			@PathVariable("username") String username, WebSession session) {
 		User loggedUser = (User) session.getAttribute("loggedUser");
-		log.debug("Logged in user: " + loggedUser);
-
-		// If the user is not logged in
-		if (loggedUser == null) {
-			return Mono.just(ResponseEntity.status(401).build());
-		}
 
 		// If the logged in user is not the same user specified or is not a vacationer
 		if (!username.equals(loggedUser.getUsername()) || !UserType.VACATIONER.equals(loggedUser.getType())) {
@@ -81,6 +80,30 @@ public class UserControllerImpl implements UserController {
 						return Mono.just(ResponseEntity.status(201).body(v));
 					}
 				});
+	}
+
+	@LoggedInMono
+	@Override
+	public Mono<ResponseEntity<Vacation>> getVacation(@PathVariable("username") String username, @PathVariable("vacationid") String id, WebSession session) {
+		User loggedUser = (User) session.getAttribute("loggedUser");
+		
+		if (!username.equals(loggedUser.getUsername())) {
+			return Mono.just(ResponseEntity.status(403).build());
+		}
+		UUID vacId = null;
+		try {
+			vacId = UUID.fromString(id);
+		} catch (Exception e) {
+			return Mono.just(ResponseEntity.badRequest().build());
+		}
+		return userService.getVacation(username, vacId).map(v->{
+			if (v.getId() == null) {
+				return ResponseEntity.notFound().build();
+			}
+			else {
+				return ResponseEntity.ok(v);
+			}
+		});
 	}
 
 }
