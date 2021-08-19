@@ -15,6 +15,8 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.WebSession;
 
 import com.revature.beans.User;
+import com.revature.beans.UserType;
+import com.revature.beans.Vacation;
 import com.revature.services.UserService;
 import com.revature.services.UserServiceImpl;
 
@@ -22,45 +24,72 @@ import reactor.core.publisher.Mono;
 
 @RestController
 @RequestMapping("/users")
-public class UserControllerImpl implements UserController{
+public class UserControllerImpl implements UserController {
 	private static Logger log = LogManager.getLogger(UserServiceImpl.class);
-	
+
 	UserService userService;
-	
+
 	@Autowired
 	public UserControllerImpl(UserService userService) {
 		this.userService = userService;
 	}
-	
+
 	@PostMapping
-	public Mono<ResponseEntity<User>> login(@RequestBody User user, WebSession session){
-		if(user == null) {
+	public Mono<ResponseEntity<User>> login(@RequestBody User user, WebSession session) {
+		if (user == null) {
 			return Mono.just(ResponseEntity.badRequest().build());
 		}
-		
-		return userService.login(user.getUsername(), user.getPassword())
-				.single().map(u -> { 
-					if(u == null) {
-						return ResponseEntity.notFound().build();
-					}
-					
-					else {
-						session.getAttributes().put("loggedUser", u);
-						return ResponseEntity.ok(u);
-					}
-				});
+
+		return userService.login(user.getUsername(), user.getPassword()).single().map(u -> {
+			log.debug("User from the map: " + u);
+			if (u.getUsername() == null) {
+				return ResponseEntity.notFound().build();
+			}
+
+			else {
+				session.getAttributes().put("loggedUser", u);
+				return ResponseEntity.ok(u);
+			}
+		});
 	}
-	
+
 	@DeleteMapping
-	public Mono<ResponseEntity<Void>> logout(WebSession session){
+	public Mono<ResponseEntity<Void>> logout(WebSession session) {
 		session.invalidate();
-		
+
 		return Mono.just(ResponseEntity.ok().build());
 	}
-	
-	@PutMapping(value="{username}", produces=MediaType.APPLICATION_NDJSON_VALUE) 
-	public Mono<ResponseEntity<User>> register(@RequestBody User user, @PathVariable("username") String name){
+
+	@PutMapping(value = "{username}", produces = MediaType.APPLICATION_NDJSON_VALUE)
+	public Mono<ResponseEntity<User>> register(@RequestBody User user, @PathVariable("username") String name) {
 		return null;
+	}
+
+	@PostMapping("{username}/vacations")
+	public Mono<ResponseEntity<Vacation>> createVacation(@RequestBody Vacation vacation,
+			@PathVariable("username") String username, WebSession session) {
+		User loggedUser = (User) session.getAttribute("loggedUser");
+		log.debug("Logged in user: " + loggedUser);
+
+		// If the user is not logged in
+		if (loggedUser == null) {
+			return Mono.just(ResponseEntity.status(401).build());
+		}
+
+		// If the logged in user is not the same user specified or is not a vacationer
+		if (loggedUser.getUsername() != username || !UserType.VACATIONER.equals(loggedUser.getType())) {
+			return Mono.just(ResponseEntity.status(403).build());
+		}
+
+		return userService.createVacation(username, vacation.getDestination(), vacation.getStartTime(),
+				vacation.getEndTime(), vacation.getPartySize(), vacation.getDuration()).flatMap(v->{
+					if (v.getId() == null) {
+						return Mono.just(ResponseEntity.status(400).build());
+					}
+					else {
+						return Mono.just(ResponseEntity.status(201).body(v));
+					}
+				});
 	}
 
 }
