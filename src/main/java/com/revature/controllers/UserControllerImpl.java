@@ -37,7 +37,7 @@ public class UserControllerImpl implements UserController {
 
 	@PostMapping
 
-	public Mono<ResponseEntity<User>> login(@RequestBody User user, WebSession session){
+	public Mono<ResponseEntity<User>> login(@RequestBody User user, WebSession session) {
 		if (user == null) {
 			return Mono.just(ResponseEntity.badRequest().build());
 		}
@@ -53,11 +53,11 @@ public class UserControllerImpl implements UserController {
 			}
 		});
 	}
-	
+
 	@DeleteMapping
 	public Mono<ResponseEntity<Void>> logout(WebSession session) {
 		session.invalidate();
-		
+
 		return Mono.just(ResponseEntity.noContent().build());
 	}
 
@@ -83,7 +83,8 @@ public class UserControllerImpl implements UserController {
 		User loggedUser = (User) session.getAttribute("loggedUser");
 
 		// If the logged in user is not the same user specified or is not a vacationer
-		if (!username.equals(loggedUser.getUsername()) || !UserType.VACATIONER.equals(loggedUser.getType())) {
+		if (loggedUser == null || !username.equals(loggedUser.getUsername())
+				|| !UserType.VACATIONER.equals(loggedUser.getType())) {
 			return Mono.just(ResponseEntity.status(403).build());
 		}
 
@@ -99,26 +100,9 @@ public class UserControllerImpl implements UserController {
 
 	@LoggedInMono
 	@Override
-	public Mono<ResponseEntity<Vacation>> getVacation(@PathVariable("username") String username, @PathVariable("vacationid") String id, WebSession session) {
-		User loggedUser = (User) session.getAttribute("loggedUser");
-		
-		if (loggedUser == null || !username.equals(loggedUser.getUsername())) {
-			return Mono.just(ResponseEntity.status(403).build());
-		}
-		UUID vacId = null;
-		try {
-			vacId = UUID.fromString(id);
-		} catch (Exception e) {
-			return Mono.just(ResponseEntity.badRequest().build());
-		}
-		return userService.getVacation(username, vacId).map(v->{
-			if (v.getId() == null) {
-				return ResponseEntity.notFound().build();
-			}
-			else {
-				return ResponseEntity.ok(v);
-			}
-		});
+	public Mono<ResponseEntity<Vacation>> getVacation(@PathVariable("username") String username,
+			@PathVariable("vacationid") String id, WebSession session) {
+		return null;
 	}
 
 }

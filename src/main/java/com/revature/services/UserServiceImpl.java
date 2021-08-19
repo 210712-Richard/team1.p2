@@ -99,15 +99,6 @@ public class UserServiceImpl implements UserService {
 	}
 	@Override
 	public Mono<Vacation> getVacation(String username, UUID id) {
-		Mono<VacationDto> monoVac = vacDao.findByUsernameAndId(username, id)
-				.switchIfEmpty(Mono.empty());
-		
-		Mono<List<Reservation>> reserveds = Flux.from(vacDao.findByUsernameAndId(username, id))
-				.map(vac -> vac.getReservations())
-				.flatMap(l -> Flux.fromIterable(l))
-				.flatMap(uuid -> resDao.findByUuid(uuid))
-				.map(r->r.getReservation())
-				.collectList();
 		return null;
 	}
 
