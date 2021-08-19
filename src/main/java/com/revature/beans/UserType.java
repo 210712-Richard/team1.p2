@@ -1,5 +1,5 @@
 package com.revature.beans;
 
 public enum UserType {
-	VACTIONER, HOTEL_STAFF, CAR_STAFF, FLIGHT_STAFF
+	VACATIONER, HOTEL_STAFF, CAR_STAFF, FLIGHT_STAFF
 }

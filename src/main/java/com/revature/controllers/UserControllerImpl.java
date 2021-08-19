@@ -34,21 +34,20 @@ public class UserControllerImpl implements UserController{
 	
 	@PostMapping
 	public Mono<ResponseEntity<User>> login(@RequestBody User user, WebSession session){
-		if(user == null) {
+		if (user == null) {
 			return Mono.just(ResponseEntity.badRequest().build());
 		}
-		
-		return userService.login(user.getUsername(), user.getPassword())
-				.single().map(u -> { 
-					if(u == null) {
-						return ResponseEntity.notFound().build();
-					}
-					
-					else {
-						session.getAttributes().put("loggedUser", u);
-						return ResponseEntity.ok(u);
-					}
-				});
+
+		return userService.login(user.getUsername(), user.getPassword()).single().map(u -> {
+			if (u.getUsername() == null) {
+				return ResponseEntity.notFound().build();
+			}
+
+			else {
+				session.getAttributes().put("loggedUser", u);
+				return ResponseEntity.ok(u);
+			}
+		});
 	}
 	
 	@DeleteMapping
