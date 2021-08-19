@@ -17,6 +17,7 @@ import com.revature.data.HotelDao;
 import com.revature.data.UserDao;
 import com.revature.data.VacationDao;
 import com.revature.dto.VacationDto;
+import com.revature.dto.UserDto;
 
 import reactor.core.publisher.Mono;
 
@@ -39,13 +40,24 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public Mono<User> login(String username, String password) {
-		return null;
+		Mono<User> usern = userDao.findByUsernameAndPassword(username, password).map(user -> user.getUser());
+
+		return usern;
 	}
 
 	@Override
 	public Mono<User> register(String username, String password, String email, String firstName, String lastName,
 			LocalDate birthday, UserType type) {
-		return null;
+		
+		User user = new User();
+		user.setUsername(username);
+		user.setPassword(password);
+		user.setEmail(email);
+		user.setFirstName(firstName);
+		user.setLastName(lastName);
+		user.setBirthday(birthday);
+		user.setType(type);
+		return userDao.save(new UserDto(user)).map(uDto -> uDto.getUser());
 	}
 
 	@Override
@@ -55,8 +67,8 @@ public class UserServiceImpl implements UserService {
 		if (!endTime.isAfter(startTime)) {
 			return Mono.just(new Vacation());
 		}
-		
-		//Create the new vacation
+
+		// Create the new vacation
 		Vacation vac = new Vacation();
 		vac.setUsername(username);
 		vac.setId(UUID.randomUUID());
@@ -65,21 +77,21 @@ public class UserServiceImpl implements UserService {
 		vac.setEndTime(endTime);
 		vac.setPartySize(partySize);
 		vac.setDuration(duration);
-		
-		
-		//Save the vacation id to the user and save the vacation to the database
-		return userDao.findByUsername(username)
-		.flatMap(u -> {
-			//Make sure vacations list isn't null
+
+		// Save the vacation id to the user and save the vacation to the database
+		return userDao.findByUsername(username).flatMap(u -> {
+			// Make sure vacations list isn't null
 			if (u.getVacations() == null) {
 				u.setVacations(new ArrayList<>());
 			}
-			//Add the vacation id to the user's list and save the user
+			// Add the vacation id to the user's list and save the user
 			u.getVacations().add(vac.getId());
 			return userDao.save(u);
-			//Return the vacation object after saving the vacation to the database
-		}).zipWith(vacDao.save(new VacationDto(vac)))
-		.flatMap(t ->Mono.just(t.getT2().getVacation()));
+			// Return the vacation object after saving the vacation to the database
+		}).zipWith(vacDao.save(new VacationDto(vac))).flatMap(t -> Mono.just(t.getT2().getVacation()));
 	}
 
+	public Mono<Boolean> checkAvailability(String newName) {
+		return userDao.existsByUsername(newName);
+	}
 }

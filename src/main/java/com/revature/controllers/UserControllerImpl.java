@@ -3,7 +3,6 @@ package com.revature.controllers;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -18,14 +17,13 @@ import com.revature.beans.User;
 import com.revature.beans.UserType;
 import com.revature.beans.Vacation;
 import com.revature.services.UserService;
-import com.revature.services.UserServiceImpl;
 
 import reactor.core.publisher.Mono;
 
 @RestController
 @RequestMapping("/users")
 public class UserControllerImpl implements UserController {
-	private static Logger log = LogManager.getLogger(UserServiceImpl.class);
+	private static Logger log = LogManager.getLogger(UserControllerImpl.class);
 
 	UserService userService;
 
@@ -44,9 +42,19 @@ public class UserControllerImpl implements UserController {
 		return null;
 	}
 
-	@PutMapping(value = "{username}", produces = MediaType.APPLICATION_NDJSON_VALUE)
-	public Mono<ResponseEntity<User>> register(@RequestBody User user, @PathVariable("username") String name) {
-		return null;
+	@PutMapping("{username}")
+	public Mono<ResponseEntity<User>> register(@RequestBody User u, @PathVariable("username") String username) {
+		// check to see if that username is available
+		return userService.checkAvailability(username).flatMap(b -> {
+			if (!b) {
+				return userService.register(username, u.getPassword(), u.getEmail(), u.getFirstName(), u.getLastName(),
+						u.getBirthday(), u.getType()).map(user -> ResponseEntity.status(201).body(user));
+			} else {
+				return Mono.just(ResponseEntity.status(409).build());
+			}
+
+		});
+
 	}
 
 	@PostMapping("{username}/vacations")
@@ -66,11 +74,10 @@ public class UserControllerImpl implements UserController {
 		}
 
 		return userService.createVacation(username, vacation.getDestination(), vacation.getStartTime(),
-				vacation.getEndTime(), vacation.getPartySize(), vacation.getDuration()).flatMap(v->{
+				vacation.getEndTime(), vacation.getPartySize(), vacation.getDuration()).flatMap(v -> {
 					if (v.getId() == null) {
 						return Mono.just(ResponseEntity.status(400).build());
-					}
-					else {
+					} else {
 						return Mono.just(ResponseEntity.status(201).body(v));
 					}
 				});

@@ -17,4 +17,6 @@ public interface UserService {
 
 	public Mono<Vacation> createVacation(String username, String destination, LocalDateTime startTime,
 			LocalDateTime endTime, Integer partySize, Integer duration);
+	
+	public Mono<Boolean> checkAvailability(String username);
 }
