@@ -65,7 +65,7 @@ public class UserServiceTests {
 	}
 
 	@Test
-	public void testLoginValid() {
+	void testLoginValid() {
 		ArgumentCaptor<String> usernameCaptor = ArgumentCaptor.forClass(String.class);
 		ArgumentCaptor<String> passwordCaptor = ArgumentCaptor.forClass(String.class);
 
@@ -86,7 +86,7 @@ public class UserServiceTests {
 	}
 
 	@Test
-	public void testLoginInvalid() {
+	void testLoginInvalid() {
 		ArgumentCaptor<String> usernameCaptor = ArgumentCaptor.forClass(String.class);
 		ArgumentCaptor<String> passwordCaptor = ArgumentCaptor.forClass(String.class);
 
@@ -107,7 +107,7 @@ public class UserServiceTests {
 	}
 
 	@Test
-	public void testRegisterValid() {
+	void testRegisterValid() {
 
 		//Capture arguments
 		ArgumentCaptor<UserDto> userCaptor = ArgumentCaptor.forClass(UserDto.class);
@@ -197,7 +197,9 @@ public class UserServiceTests {
 		Mockito.verifyNoInteractions(vacDao);
 		Mockito.verifyNoInteractions(userDao);
 	}
-	public void testCheckAvailabilityValid() {
+	
+	@Test
+	void testCheckAvailabilityValid() {
 		Mockito.when(userDao.existsByUsername(user.getUsername())).thenReturn(Mono.just(true));
 		
 		Mono<Boolean> monoBool = service.checkAvailability(user.getUsername());
@@ -205,13 +207,9 @@ public class UserServiceTests {
 		StepVerifier.create(monoBool).expectNextMatches(b -> b.equals(true)).verifyComplete();
 	}
 
+
 	@Test
-	public void testRegisterInvalid() {
-
-	}
-
-
-	public void testCheckAvailabilityInvalid() {
+	void testCheckAvailabilityInvalid() {
 		Mockito.when(userDao.existsByUsername("wrong")).thenReturn(Mono.just(false));
 		
 		Mono<Boolean> monoBool = service.checkAvailability("wrong");

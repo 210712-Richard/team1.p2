@@ -52,7 +52,9 @@ public class UserControllerImpl implements UserController {
 
 	@DeleteMapping
 	public Mono<ResponseEntity<Void>> logout(WebSession session) {
-		return null;
+		session.invalidate();
+		
+		return Mono.just(ResponseEntity.noContent().build());
 	}
 
 	@PutMapping("{username}")
