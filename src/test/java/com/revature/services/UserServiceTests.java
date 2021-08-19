@@ -1,7 +1,5 @@
 package com.revature.services;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Period;
@@ -10,7 +8,6 @@ import java.util.UUID;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -65,75 +62,17 @@ public class UserServiceTests {
 
 	@Test
 	public void testLoginValid() {
-		ArgumentCaptor<String> usernameCaptor = ArgumentCaptor.forClass(String.class);
-		ArgumentCaptor<String> passwordCaptor = ArgumentCaptor.forClass(String.class);
-
-		Mockito.when(userDao.findByUsernameAndPassword(user.getUsername(), user.getPassword()))
-				.thenReturn(Mono.just(new UserDto(user)));
-
-		Mono<User> monoUser = service.login(user.getUsername(), user.getPassword());
-
-		Mockito.verify(userDao).findByUsernameAndPassword(usernameCaptor.capture(), passwordCaptor.capture());
-
-		StepVerifier.create(monoUser).expectNextMatches(u -> u.equals(user)).verifyComplete();
-
-		assertEquals(user.getUsername(), usernameCaptor.getValue(),
-				"Assert that the username passed in is the same username.");
-		assertEquals(user.getPassword(), passwordCaptor.getValue(),
-				"Assert that the password passed in is the same password.");
-
+		
 	}
 
 	@Test
 	public void testLoginInvalid() {
-		Mockito.when(userDao.findByUsernameAndPassword(Mockito.anyString(), Mockito.anyString()))
-				.thenReturn(Mono.empty());
-
-		Mono<User> monoUser = service.login(user.getUsername(), "Wrong");
-		StepVerifier.create(monoUser).expectNextMatches(u -> u.getUsername() == null).verifyComplete();
-
-		monoUser = service.login("Wrong", user.getPassword());
-		StepVerifier.create(monoUser).expectNextMatches(u -> u.getUsername() == null).verifyComplete();
-
+		
 	}
 
 	@Test
 	public void testRegisterValid() {
-		// Capture arguments
-		ArgumentCaptor<UserDto> userCaptor = ArgumentCaptor.forClass(UserDto.class);
-
-		// Set Mock returns
-		Mockito.when(userDao.save(new UserDto(user))).thenReturn(Mono.just(new UserDto(user)));
-
-		// Call the method
-		Mono<User> monoUser = service.register(user.getUsername(), user.getPassword(), user.getEmail(),
-				user.getFirstName(), user.getLastName(), user.getBirthday(), user.getType());
-
-		// Verify the mono and flux are correct
-		StepVerifier.create(monoUser).expectNextMatches(u -> user.getUsername().equals(u.getUsername()))
-				.expectNextMatches(u -> user.getPassword().equals(u.getPassword()))
-				.expectNextMatches(u -> user.getEmail().equals(u.getEmail()))
-				.expectNextMatches(u -> user.getFirstName().equals(u.getFirstName()))
-				.expectNextMatches(u -> user.getLastName().equals(u.getLastName()))
-				.expectNextMatches(u -> user.getBirthday().equals(u.getBirthday()))
-				.expectNextMatches(u -> user.getType().equals(u.getType())).verifyComplete();
-
-		// Verify methods inside were called
-		Mockito.verify(userDao).save(userCaptor.capture());
-
-		// Make sure the captured value is correct
-		User capUser = userCaptor.getValue().getUser();
-		assertEquals(user.getUsername(), capUser.getUsername(), "Assert that user and capUser have the same username.");
-		assertEquals(user.getPassword(), capUser.getPassword(), "Assert that user and capUser have the same password.");
-		assertEquals(user.getEmail(), capUser.getEmail(), "Assert that the user and capUser have the same email.");
-		assertEquals(user.getBirthday(), capUser.getBirthday(),
-				"Assert that the user and capUser have the same birthday.");
-		assertEquals(user.getType(), capUser.getType(), "Assert that the user and capUser have the same type.");
-		assertEquals(user.getFirstName(), capUser.getFirstName(),
-				"Assert that the user and capUser have the same first name.");
-		assertEquals(user.getLastName(), capUser.getLastName(),
-				"Assert that the user and capUser have the same last name.");
-
+		
 	}
 
 	@Test
