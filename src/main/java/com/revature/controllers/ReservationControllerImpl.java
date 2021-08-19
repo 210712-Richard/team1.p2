@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -17,7 +18,6 @@ import com.revature.beans.Flight;
 import com.revature.beans.Hotel;
 import com.revature.beans.Reservation;
 import com.revature.services.ReservationService;
-import com.revature.services.UserServiceImpl;
 
 import reactor.core.publisher.Mono;
 
@@ -35,6 +35,7 @@ public class ReservationControllerImpl implements ReservationController {
 
 	@Override
 	@LoggedInMono
+	@PostMapping("{vacId}/hotel")
 	public Mono<ResponseEntity<Reservation>> reserveHotel(@RequestBody Hotel hotel, @PathVariable("vacId") String vacId,
 			WebSession session) {
 		return null;
@@ -42,6 +43,7 @@ public class ReservationControllerImpl implements ReservationController {
 
 	@Override
 	@LoggedInMono
+	@PostMapping("{vacId}/flight")
 	public Mono<ResponseEntity<Reservation>> reserveFlight(@RequestBody Flight flight,
 			@PathVariable("vacId") String vacId, WebSession session) {
 		return null;
@@ -57,6 +59,7 @@ public class ReservationControllerImpl implements ReservationController {
 
 	@Override
 	@LoggedInMono
+	@PutMapping("{vacId}/status")
 	public Mono<ResponseEntity<Reservation>> confirmReservation(@PathVariable("vacId") String resId,
 			WebSession session) {
 		return null;

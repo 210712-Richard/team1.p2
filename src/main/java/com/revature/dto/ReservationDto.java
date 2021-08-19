@@ -18,7 +18,7 @@ import com.revature.beans.ReservationType;
 @Table("reservation")
 public class ReservationDto {
 	@PrimaryKeyColumn(name = "id", ordinal = 1, type = PrimaryKeyType.PARTITIONED)
-	private UUID id;
+	private UUID uuid;
 	@PrimaryKeyColumn(name = "type", ordinal = 1, type = PrimaryKeyType.CLUSTERED, ordering = Ordering.DESCENDING)
 	private String type;
 	@PrimaryKeyColumn(name = "reservedId", ordinal = 2, type = PrimaryKeyType.CLUSTERED, ordering = Ordering.DESCENDING)
@@ -56,11 +56,11 @@ public class ReservationDto {
 	}
 
 	public UUID getId() {
-		return id;
+		return uuid;
 	}
 
 	public void setId(UUID id) {
-		this.id = id;
+		this.uuid = id;
 	}
 
 	public UUID getVacationId() {
@@ -131,7 +131,7 @@ public class ReservationDto {
 		Reservation r = new Reservation();
 		
 		r.setType(ReservationType.valueOf(type));
-		r.setId(id);
+		r.setId(uuid);
 		r.setVacationId(vacationId);
 		r.setUsername(username);
 		r.setReservedName(reservedName);
@@ -145,7 +145,7 @@ public class ReservationDto {
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(cost, duration, id, reservedId, reservedName, starttime, status, type, username,
+		return Objects.hash(cost, duration, uuid, reservedId, reservedName, starttime, status, type, username,
 				vacationId);
 	}
 
@@ -159,7 +159,7 @@ public class ReservationDto {
 			return false;
 		ReservationDto other = (ReservationDto) obj;
 		return Objects.equals(cost, other.cost) && Objects.equals(duration, other.duration)
-				&& Objects.equals(id, other.id) && Objects.equals(reservedId, other.reservedId)
+				&& Objects.equals(uuid, other.uuid) && Objects.equals(reservedId, other.reservedId)
 				&& Objects.equals(reservedName, other.reservedName) && Objects.equals(starttime, other.starttime)
 				&& Objects.equals(status, other.status) && Objects.equals(type, other.type)
 				&& Objects.equals(username, other.username) && Objects.equals(vacationId, other.vacationId);
@@ -167,7 +167,7 @@ public class ReservationDto {
 
 	@Override
 	public String toString() {
-		return "ReservationDto [id=" + id + ", type=" + type + ", reservedId=" + reservedId + ", vacationId="
+		return "ReservationDto [id=" + uuid + ", type=" + type + ", reservedId=" + reservedId + ", vacationId="
 				+ vacationId + ", username=" + username + ", reservedName=" + reservedName + ", starttime=" + starttime
 				+ ", cost=" + cost + ", duration=" + duration + ", status=" + status + "]";
 	}

@@ -11,5 +11,5 @@ import reactor.core.publisher.Mono;
 
 @Repository
 public interface ReservationDao extends ReactiveCassandraRepository<ReservationDto, UUID> {
-	Mono<ReservationDto> findById(UUID id);
+	Mono<ReservationDto> findByUuid(UUID id);
 }
