@@ -142,4 +142,5 @@ public class UserServiceTests {
 		Mockito.verifyNoInteractions(vacDao);
 		Mockito.verifyNoInteractions(userDao);
 	}
+	
 }
