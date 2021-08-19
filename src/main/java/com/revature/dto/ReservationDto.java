@@ -12,6 +12,7 @@ import org.springframework.data.cassandra.core.mapping.PrimaryKeyColumn;
 import org.springframework.data.cassandra.core.mapping.Table;
 
 import com.revature.beans.Reservation;
+import com.revature.beans.ReservationStatus;
 import com.revature.beans.ReservationType;
 
 @Table("reservation")
@@ -28,6 +29,7 @@ public class ReservationDto {
 	private Instant starttime;
 	private Double cost;
 	private Integer duration;
+	private String status;
 	
 	public ReservationDto() {
 		super();
@@ -42,6 +44,7 @@ public class ReservationDto {
 		this.setStarttime(r.getStarttime().toInstant(ZoneOffset.UTC));
 		this.setCost(r.getCost());
 		this.setDuration(r.getDuration());
+		this.setStatus(r.getStatus().toString());
 	}
 
 	public String getType() {
@@ -108,6 +111,22 @@ public class ReservationDto {
 		this.duration = duration;
 	}
 	
+	public UUID getReservedId() {
+		return reservedId;
+	}
+
+	public void setReservedId(UUID reservedId) {
+		this.reservedId = reservedId;
+	}
+
+	public String getStatus() {
+		return status;
+	}
+
+	public void setStatus(String status) {
+		this.status = status;
+	}
+
 	public Reservation getReservation() {
 		Reservation r = new Reservation();
 		
@@ -119,13 +138,15 @@ public class ReservationDto {
 		r.setStarttime(LocalDateTime.ofInstant(starttime, ZoneOffset.UTC));
 		r.setCost(cost);
 		r.setDuration(duration);
+		r.setStatus(ReservationStatus.valueOf(status));
 		
 		return r;
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(cost, duration, id, starttime, type, username, vacationId);
+		return Objects.hash(cost, duration, id, reservedId, reservedName, starttime, status, type, username,
+				vacationId);
 	}
 
 	@Override
@@ -138,15 +159,17 @@ public class ReservationDto {
 			return false;
 		ReservationDto other = (ReservationDto) obj;
 		return Objects.equals(cost, other.cost) && Objects.equals(duration, other.duration)
-				&& Objects.equals(id, other.id) && Objects.equals(starttime, other.starttime)
-				&& Objects.equals(type, other.type) && Objects.equals(username, other.username)
-				&& Objects.equals(vacationId, other.vacationId);
+				&& Objects.equals(id, other.id) && Objects.equals(reservedId, other.reservedId)
+				&& Objects.equals(reservedName, other.reservedName) && Objects.equals(starttime, other.starttime)
+				&& Objects.equals(status, other.status) && Objects.equals(type, other.type)
+				&& Objects.equals(username, other.username) && Objects.equals(vacationId, other.vacationId);
 	}
 
 	@Override
 	public String toString() {
-		return "ReservationDto [type=" + type + ", id=" + id + ", vacationId=" + vacationId + ", username=" + username
-				+ ", starttime=" + starttime + ", cost=" + cost + ", duration=" + duration + "]";
+		return "ReservationDto [id=" + id + ", type=" + type + ", reservedId=" + reservedId + ", vacationId="
+				+ vacationId + ", username=" + username + ", reservedName=" + reservedName + ", starttime=" + starttime
+				+ ", cost=" + cost + ", duration=" + duration + ", status=" + status + "]";
 	}
 	
 }
