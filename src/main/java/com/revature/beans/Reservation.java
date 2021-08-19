@@ -20,13 +20,13 @@ public class Reservation {
 	public Reservation(ReservationType type, UUID id, UUID vacationId, String username, LocalDateTime starttime,
 			Double cost, Integer duration) {
 		super();
-		this.type = type;
-		this.id = id;
-		this.vacationId = vacationId;
-		this.username = username;
-		this.starttime = starttime;
-		this.cost = cost;
-		this.duration = duration;
+		this.setType(type);
+		this.setId(id);
+		this.setVacationId(vacationId);
+		this.setUsername(username);
+		this.setStarttime(starttime);
+		this.setCost(cost);
+		this.setDuration(duration);
 	}
 
 	public ReservationType getType() {
