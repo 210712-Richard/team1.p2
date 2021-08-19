@@ -69,16 +69,17 @@ public class UserServiceImpl implements UserService {
 		
 		//Save the vacation id to the user and save the vacation to the database
 		return userDao.findByUsername(username)
-		.flatMap((u) -> {
+		.flatMap(u -> {
+			//Make sure vacations list isn't null
 			if (u.getVacations() == null) {
 				u.setVacations(new ArrayList<>());
 			}
+			//Add the vacation id to the user's list and save the user
 			u.getVacations().add(vac.getId());
 			return userDao.save(u);
+			//Return the vacation object after saving the vacation to the database
 		}).zipWith(vacDao.save(new VacationDto(vac)))
-		.flatMap((t) -> {
-			return Mono.just(t.getT2().getVacation());
-		});
+		.flatMap(t ->Mono.just(t.getT2().getVacation()));
 	}
 
 }

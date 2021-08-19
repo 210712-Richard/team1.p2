@@ -81,7 +81,7 @@ public class UserServiceTests {
 	}
 
 	@Test
-	public void testCreateVacationValid() {
+	void testCreateVacationValid() {
 		Vacation vac = new Vacation();
 		vac.setUsername(user.getUsername());
 		vac.setId(UUID.randomUUID());
@@ -109,7 +109,7 @@ public class UserServiceTests {
 	}
 
 	@Test
-	public void testCreateVacationInvalid() {
+	void testCreateVacationInvalid() {
 		
 		//Check if end date is before start date
 		Vacation vac = new Vacation();
