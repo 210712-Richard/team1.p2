@@ -25,7 +25,7 @@ public class AuthenticationAspect {
 	public Object checkLoggedInMono(ProceedingJoinPoint pjp) throws Throwable {
 		log.trace("Checking if user is logged in");
 
-		if (!isLoggedIn(pjp.getArgs())) {
+		if (Boolean.FALSE.equals(isLoggedIn(pjp.getArgs()))) {
 			return Mono.just(ResponseEntity.status(401).build());
 		}
 		return pjp.proceed();
@@ -35,7 +35,7 @@ public class AuthenticationAspect {
 	public Object checkLoggedInFlux(ProceedingJoinPoint pjp) throws Throwable {
 		log.trace("Checking if user is logged in");
 
-		if (!isLoggedIn(pjp.getArgs())) {
+		if (Boolean.FALSE.equals(isLoggedIn(pjp.getArgs()))) {
 			return ResponseEntity.status(401).build();
 		}
 		return pjp.proceed();
@@ -44,7 +44,7 @@ public class AuthenticationAspect {
 	private Boolean isLoggedIn(Object[] args) {
 
 		WebSession session = (WebSession) Stream.of(args)
-				.filter(o -> o instanceof WebSession)
+				.filter(WebSession.class::isInstance)
 				.findFirst()
 				.orElse(null);
 		if (session == null) {
@@ -52,10 +52,8 @@ public class AuthenticationAspect {
 		}
 		User loggedUser = (User) session.getAttribute("loggedUser");
 		log.debug("Logged In user: " + loggedUser);
-		if (loggedUser == null) {
-			return false;
-		}
-		return true;
+		
+		return loggedUser == null ? false : true;
 	}
 
 	@Pointcut("@annotation(com.revature.aspects.LoggedInMono)")

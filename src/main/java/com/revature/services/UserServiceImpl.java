@@ -19,8 +19,8 @@ import com.revature.data.HotelDao;
 import com.revature.data.ReservationDao;
 import com.revature.data.UserDao;
 import com.revature.data.VacationDao;
-import com.revature.dto.VacationDto;
 import com.revature.dto.UserDto;
+import com.revature.dto.VacationDto;
 
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -33,15 +33,12 @@ public class UserServiceImpl implements UserService {
 
 	private VacationDao vacDao;
 
-	private HotelDao hotelDao;
-	
 	private ReservationDao resDao; 
 
 	@Autowired
 	public UserServiceImpl(UserDao userDao, VacationDao vacDao, HotelDao hotelDao, ReservationDao resDao) {
 		this.userDao = userDao;
 		this.vacDao = vacDao;
-		this.hotelDao = hotelDao;
 		this.resDao = resDao;
 	}
 
@@ -102,6 +99,15 @@ public class UserServiceImpl implements UserService {
 	}
 	@Override
 	public Mono<Vacation> getVacation(String username, UUID id) {
+		Mono<VacationDto> monoVac = vacDao.findByUsernameAndId(username, id)
+				.switchIfEmpty(Mono.empty());
+		
+		Mono<List<Reservation>> reserveds = Flux.from(vacDao.findByUsernameAndId(username, id))
+				.map(vac -> vac.getReservations())
+				.flatMap(l -> Flux.fromIterable(l))
+				.flatMap(uuid -> resDao.findByUuid(uuid))
+				.map(r->r.getReservation())
+				.collectList();
 		return null;
 	}
 
