@@ -51,12 +51,12 @@ public class VacationDto {
 		
 		if (v.getReservations() != null) {
 			for (Reservation res : v.getReservations())
-			this.reservations.add(res.getId());
+				this.reservations.add(res.getId());
 		}
 		
 		if (v.getActivities() != null) {
 			for (Activity act : v.getActivities())
-			this.activities.add(act.getId());
+				this.activities.add(act.getId());
 		}
 
 
