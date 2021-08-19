@@ -66,7 +66,6 @@ public class UserServiceImpl implements UserService {
 		vac.setPartySize(partySize);
 		vac.setDuration(duration);
 		
-		log.debug("Vacation being added: " + vac);
 		
 		//Save the vacation id to the user and save the vacation to the database
 		return userDao.findByUsername(username)
