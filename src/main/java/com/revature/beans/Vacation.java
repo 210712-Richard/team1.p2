@@ -10,9 +10,7 @@ public class Vacation {
 	private String username;
 	private UUID id;
 	private String destination;
-	private List<Flight> flights;
-	private List<Hotel> hotels;
-	private List<Car> cars;
+	private List<Reservation> reservations;
 	private List<Activity> activities;
 	private LocalDateTime startTime;
 	private LocalDateTime endTime;
@@ -21,9 +19,7 @@ public class Vacation {
 	private Integer duration;
 
 	public Vacation() {
-		flights = new ArrayList<>();
-		hotels = new ArrayList<>();
-		cars = new ArrayList<>();
+		reservations = new ArrayList<>();
 		activities = new ArrayList<>();
 		total = 0.00;
 	}
@@ -63,29 +59,13 @@ public class Vacation {
 	public void setDestination(String destination) {
 		this.destination = destination;
 	}
-
-	public List<Flight> getFlights() {
-		return flights;
+	
+	public List<Reservation> getReservations() {
+		return reservations;
 	}
 
-	public void setFlights(List<Flight> flights) {
-		this.flights = flights;
-	}
-
-	public List<Hotel> getHotels() {
-		return hotels;
-	}
-
-	public void setHotels(List<Hotel> hotels) {
-		this.hotels = hotels;
-	}
-
-	public List<Car> getCars() {
-		return cars;
-	}
-
-	public void setCars(List<Car> cars) {
-		this.cars = cars;
+	public void setReservations(List<Reservation> reservations) {
+		this.reservations = reservations;
 	}
 
 	public List<Activity> getActivities() {
@@ -138,8 +118,8 @@ public class Vacation {
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(activities, cars, destination, duration, endTime, flights, hotels, id, partySize, startTime,
-				total, username);
+		return Objects.hash(activities, destination, duration, endTime, id, partySize, reservations, startTime, total,
+				username);
 	}
 
 	@Override
@@ -151,20 +131,18 @@ public class Vacation {
 		if (getClass() != obj.getClass())
 			return false;
 		Vacation other = (Vacation) obj;
-		return Objects.equals(activities, other.activities) && Objects.equals(cars, other.cars)
-				&& Objects.equals(destination, other.destination) && Objects.equals(duration, other.duration)
-				&& Objects.equals(endTime, other.endTime) && Objects.equals(flights, other.flights)
-				&& Objects.equals(hotels, other.hotels) && Objects.equals(id, other.id)
-				&& Objects.equals(partySize, other.partySize) && Objects.equals(startTime, other.startTime)
+		return Objects.equals(activities, other.activities) && Objects.equals(destination, other.destination)
+				&& Objects.equals(duration, other.duration) && Objects.equals(endTime, other.endTime)
+				&& Objects.equals(id, other.id) && Objects.equals(partySize, other.partySize)
+				&& Objects.equals(reservations, other.reservations) && Objects.equals(startTime, other.startTime)
 				&& Objects.equals(total, other.total) && Objects.equals(username, other.username);
 	}
 
 	@Override
 	public String toString() {
-		return "Vacation [username=" + username + ", id=" + id + ", destination=" + destination + ", flights=" + flights
-				+ ", hotels=" + hotels + ", cars=" + cars + ", activities=" + activities + ", startTime=" + startTime
-				+ ", endTime=" + endTime + ", total=" + total + ", partySize=" + partySize + ", duration=" + duration
-				+ "]";
+		return "Vacation [username=" + username + ", id=" + id + ", destination=" + destination + ", reservations="
+				+ reservations + ", activities=" + activities + ", startTime=" + startTime + ", endTime=" + endTime
+				+ ", total=" + total + ", partySize=" + partySize + ", duration=" + duration + "]";
 	}
 
 	

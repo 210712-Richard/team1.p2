@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
 
 public class User {
 	private String username;
@@ -12,7 +13,7 @@ public class User {
 	private String firstName;
 	private String lastName;
 	private LocalDate birthday;
-	private List<Vacation> vacations;
+	private List<UUID> vacations;
 	private UserType type;
 	
 	public User() {
@@ -79,11 +80,11 @@ public class User {
 		this.birthday = birthday;
 	}
 
-	public List<Vacation> getVacations() {
+	public List<UUID> getVacations() {
 		return vacations;
 	}
 
-	public void setVacations(List<Vacation> vacations) {
+	public void setVacations(List<UUID> vacations) {
 		this.vacations = vacations;
 	}
 
