@@ -7,6 +7,7 @@ import java.util.UUID;
 public class Reservation {
 	private ReservationType type;
 	private UUID id;
+	private UUID reservedId;
 	private UUID vacationId;
 	private String username;
 	private String reservedName;
@@ -18,14 +19,14 @@ public class Reservation {
 		super();
 	}
 
-	public Reservation(ReservationType type, UUID id, UUID vacationId, String username, String reservedName,
+	public Reservation(ReservationType type, UUID id, UUID reservedId, UUID vacationId, String username,
 			LocalDateTime starttime) {
 		super();
 		this.setType(type);
 		this.setId(id);
+		this.setReservedId(reservedId);
 		this.setVacationId(vacationId);
 		this.setUsername(username);
-		this.setReservedName(reservedName);
 		this.setStarttime(starttime);
 	}
 
@@ -43,6 +44,14 @@ public class Reservation {
 
 	public void setId(UUID id) {
 		this.id = id;
+	}
+
+	public UUID getReservedId() {
+		return reservedId;
+	}
+
+	public void setReservedId(UUID reservedId) {
+		this.reservedId = reservedId;
 	}
 
 	public UUID getVacationId() {
@@ -95,7 +104,7 @@ public class Reservation {
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(cost, duration, id, starttime, type, username, vacationId);
+		return Objects.hash(cost, duration, id, reservedId, reservedName, starttime, type, username, vacationId);
 	}
 
 	@Override
@@ -108,14 +117,17 @@ public class Reservation {
 			return false;
 		Reservation other = (Reservation) obj;
 		return Objects.equals(cost, other.cost) && Objects.equals(duration, other.duration)
-				&& Objects.equals(id, other.id) && Objects.equals(starttime, other.starttime) && type == other.type
-				&& Objects.equals(username, other.username) && Objects.equals(vacationId, other.vacationId);
+				&& Objects.equals(id, other.id) && Objects.equals(reservedId, other.reservedId)
+				&& Objects.equals(reservedName, other.reservedName) && Objects.equals(starttime, other.starttime)
+				&& type == other.type && Objects.equals(username, other.username)
+				&& Objects.equals(vacationId, other.vacationId);
 	}
 
 	@Override
 	public String toString() {
-		return "Reservation [type=" + type + ", id=" + id + ", vacationId=" + vacationId + ", username=" + username
-				+ ", starttime=" + starttime + ", cost=" + cost + ", duration=" + duration + "]";
+		return "Reservation [type=" + type + ", id=" + id + ", reservedId=" + reservedId + ", vacationId=" + vacationId
+				+ ", username=" + username + ", reservedName=" + reservedName + ", starttime=" + starttime + ", cost="
+				+ cost + ", duration=" + duration + "]";
 	}
 
 }

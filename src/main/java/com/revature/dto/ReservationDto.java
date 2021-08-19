@@ -16,11 +16,12 @@ import com.revature.beans.ReservationType;
 
 @Table("reservation")
 public class ReservationDto {
-	@PrimaryKeyColumn(name = "type", ordinal = 0, type = PrimaryKeyType.PARTITIONED)
-	private String type;
-	@PrimaryKeyColumn(name = "id", ordinal = 1, type = PrimaryKeyType.CLUSTERED, ordering = Ordering.DESCENDING)
+	@PrimaryKeyColumn(name = "id", ordinal = 1, type = PrimaryKeyType.PARTITIONED)
 	private UUID id;
-	@PrimaryKeyColumn(name = "vacationid", ordinal = 2, type = PrimaryKeyType.CLUSTERED, ordering = Ordering.DESCENDING)
+	@PrimaryKeyColumn(name = "type", ordinal = 1, type = PrimaryKeyType.CLUSTERED, ordering = Ordering.DESCENDING)
+	private String type;
+	@PrimaryKeyColumn(name = "reservedId", ordinal = 2, type = PrimaryKeyType.CLUSTERED, ordering = Ordering.DESCENDING)
+	private UUID reservedId;
 	private UUID vacationId;
 	private String username;
 	private String reservedName;
