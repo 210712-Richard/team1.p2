@@ -53,7 +53,7 @@ public class AuthenticationAspect {
 		User loggedUser = (User) session.getAttribute("loggedUser");
 		log.debug("Logged In user: " + loggedUser);
 		
-		return loggedUser == null ? false : true;
+		return loggedUser != null;
 	}
 
 	@Pointcut("@annotation(com.revature.aspects.LoggedInMono)")
