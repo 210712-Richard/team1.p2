@@ -23,6 +23,7 @@ public class ReservationDto {
 	@PrimaryKeyColumn(name = "vacationid", ordinal = 2, type = PrimaryKeyType.CLUSTERED, ordering = Ordering.DESCENDING)
 	private UUID vacationId;
 	private String username;
+	private String reservedName;
 	private Instant starttime;
 	private Double cost;
 	private Integer duration;
@@ -36,6 +37,7 @@ public class ReservationDto {
 		this.setId(r.getId());
 		this.setVacationId(r.getVacationId());
 		this.setUsername(r.getUsername());
+		this.setReservedName(r.getReservedName());
 		this.setStarttime(r.getStarttime().toInstant(ZoneOffset.UTC));
 		this.setCost(r.getCost());
 		this.setDuration(r.getDuration());
@@ -73,6 +75,14 @@ public class ReservationDto {
 		this.username = username;
 	}
 
+	public String getReservedName() {
+		return reservedName;
+	}
+
+	public void setReservedName(String reservedName) {
+		this.reservedName = reservedName;
+	}
+
 	public Instant getStarttime() {
 		return starttime;
 	}
@@ -104,6 +114,7 @@ public class ReservationDto {
 		r.setId(id);
 		r.setVacationId(vacationId);
 		r.setUsername(username);
+		r.setReservedName(reservedName);
 		r.setStarttime(LocalDateTime.ofInstant(starttime, ZoneOffset.UTC));
 		r.setCost(cost);
 		r.setDuration(duration);

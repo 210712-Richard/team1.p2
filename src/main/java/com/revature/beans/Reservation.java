@@ -9,6 +9,7 @@ public class Reservation {
 	private UUID id;
 	private UUID vacationId;
 	private String username;
+	private String reservedName;
 	private LocalDateTime starttime;
 	private Double cost;
 	private Integer duration;
@@ -17,13 +18,14 @@ public class Reservation {
 		super();
 	}
 
-	public Reservation(ReservationType type, UUID id, UUID vacationId, String username, LocalDateTime starttime,
+	public Reservation(ReservationType type, UUID id, UUID vacationId, String username, String reservedName, LocalDateTime starttime,
 			Double cost, Integer duration) {
 		super();
 		this.setType(type);
 		this.setId(id);
 		this.setVacationId(vacationId);
 		this.setUsername(username);
+		this.setReservedName(reservedName);
 		this.setStarttime(starttime);
 		this.setCost(cost);
 		this.setDuration(duration);
@@ -59,6 +61,14 @@ public class Reservation {
 
 	public void setUsername(String username) {
 		this.username = username;
+	}
+
+	public String getReservedName() {
+		return reservedName;
+	}
+
+	public void setReservedName(String reservedName) {
+		this.reservedName = reservedName;
 	}
 
 	public LocalDateTime getStarttime() {

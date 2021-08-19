@@ -10,8 +10,8 @@ public class Vacation {
 	private String username;
 	private UUID id;
 	private String destination;
-	private List<UUID> reservations;
-	private List<UUID> activities;
+	private List<Reservation> reservations;
+	private List<Activity> activities;
 	private LocalDateTime startTime;
 	private LocalDateTime endTime;
 	private Double total;
@@ -60,19 +60,19 @@ public class Vacation {
 		this.destination = destination;
 	}
 	
-	public List<UUID> getReservations() {
+	public List<Reservation> getReservations() {
 		return reservations;
 	}
 
-	public void setReservations(List<UUID> reservations) {
+	public void setReservations(List<Reservation> reservations) {
 		this.reservations = reservations;
 	}
 
-	public List<UUID> getActivities() {
+	public List<Activity> getActivities() {
 		return activities;
 	}
 
-	public void setActivities(List<UUID> activities) {
+	public void setActivities(List<Activity> activities) {
 		this.activities = activities;
 	}
 

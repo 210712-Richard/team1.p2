@@ -13,6 +13,8 @@ import org.springframework.data.cassandra.core.cql.PrimaryKeyType;
 import org.springframework.data.cassandra.core.mapping.PrimaryKeyColumn;
 import org.springframework.data.cassandra.core.mapping.Table;
 
+import com.revature.beans.Activity;
+import com.revature.beans.Reservation;
 import com.revature.beans.Vacation;
 
 @Table("vacation")
@@ -41,12 +43,22 @@ public class VacationDto {
 		this.setUsername(v.getUsername());
 		this.setId(v.getId());
 		this.setDestination(v.getDestination());
-		this.setActivities(v.getActivities());
 		this.setStartTime(v.getStartTime().toInstant(ZoneOffset.UTC));
 		this.setEndTime(v.getEndTime().toInstant(ZoneOffset.UTC));
 		this.setTotal(v.getTotal());
 		this.setPartySize(v.getPartySize());
 		this.setDuration(v.getDuration());
+		
+		if (v.getReservations() != null) {
+			for (Reservation res : v.getReservations())
+			this.reservations.add(res.getId());
+		}
+		
+		if (v.getActivities() != null) {
+			for (Activity act : v.getActivities())
+			this.activities.add(act.getId());
+		}
+
 
 	}
 
@@ -136,8 +148,6 @@ public class VacationDto {
 		v.setUsername(username);
 		v.setId(id);
 		v.setDestination(destination);
-		v.setReservations(reservations);
-		v.setActivities(activities);
 		v.setStartTime(LocalDateTime.ofInstant(startTime, ZoneOffset.UTC));
 		v.setEndTime(LocalDateTime.ofInstant(endTime, ZoneOffset.UTC));
 		v.setTotal(total);
