@@ -36,28 +36,12 @@ public class UserControllerImpl implements UserController {
 
 	@PostMapping
 	public Mono<ResponseEntity<User>> login(@RequestBody User user, WebSession session) {
-		if (user == null) {
-			return Mono.just(ResponseEntity.badRequest().build());
-		}
-
-		return userService.login(user.getUsername(), user.getPassword()).single().map(u -> {
-			log.debug("User from the map: " + u);
-			if (u.getUsername() == null) {
-				return ResponseEntity.notFound().build();
-			}
-
-			else {
-				session.getAttributes().put("loggedUser", u);
-				return ResponseEntity.ok(u);
-			}
-		});
+		return null;
 	}
 
 	@DeleteMapping
 	public Mono<ResponseEntity<Void>> logout(WebSession session) {
-		session.invalidate();
-
-		return Mono.just(ResponseEntity.ok().build());
+		return null;
 	}
 
 	@PutMapping(value = "{username}", produces = MediaType.APPLICATION_NDJSON_VALUE)
@@ -77,7 +61,7 @@ public class UserControllerImpl implements UserController {
 		}
 
 		// If the logged in user is not the same user specified or is not a vacationer
-		if (loggedUser.getUsername() != username || !UserType.VACATIONER.equals(loggedUser.getType())) {
+		if (!username.equals(loggedUser.getUsername()) || !UserType.VACATIONER.equals(loggedUser.getType())) {
 			return Mono.just(ResponseEntity.status(403).build());
 		}
 

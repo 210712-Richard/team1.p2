@@ -2,6 +2,7 @@ package com.revature.services;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.UUID;
 
 import org.apache.logging.log4j.LogManager;
@@ -38,16 +39,13 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public Mono<User> login(String username, String password) {
-		Mono<User> returnUser = userDao.findByUsernameAndPassword(username, password).map(u -> u.getUser())
-				.switchIfEmpty(Mono.just(new User()));
-
-		return returnUser;
+		return null;
 	}
 
 	@Override
 	public Mono<User> register(String username, String password, String email, String firstName, String lastName,
 			LocalDate birthday, UserType type) {
-		return Mono.just(new User(username, password, email, firstName, lastName, birthday, type));
+		return null;
 	}
 
 	@Override
@@ -57,6 +55,8 @@ public class UserServiceImpl implements UserService {
 		if (!endTime.isAfter(startTime)) {
 			return Mono.just(new Vacation());
 		}
+		
+		//Create the new vacation
 		Vacation vac = new Vacation();
 		vac.setUsername(username);
 		vac.setId(UUID.randomUUID());
@@ -65,13 +65,21 @@ public class UserServiceImpl implements UserService {
 		vac.setEndTime(endTime);
 		vac.setPartySize(partySize);
 		vac.setDuration(duration);
-
-		return userDao.findByUsername(username).flatMap((u) -> {
+		
+		log.debug("Vacation being added: " + vac);
+		
+		//Save the vacation id to the user and save the vacation to the database
+		return userDao.findByUsername(username)
+		.flatMap((u) -> {
+			if (u.getVacations() == null) {
+				u.setVacations(new ArrayList<>());
+			}
 			u.getVacations().add(vac.getId());
 			return userDao.save(u);
-		}).flatMap(u->vacDao.save(new VacationDto(vac)).flatMap((v) -> {
-			return Mono.just(v.getVacation());
-		}));
+		}).zipWith(vacDao.save(new VacationDto(vac)))
+		.flatMap((t) -> {
+			return Mono.just(t.getT2().getVacation());
+		});
 	}
 
 }
