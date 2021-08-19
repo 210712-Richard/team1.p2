@@ -43,12 +43,10 @@ public class UserServiceImpl implements UserService {
 		user.setLastName(lastName);
 		user.setBirthday(birthday);
 		user.setType(type);
-		userDao.save(new UserDto(user));
-		return Mono.just(user); 
+		return userDao.save(new UserDto(user)).map(uDto -> uDto.getUser());
 	} 			
 	
-	public boolean checkAvailability(String newName) {
-		Mono<UserDto> u = userDao.findByUsername(newName);
-		return (u == null) ? false : true;
+	public Mono<Boolean> checkAvailability(String newName) {
+		return userDao.existsByUsername(newName);
 }
 }

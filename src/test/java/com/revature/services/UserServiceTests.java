@@ -105,7 +105,20 @@ public class UserServiceTests {
 	}
 	
 	@Test
-	public void testRegisterInvalid() {
+	public void testCheckAvailabilityValid() {
+		Mockito.when(userDao.existsByUsername(user.getUsername())).thenReturn(Mono.just(true));
 		
+		Mono<Boolean> monoBool = service.checkAvailability(user.getUsername());
+		
+		StepVerifier.create(monoBool).expectNextMatches(b -> b.equals(true)).verifyComplete();
+	}
+	
+	@Test
+	public void testCheckAvailabilityInvalid() {
+		Mockito.when(userDao.existsByUsername("wrong")).thenReturn(Mono.just(false));
+		
+		Mono<Boolean> monoBool = service.checkAvailability("wrong");
+		
+		StepVerifier.create(monoBool).expectNextMatches(b -> b.equals(false)).verifyComplete();
 	}
 }

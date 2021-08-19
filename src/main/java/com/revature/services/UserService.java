@@ -13,5 +13,5 @@ public interface UserService {
 	public Mono<User> register(String username, String password, String email, String firstName, String lastName,
 			LocalDate birthday, UserType type);
 	
-	boolean checkAvailability(String newName);
+	public Mono<Boolean> checkAvailability(String username);
 }
