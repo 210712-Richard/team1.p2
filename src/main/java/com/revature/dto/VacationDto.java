@@ -23,9 +23,7 @@ public class VacationDto {
 	private UUID id;
 	@PrimaryKeyColumn(name = "destination", ordinal = 2, type = PrimaryKeyType.CLUSTERED, ordering = Ordering.DESCENDING)
 	private String destination;
-	private List<UUID> flights;
-	private List<UUID> hotels;
-	private List<UUID> cars;
+	private List<UUID> reservations;
 	private List<UUID> activities;
 	private Instant startTime;
 	private Instant endTime;
@@ -34,9 +32,8 @@ public class VacationDto {
 	private Integer duration;
 
 	public VacationDto() {
-		flights = new ArrayList<>();
-		hotels = new ArrayList<>();
-		cars = new ArrayList<>();
+		reservations = new ArrayList<>();
+		activities = new ArrayList<>();
 	}
 
 	public VacationDto(Vacation v) {
@@ -44,19 +41,13 @@ public class VacationDto {
 		this.setUsername(v.getUsername());
 		this.setId(v.getId());
 		this.setDestination(v.getDestination());
+		this.setActivities(v.getActivities());
 		this.setStartTime(v.getStartTime().toInstant(ZoneOffset.UTC));
 		this.setEndTime(v.getEndTime().toInstant(ZoneOffset.UTC));
 		this.setTotal(v.getTotal());
 		this.setPartySize(v.getPartySize());
 		this.setDuration(v.getDuration());
 
-		v.getFlights().stream().forEach(f -> this.flights.add(f.getId()));
-
-		v.getHotels().stream().forEach(h -> this.hotels.add(h.getId()));
-
-		v.getCars().stream().forEach(c -> this.cars.add(c.getId()));
-
-		v.getActivities().stream().forEach(a -> this.activities.add(a.getId()));
 	}
 
 	public String getUsername() {
@@ -83,28 +74,12 @@ public class VacationDto {
 		this.destination = destination;
 	}
 
-	public List<UUID> getFlights() {
-		return flights;
+	public List<UUID> getReservations() {
+		return reservations;
 	}
 
-	public void setFlights(List<UUID> flights) {
-		this.flights = flights;
-	}
-
-	public List<UUID> getHotels() {
-		return hotels;
-	}
-
-	public void setHotels(List<UUID> hotels) {
-		this.hotels = hotels;
-	}
-
-	public List<UUID> getCars() {
-		return cars;
-	}
-
-	public void setCars(List<UUID> cars) {
-		this.cars = cars;
+	public void setReservations(List<UUID> reservations) {
+		this.reservations = reservations;
 	}
 
 	public List<UUID> getActivities() {
@@ -161,6 +136,8 @@ public class VacationDto {
 		v.setUsername(username);
 		v.setId(id);
 		v.setDestination(destination);
+		v.setReservations(reservations);
+		v.setActivities(activities);
 		v.setStartTime(LocalDateTime.ofInstant(startTime, ZoneOffset.UTC));
 		v.setEndTime(LocalDateTime.ofInstant(endTime, ZoneOffset.UTC));
 		v.setTotal(total);
@@ -172,8 +149,8 @@ public class VacationDto {
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(activities, cars, destination, duration, endTime, flights, hotels, id, partySize, startTime,
-				total, username);
+		return Objects.hash(activities, destination, duration, endTime, id, partySize, reservations, startTime, total,
+				username);
 	}
 
 	@Override
@@ -185,20 +162,18 @@ public class VacationDto {
 		if (getClass() != obj.getClass())
 			return false;
 		VacationDto other = (VacationDto) obj;
-		return Objects.equals(activities, other.activities) && Objects.equals(cars, other.cars)
-				&& Objects.equals(destination, other.destination) && Objects.equals(duration, other.duration)
-				&& Objects.equals(endTime, other.endTime) && Objects.equals(flights, other.flights)
-				&& Objects.equals(hotels, other.hotels) && Objects.equals(id, other.id)
-				&& Objects.equals(partySize, other.partySize) && Objects.equals(startTime, other.startTime)
+		return Objects.equals(activities, other.activities) && Objects.equals(destination, other.destination)
+				&& Objects.equals(duration, other.duration) && Objects.equals(endTime, other.endTime)
+				&& Objects.equals(id, other.id) && Objects.equals(partySize, other.partySize)
+				&& Objects.equals(reservations, other.reservations) && Objects.equals(startTime, other.startTime)
 				&& Objects.equals(total, other.total) && Objects.equals(username, other.username);
 	}
 
 	@Override
 	public String toString() {
-		return "VacationDto [username=" + username + ", id=" + id + ", destination=" + destination + ", flights="
-				+ flights + ", hotels=" + hotels + ", cars=" + cars + ", activities=" + activities + ", startTime="
-				+ startTime + ", endTime=" + endTime + ", total=" + total + ", partySize=" + partySize + ", duration="
-				+ duration + "]";
+		return "VacationDto [username=" + username + ", id=" + id + ", destination=" + destination + ", reservations="
+				+ reservations + ", activities=" + activities + ", startTime=" + startTime + ", endTime=" + endTime
+				+ ", total=" + total + ", partySize=" + partySize + ", duration=" + duration + "]";
 	}
 
 }

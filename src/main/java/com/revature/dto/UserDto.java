@@ -38,8 +38,7 @@ public class UserDto {
 		this.setFirstName(user.getFirstName());
 		this.setLastName(user.getLastName());
 		this.setBirthday(user.getBirthday());
-		this.vacations = new ArrayList<>();
-		user.getVacations().stream().forEach(v -> this.vacations.add(v.getId()));
+		this.setVacations(user.getVacations());
 		this.setType(user.getType().toString());
 	}
 
@@ -108,8 +107,10 @@ public class UserDto {
 	}
 
 	public User getUser() {
-		return new User(this.username, this.password, this.email, this.firstName, this.lastName, this.birthday,
+		User user = new User(this.username, this.password, this.email, this.firstName, this.lastName, this.birthday,
 				UserType.valueOf(this.type));
+		user.setVacations(vacations);
+		return user;
 	}
 
 	@Override
