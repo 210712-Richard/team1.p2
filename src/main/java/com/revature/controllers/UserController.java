@@ -13,4 +13,5 @@ public interface UserController {
 	public Mono<ResponseEntity<Void>> logout(WebSession session);
 
 	public Mono<ResponseEntity<User>> register(User user, String name);
+	
 }

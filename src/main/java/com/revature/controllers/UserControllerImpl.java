@@ -16,35 +16,60 @@ import org.springframework.web.server.WebSession;
 
 import com.revature.beans.User;
 import com.revature.services.UserService;
-import com.revature.services.UserServiceImpl;
 
 import reactor.core.publisher.Mono;
+import reactor.util.function.Tuple2;
 
 @RestController
 @RequestMapping("/users")
-public class UserControllerImpl implements UserController{
-	private static Logger log = LogManager.getLogger(UserServiceImpl.class);
-	
-	UserService userService;
-	
+public class UserControllerImpl {
 	@Autowired
-	public UserControllerImpl(UserService userService) {
-		this.userService = userService;
+	private UserService userService;
+
+	private static final Logger log = LogManager.getLogger(UserControllerImpl.class);
+
+	// As a user, I can log in.
+	@PostMapping // ("/users")
+	public Mono<ResponseEntity<User>> login(@RequestBody User user, WebSession session) {
+		if (user == null) {
+			return Mono.just(ResponseEntity.badRequest().build());
+		}
+
+		return userService.login(user.getUsername(), user.getPassword()).single().map(u -> {
+			if (u == null) {
+				return ResponseEntity.notFound().build();
+			}
+
+			else {
+				session.getAttributes().put("loggedUser", u);
+				return ResponseEntity.ok(u);
+			}
+		});
 	}
-	
-	@PostMapping
-	public Mono<ResponseEntity<User>> login(@RequestBody User user, WebSession session){
-		return null;
-	}
-	
+
+	// As a user, I can log out.
 	@DeleteMapping
-	public Mono<ResponseEntity<Void>> logout(WebSession session){
-		return null;
+	public ResponseEntity<Void> logout(WebSession session) {
+		session.invalidate();
+		return ResponseEntity.noContent().build();
 	}
-	
-	@PutMapping(value="{username}", produces=MediaType.APPLICATION_NDJSON_VALUE) 
-	public Mono<ResponseEntity<User>> register(@RequestBody User user, @PathVariable("username") String name){
-		return null;
+
+	// As a user, I can register.
+	@PutMapping("{username}")
+	public Mono<ResponseEntity<User>> register(@RequestBody User u, @PathVariable("username") String username) {
+		// check to see if that username is available
+		return userService.checkAvailability(username).flatMap(b->{
+			if (!b) {
+				return userService.register(username, u.getPassword(), u.getEmail(), u.getFirstName(), u.getLastName(),
+						u.getBirthday(), u.getType())
+						.map(user -> ResponseEntity.status(201).body(user));
+			}
+			else {
+				return Mono.just(ResponseEntity.status(409).build());
+			}
+			
+		});
+				
 	}
 
 }

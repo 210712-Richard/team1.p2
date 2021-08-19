@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import com.revature.beans.User;
 import com.revature.beans.UserType;
 import com.revature.data.UserDao;
+import com.revature.dto.UserDto;
 
 import reactor.core.publisher.Mono;
 
@@ -26,12 +27,26 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public Mono<User> login(String username, String password) {
-		return null;
+		Mono<User> usern = userDao.findByUsernameAndPassword(username, password).map(user -> user.getUser());
+		
+		return usern;
 	}
 
 	@Override
 	public Mono<User> register(String username, String password, String email, String firstName, String lastName,
 			LocalDate birthday, UserType type) {
-		return null;
-	}
+		User user = new User();
+		user.setUsername(username);
+		user.setPassword(password);
+		user.setEmail(email);
+		user.setFirstName(firstName);
+		user.setLastName(lastName);
+		user.setBirthday(birthday);
+		user.setType(type);
+		return userDao.save(new UserDto(user)).map(uDto -> uDto.getUser());
+	} 			
+	
+	public Mono<Boolean> checkAvailability(String newName) {
+		return userDao.existsByUsername(newName);
+}
 }
