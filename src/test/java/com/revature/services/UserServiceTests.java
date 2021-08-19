@@ -1,6 +1,7 @@
 package com.revature.services;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -64,17 +65,50 @@ public class UserServiceTests {
 	}
 
 	@Test
-	public void testLoginValid() {
-		
-	}
-	
-	@Test
-	public void testLoginInvalid() {
-		
+	void testLoginValid() {
+		ArgumentCaptor<String> usernameCaptor = ArgumentCaptor.forClass(String.class);
+		ArgumentCaptor<String> passwordCaptor = ArgumentCaptor.forClass(String.class);
+
+		Mockito.when(userDao.findByUsernameAndPassword(user.getUsername(), user.getPassword()))
+				.thenReturn(Mono.just(new UserDto(user)));
+
+		Mono<User> monoUser = service.login(user.getUsername(), user.getPassword());
+
+		Mockito.verify(userDao).findByUsernameAndPassword(usernameCaptor.capture(), passwordCaptor.capture());
+
+		StepVerifier.create(monoUser).expectNextMatches(u -> u.equals(user)).verifyComplete();
+
+		assertEquals(user.getUsername(), usernameCaptor.getValue(),
+				"Assert that the username passed in is the same username.");
+		assertEquals(user.getPassword(), passwordCaptor.getValue(),
+				"Assert that the password passed in is the same password.");
+
 	}
 
 	@Test
-	public void testRegisterValid() {
+	void testLoginInvalid() {
+		ArgumentCaptor<String> usernameCaptor = ArgumentCaptor.forClass(String.class);
+		ArgumentCaptor<String> passwordCaptor = ArgumentCaptor.forClass(String.class);
+
+		Mockito.when(userDao.findByUsernameAndPassword(user.getUsername(), "pass"))
+				.thenReturn(Mono.just(new UserDto(user)));
+
+		Mono<User> monoUser = service.login(user.getUsername(), "pass");
+
+		Mockito.verify(userDao).findByUsernameAndPassword(usernameCaptor.capture(), passwordCaptor.capture());
+
+		StepVerifier.create(monoUser).expectError(NullPointerException.class);
+
+		assertEquals(user.getUsername(), usernameCaptor.getValue(),
+				"Assert that the username passed in is the same username.");
+		assertNotEquals(user.getPassword(), passwordCaptor.getValue(),
+				"Assert that the password passed in is different from user's password.");
+
+	}
+
+	@Test
+	void testRegisterValid() {
+
 		//Capture arguments
 		ArgumentCaptor<UserDto> userCaptor = ArgumentCaptor.forClass(UserDto.class);
         //Set Mock returns
@@ -163,16 +197,19 @@ public class UserServiceTests {
 		Mockito.verifyNoInteractions(vacDao);
 		Mockito.verifyNoInteractions(userDao);
 	}
-	public void testCheckAvailabilityValid() {
+	
+	@Test
+	void testCheckAvailabilityValid() {
 		Mockito.when(userDao.existsByUsername(user.getUsername())).thenReturn(Mono.just(true));
 		
 		Mono<Boolean> monoBool = service.checkAvailability(user.getUsername());
 		
 		StepVerifier.create(monoBool).expectNextMatches(b -> b.equals(true)).verifyComplete();
 	}
-	
+
+
 	@Test
-	public void testCheckAvailabilityInvalid() {
+	void testCheckAvailabilityInvalid() {
 		Mockito.when(userDao.existsByUsername("wrong")).thenReturn(Mono.just(false));
 		
 		Mono<Boolean> monoBool = service.checkAvailability("wrong");
