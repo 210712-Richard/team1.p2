@@ -24,6 +24,7 @@ import com.revature.dto.VacationDto;
 
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.util.function.Tuple2;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -99,7 +100,39 @@ public class UserServiceImpl implements UserService {
 	}
 	@Override
 	public Mono<Vacation> getVacation(String username, UUID id) {
-		return null;
+		Mono<Vacation> monoVac = vacDao.findByUsernameAndId(username, id).map(vDto -> vDto.getVacation())
+				.switchIfEmpty(Mono.empty());
+		
+		Mono<List<Reservation>> reserveds = Flux.from(vacDao.findByUsernameAndId(username, id))
+				.map(vac -> {
+					if (vac.getReservations() == null) {
+						vac.setReservations(new ArrayList<UUID>());
+					}
+					return vac.getReservations();
+				})
+				.flatMap(l -> {
+					log.debug("The list from the vacation: " + l);
+					if (l.isEmpty()) {
+						return Flux.fromIterable(new ArrayList<Reservation>());
+					}
+					else {
+						return Flux.fromIterable(l)
+						.flatMap(uuid -> resDao.findByUuid(uuid))
+						.map(r->r.getReservation());
+					}
+				}).collectList()
+				.switchIfEmpty(Mono.just(new ArrayList<Reservation>()));
+				
+		
+		Mono<Tuple2<List<Reservation>, Vacation>> zippedMono = reserveds.zipWith(monoVac).switchIfEmpty(Mono.empty());
+		return zippedMono.map(t -> {
+			Vacation vac = t.getT2();
+			log.debug("Vacation received: " + vac);
+			List<Reservation> resList = t.getT1();
+			log.debug("Reservation List received: " + resList);
+			vac.setReservations(resList);
+			return vac;
+		}).switchIfEmpty(Mono.just(new Vacation()));
 	}
 
 }
