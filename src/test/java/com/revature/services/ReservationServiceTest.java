@@ -65,7 +65,7 @@ public class ReservationServiceTest {
 	}
 	
 	@BeforeEach
-	public void beforeEach() {
+	void beforeEach() {
 		MockitoAnnotations.openMocks(this);
 
 		vac = new Vacation();
@@ -86,7 +86,7 @@ public class ReservationServiceTest {
 	}
 	
 	@Test
-	public void testReserveHotelValidNoReservations() {
+	void testReserveHotelValidNoReservations() {
 		
 		
 		Reservation res = new Reservation();
@@ -124,7 +124,7 @@ public class ReservationServiceTest {
 	}
 	
 	@Test
-	public void testReserveHotelValidWithReservations() {
+	void testReserveHotelValidWithReservations() {
 		
 		
 		Reservation res = new Reservation();
@@ -201,7 +201,7 @@ public class ReservationServiceTest {
 	}
 	
 	@Test
-	public void testReserveHotelInvalid() {
+	void testReserveHotelInvalid() {
 		
 		Reservation setRes1 = new Reservation();
 		setRes1.setUsername("otherTest1");
