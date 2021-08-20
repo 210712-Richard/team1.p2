@@ -10,6 +10,6 @@ import com.revature.dto.ReservationDto;
 import reactor.core.publisher.Mono;
 
 @Repository
-public interface ReservationDao extends ReactiveCassandraRepository<ReservationDto, String> {
+public interface ReservationDao extends ReactiveCassandraRepository<ReservationDto, UUID> {
 	Mono<ReservationDto> findByUuid(UUID id);
 }

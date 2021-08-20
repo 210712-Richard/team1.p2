@@ -12,12 +12,13 @@ import org.springframework.data.cassandra.core.mapping.PrimaryKeyColumn;
 import org.springframework.data.cassandra.core.mapping.Table;
 
 import com.revature.beans.Reservation;
+import com.revature.beans.ReservationStatus;
 import com.revature.beans.ReservationType;
 
 @Table("reservation")
 public class ReservationDto {
 	@PrimaryKeyColumn(name = "id", ordinal = 1, type = PrimaryKeyType.PARTITIONED)
-	private UUID id;
+	private UUID uuid;
 	@PrimaryKeyColumn(name = "type", ordinal = 1, type = PrimaryKeyType.CLUSTERED, ordering = Ordering.DESCENDING)
 	private String type;
 	@PrimaryKeyColumn(name = "reservedId", ordinal = 2, type = PrimaryKeyType.CLUSTERED, ordering = Ordering.DESCENDING)
@@ -28,6 +29,7 @@ public class ReservationDto {
 	private Instant starttime;
 	private Double cost;
 	private Integer duration;
+	private String status;
 	
 	public ReservationDto() {
 		super();
@@ -42,6 +44,7 @@ public class ReservationDto {
 		this.setStarttime(r.getStarttime().toInstant(ZoneOffset.UTC));
 		this.setCost(r.getCost());
 		this.setDuration(r.getDuration());
+		this.setStatus(r.getStatus().toString());
 	}
 
 	public String getType() {
@@ -53,11 +56,11 @@ public class ReservationDto {
 	}
 
 	public UUID getId() {
-		return id;
+		return uuid;
 	}
 
 	public void setId(UUID id) {
-		this.id = id;
+		this.uuid = id;
 	}
 
 	public UUID getVacationId() {
@@ -108,24 +111,42 @@ public class ReservationDto {
 		this.duration = duration;
 	}
 	
+	public UUID getReservedId() {
+		return reservedId;
+	}
+
+	public void setReservedId(UUID reservedId) {
+		this.reservedId = reservedId;
+	}
+
+	public String getStatus() {
+		return status;
+	}
+
+	public void setStatus(String status) {
+		this.status = status;
+	}
+
 	public Reservation getReservation() {
 		Reservation r = new Reservation();
 		
 		r.setType(ReservationType.valueOf(type));
-		r.setId(id);
+		r.setId(uuid);
 		r.setVacationId(vacationId);
 		r.setUsername(username);
 		r.setReservedName(reservedName);
 		r.setStarttime(LocalDateTime.ofInstant(starttime, ZoneOffset.UTC));
 		r.setCost(cost);
 		r.setDuration(duration);
+		r.setStatus(ReservationStatus.valueOf(status));
 		
 		return r;
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(cost, duration, id, starttime, type, username, vacationId);
+		return Objects.hash(cost, duration, uuid, reservedId, reservedName, starttime, status, type, username,
+				vacationId);
 	}
 
 	@Override
@@ -138,15 +159,17 @@ public class ReservationDto {
 			return false;
 		ReservationDto other = (ReservationDto) obj;
 		return Objects.equals(cost, other.cost) && Objects.equals(duration, other.duration)
-				&& Objects.equals(id, other.id) && Objects.equals(starttime, other.starttime)
-				&& Objects.equals(type, other.type) && Objects.equals(username, other.username)
-				&& Objects.equals(vacationId, other.vacationId);
+				&& Objects.equals(uuid, other.uuid) && Objects.equals(reservedId, other.reservedId)
+				&& Objects.equals(reservedName, other.reservedName) && Objects.equals(starttime, other.starttime)
+				&& Objects.equals(status, other.status) && Objects.equals(type, other.type)
+				&& Objects.equals(username, other.username) && Objects.equals(vacationId, other.vacationId);
 	}
 
 	@Override
 	public String toString() {
-		return "ReservationDto [type=" + type + ", id=" + id + ", vacationId=" + vacationId + ", username=" + username
-				+ ", starttime=" + starttime + ", cost=" + cost + ", duration=" + duration + "]";
+		return "ReservationDto [id=" + uuid + ", type=" + type + ", reservedId=" + reservedId + ", vacationId="
+				+ vacationId + ", username=" + username + ", reservedName=" + reservedName + ", starttime=" + starttime
+				+ ", cost=" + cost + ", duration=" + duration + ", status=" + status + "]";
 	}
 	
 }

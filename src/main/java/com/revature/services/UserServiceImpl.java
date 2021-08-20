@@ -3,6 +3,7 @@ package com.revature.services;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import org.apache.logging.log4j.LogManager;
@@ -10,39 +11,41 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.revature.beans.Reservation;
 import com.revature.beans.User;
 import com.revature.beans.UserType;
 import com.revature.beans.Vacation;
 import com.revature.data.HotelDao;
+import com.revature.data.ReservationDao;
 import com.revature.data.UserDao;
 import com.revature.data.VacationDao;
-import com.revature.dto.VacationDto;
 import com.revature.dto.UserDto;
+import com.revature.dto.VacationDto;
 
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Service
 public class UserServiceImpl implements UserService {
 	private static Logger log = LogManager.getLogger(UserServiceImpl.class);
 
-	UserDao userDao;
+	private UserDao userDao;
 
-	VacationDao vacDao;
+	private VacationDao vacDao;
 
-	HotelDao hotelDao;
+	private ReservationDao resDao; 
 
 	@Autowired
-	public UserServiceImpl(UserDao userDao, VacationDao vacDao, HotelDao hotelDao) {
+	public UserServiceImpl(UserDao userDao, VacationDao vacDao, HotelDao hotelDao, ReservationDao resDao) {
 		this.userDao = userDao;
 		this.vacDao = vacDao;
-		this.hotelDao = hotelDao;
+		this.resDao = resDao;
 	}
 
 	@Override
 	public Mono<User> login(String username, String password) {
-		Mono<User> usern = userDao.findByUsernameAndPassword(username, password).map(user -> user.getUser());
-
-		return usern;
+		return userDao.findByUsernameAndPassword(username, password).map(u -> u.getUser())
+				.switchIfEmpty(Mono.just(new User()));
 	}
 
 	@Override
@@ -94,4 +97,9 @@ public class UserServiceImpl implements UserService {
 	public Mono<Boolean> checkAvailability(String newName) {
 		return userDao.existsByUsername(newName);
 	}
+	@Override
+	public Mono<Vacation> getVacation(String username, UUID id) {
+		return null;
+	}
+
 }
