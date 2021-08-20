@@ -38,6 +38,7 @@ public class ReservationDto {
 	public ReservationDto(Reservation r) {
 		this.setType(r.getType().toString());
 		this.setId(r.getId());
+		this.setReservedId(r.getReservedId());
 		this.setVacationId(r.getVacationId());
 		this.setUsername(r.getUsername());
 		this.setReservedName(r.getReservedName());
@@ -132,6 +133,7 @@ public class ReservationDto {
 		
 		r.setType(ReservationType.valueOf(type));
 		r.setId(uuid);
+		r.setReservedId(reservedId);
 		r.setVacationId(vacationId);
 		r.setUsername(username);
 		r.setReservedName(reservedName);

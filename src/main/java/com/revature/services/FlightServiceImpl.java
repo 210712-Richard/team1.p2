@@ -7,25 +7,25 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.revature.beans.Car;
-import com.revature.data.CarDao;
+import com.revature.beans.Flight;
+import com.revature.data.FlightDao;
 
 import reactor.core.publisher.Mono;
 
 @Service
-public class CarServiceImpl implements CarService {
-
+public class FlightServiceImpl implements FlightService{
 	private static Logger log = LogManager.getLogger(HotelServiceImpl.class);
 
-	private CarDao carDao;
+	private FlightDao flightDao;
 	
 	@Autowired
-	public CarServiceImpl(CarDao carDao) {
-		this.carDao = carDao;
+	public FlightServiceImpl(FlightDao flightDao) {
+		this.flightDao = flightDao;
 	}
 
 	@Override
-	public Mono<Car> getCar(String destination, UUID id) {
-		return carDao.findByLocationAndId(destination, id).map(cDto -> cDto.getCar());
+	public Mono<Flight> getFlight(String destination, UUID id) {
+		return flightDao.findByDestinationAndId(destination, id).map(fDto -> fDto.getFlight());
 	}
+
 }
