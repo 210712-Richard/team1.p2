@@ -17,6 +17,7 @@ import com.revature.beans.Car;
 import com.revature.beans.Flight;
 import com.revature.beans.Hotel;
 import com.revature.beans.Reservation;
+import com.revature.beans.ReservationStatus;
 import com.revature.services.ReservationService;
 
 import reactor.core.publisher.Mono;
@@ -35,33 +36,42 @@ public class ReservationControllerImpl implements ReservationController {
 
 	@Override
 	@LoggedInMono
-	@PostMapping("{vacId}/hotel")
-	public Mono<ResponseEntity<Reservation>> reserveHotel(@RequestBody Hotel hotel, @PathVariable("vacId") String vacId,
+	@PostMapping("{resId}/hotel")
+	public Mono<ResponseEntity<Reservation>> reserveHotel(@RequestBody Hotel hotel, @PathVariable("resId") String resId,
 			WebSession session) {
 		return null;
 	}
 
 	@Override
 	@LoggedInMono
-	@PostMapping("{vacId}/flight")
+	@PostMapping("{resId}/flight")
 	public Mono<ResponseEntity<Reservation>> reserveFlight(@RequestBody Flight flight,
-			@PathVariable("vacId") String vacId, WebSession session) {
+			@PathVariable("resId") String resId, WebSession session) {
 		return null;
 	}
 
 	@Override
 	@LoggedInMono
-	@PostMapping("{vacId}/car")
-	public Mono<ResponseEntity<Reservation>> reserveCar(@RequestBody Car car, @PathVariable("vacId") String vacId,
+	@PostMapping("{resId}/car")
+	public Mono<ResponseEntity<Reservation>> reserveCar(@RequestBody Car car, @PathVariable("resId") String vacId,
 			WebSession session) {
 		return null;
 	}
 
 	@Override
 	@LoggedInMono
-	@PutMapping("{vacId}/status")
-	public Mono<ResponseEntity<Reservation>> confirmReservation(@PathVariable("vacId") String resId,
-			WebSession session) {
-		return null;
+	@PutMapping("{resId}/status")
+	public Mono<ResponseEntity<Reservation>> confirmReservation(@PathVariable("resId") String resId, WebSession session) {
+		if(resId == null || resId.equals("")) 
+			return Mono.just(ResponseEntity.badRequest().build());
+		
+		return resService.confirmReservation(resId).single().map(res -> {
+			log.debug("resevation result from DB: " + res);
+			if(res.getReservedId() == null) 
+				return ResponseEntity.notFound().build();
+					
+			log.debug("resevation updated: " + res);			
+			return ResponseEntity.ok(res);
+		});
 	}
 }

@@ -36,7 +36,6 @@ public class UserControllerImpl implements UserController {
 	}
 
 	@PostMapping
-
 	public Mono<ResponseEntity<User>> login(@RequestBody User user, WebSession session) {
 		if (user == null) {
 			return Mono.just(ResponseEntity.badRequest().build());

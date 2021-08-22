@@ -11,11 +11,13 @@ import com.revature.beans.Car;
 import com.revature.beans.Flight;
 import com.revature.beans.Hotel;
 import com.revature.beans.Reservation;
+import com.revature.beans.ReservationStatus;
 import com.revature.data.CarDao;
 import com.revature.data.FlightDao;
 import com.revature.data.HotelDao;
 import com.revature.data.ReservationDao;
 import com.revature.data.VacationDao;
+import com.revature.dto.ReservationDto;
 
 import reactor.core.publisher.Mono;
 
@@ -57,7 +59,21 @@ public class ReservationServiceImpl implements ReservationService{
 
 	@Override
 	public Mono<Reservation> confirmReservation(String resId) {
-		return null;
+		UUID id = UUID.fromString(resId);
+		return resDao.findByUuid(id).single().map(res -> {
+				Reservation r = res.getReservation();
+				
+				if(ReservationStatus.CLOSED != r.getStatus()) {
+					r.setStatus(ReservationStatus.CONFIRMED);
+					ReservationDto rdto = new ReservationDto(r);
+					resDao.save(rdto);
+					return r;
+				}
+				
+				else 
+					return null;
+				
+		}).switchIfEmpty(Mono.just(new Reservation()));
 	}
 	
 	
