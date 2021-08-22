@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.revature.beans.Car;
+import com.revature.beans.Hotel;
 import com.revature.data.CarDao;
 
 import reactor.core.publisher.Mono;
@@ -26,6 +27,8 @@ public class CarServiceImpl implements CarService {
 
 	@Override
 	public Mono<Car> getCar(String destination, UUID id) {
-		return carDao.findByLocationAndId(destination, id).map(cDto -> cDto.getCar());
+		return carDao.findByLocationAndId(destination, id)
+				.map(cDto -> cDto.getCar())
+				.switchIfEmpty(Mono.just(new Car()));
 	}
 }
