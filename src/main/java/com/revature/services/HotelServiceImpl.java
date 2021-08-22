@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import com.revature.beans.Hotel;
 import com.revature.data.HotelDao;
 
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Service
@@ -28,6 +29,11 @@ public class HotelServiceImpl implements HotelService{
 		return hotelDao.findByLocationAndId(location, id)
 				.map(hDto -> hDto.getHotel())
 				.switchIfEmpty(Mono.just(new Hotel()));
+	}
+
+	@Override
+	public Flux<Hotel> getHotelsByLocation(String location) {
+		return hotelDao.findByLocation(location).map(h->h.getHotel());
 	}
 
 }
