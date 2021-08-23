@@ -14,14 +14,16 @@ public class Reservation {
 	private LocalDateTime starttime;
 	private Double cost;
 	private Integer duration;
+	private ReservationStatus status;
 
 	public Reservation() {
 		super();
+		this.setStatus(ReservationStatus.AWAITING);
 	}
 
 	public Reservation(ReservationType type, UUID id, UUID reservedId, UUID vacationId, String username,
 			LocalDateTime starttime) {
-		super();
+		this();
 		this.setType(type);
 		this.setId(id);
 		this.setReservedId(reservedId);
@@ -101,10 +103,19 @@ public class Reservation {
 	public void setDuration(Integer duration) {
 		this.duration = duration;
 	}
+	
+	public ReservationStatus getStatus() {
+		return status;
+	}
+
+	public void setStatus(ReservationStatus status) {
+		this.status = status;
+	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(cost, duration, id, reservedId, reservedName, starttime, type, username, vacationId);
+		return Objects.hash(cost, duration, id, reservedId, reservedName, starttime, status, type, username,
+				vacationId);
 	}
 
 	@Override
@@ -119,7 +130,7 @@ public class Reservation {
 		return Objects.equals(cost, other.cost) && Objects.equals(duration, other.duration)
 				&& Objects.equals(id, other.id) && Objects.equals(reservedId, other.reservedId)
 				&& Objects.equals(reservedName, other.reservedName) && Objects.equals(starttime, other.starttime)
-				&& type == other.type && Objects.equals(username, other.username)
+				&& status == other.status && type == other.type && Objects.equals(username, other.username)
 				&& Objects.equals(vacationId, other.vacationId);
 	}
 
@@ -127,7 +138,8 @@ public class Reservation {
 	public String toString() {
 		return "Reservation [type=" + type + ", id=" + id + ", reservedId=" + reservedId + ", vacationId=" + vacationId
 				+ ", username=" + username + ", reservedName=" + reservedName + ", starttime=" + starttime + ", cost="
-				+ cost + ", duration=" + duration + "]";
+				+ cost + ", duration=" + duration + ", status=" + status + "]";
 	}
+
 
 }

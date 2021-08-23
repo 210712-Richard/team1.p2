@@ -2,6 +2,7 @@ package com.revature.services;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 import com.revature.beans.User;
 import com.revature.beans.UserType;
@@ -17,6 +18,8 @@ public interface UserService {
 
 	public Mono<Vacation> createVacation(String username, String destination, LocalDateTime startTime,
 			LocalDateTime endTime, Integer partySize, Integer duration);
-	
+
 	public Mono<Boolean> checkAvailability(String username);
+
+	public Mono<Vacation> getVacation(String username, UUID id);
 }
