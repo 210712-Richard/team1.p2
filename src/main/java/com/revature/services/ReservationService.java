@@ -13,4 +13,5 @@ public interface ReservationService {
 	public Mono<Reservation> reserveFlight(Flight flight, Vacation vacation);
 	public Mono<Reservation> reserveCar(Car car, Vacation vacation)	;
 	public Mono<Reservation> confirmReservation(String resId);
+	public Mono<Reservation> resetReservationStatus(String resId);
 }

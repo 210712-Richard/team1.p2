@@ -217,7 +217,7 @@ public class ReservationControllerImpl implements ReservationController {
 		if(resId == null || resId.equals("")) 
 			return Mono.just(ResponseEntity.badRequest().build());
 		
-		return resService.confirmReservation(resId).single().map(res -> {
+		return resService.resetReservationStatus(resId).map(res -> {
 			log.debug("Resevation result from DB: " + res.toString());
 			if(res.getReservedId() == null) 
 				return ResponseEntity.notFound().build();
