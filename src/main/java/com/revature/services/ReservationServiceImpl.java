@@ -101,13 +101,13 @@ public class ReservationServiceImpl implements ReservationService {
 				res.setStarttime(vacation.getStartTime());
 
 				// Save the reservation and the vacation and return the reservation
-				if (!car.getInUse()) {
+				if (Boolean.FALSE.equals(car.getInUse())) {
 					// Add the reservation to the vacation
 					vacation.getReservations().add(res);
 					vacation.setTotal(vacation.getTotal() + res.getCost());
 					return vacDao.save(new VacationDto(vacation))
 							.flatMap(v -> resDao.save(new ReservationDto(res)))
-							.map(rDto -> rDto.getReservation());
+							.map(ReservationDto::getReservation);
 				}
 				return Mono.empty();
 	}
