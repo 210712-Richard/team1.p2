@@ -19,7 +19,7 @@ import com.revature.dto.CarDto;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
-public class CarServiceTest {
+class CarServiceTest {
 	
 	@InjectMocks
 	private CarServiceImpl service;

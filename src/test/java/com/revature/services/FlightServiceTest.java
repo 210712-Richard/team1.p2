@@ -20,7 +20,7 @@ import com.revature.dto.FlightDto;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
-public class FlightServiceTest {
+class FlightServiceTest {
 	
 	@InjectMocks
 	private FlightServiceImpl service;

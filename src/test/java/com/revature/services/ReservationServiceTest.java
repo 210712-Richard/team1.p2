@@ -34,7 +34,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
-public class ReservationServiceTest {
+class ReservationServiceTest {
 	// Tells Spring to put mocks into service
 	@InjectMocks
 	private ReservationServiceImpl service;
