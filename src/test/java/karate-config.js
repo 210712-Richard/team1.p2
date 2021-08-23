@@ -8,7 +8,7 @@ function fn() {
 	var config = {
 		loginUrl: 'http://localhost:8080/users',
 		registerUrl: 'http://localhost:8080/users/newTest',
-		reserveHotelUrl: 'http://localhost:8080/reservations/ffb4ccc4-65d2-4615-a409-4bb6782a1129/hotel'
+		reservationUrl: 'http://localhost:8080/reservations'
 	}
 	
 	// don't waste time waiting for a server I didn't start

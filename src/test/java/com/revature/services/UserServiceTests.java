@@ -32,7 +32,7 @@ import com.revature.dto.VacationDto;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
-public class UserServiceTests {
+class UserServiceTests {
 
 	// Tells Spring to put mocks into service
 	@InjectMocks

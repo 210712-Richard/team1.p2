@@ -19,6 +19,7 @@ import com.revature.data.HotelDao;
 import com.revature.data.ReservationDao;
 import com.revature.data.UserDao;
 import com.revature.data.VacationDao;
+import com.revature.dto.ReservationDto;
 import com.revature.dto.UserDto;
 import com.revature.dto.VacationDto;
 
@@ -100,13 +101,13 @@ public class UserServiceImpl implements UserService {
 	}
 	@Override
 	public Mono<Vacation> getVacation(String username, UUID id) {
-		Mono<Vacation> monoVac = vacDao.findByUsernameAndId(username, id).map(vDto -> vDto.getVacation())
+		Mono<Vacation> monoVac = vacDao.findByUsernameAndId(username, id).map(VacationDto::getVacation)
 				.switchIfEmpty(Mono.empty());
 		
 		Mono<List<Reservation>> reserveds = Flux.from(vacDao.findByUsernameAndId(username, id))
 				.map(vac -> {
 					if (vac.getReservations() == null) {
-						vac.setReservations(new ArrayList<UUID>());
+						vac.setReservations(new ArrayList<>());
 					}
 					return vac.getReservations();
 				})
@@ -118,7 +119,7 @@ public class UserServiceImpl implements UserService {
 					else {
 						return Flux.fromIterable(l)
 						.flatMap(uuid -> resDao.findByUuid(uuid))
-						.map(r->r.getReservation());
+						.map(ReservationDto::getReservation);
 					}
 				}).collectList()
 				.switchIfEmpty(Mono.just(new ArrayList<Reservation>()));
