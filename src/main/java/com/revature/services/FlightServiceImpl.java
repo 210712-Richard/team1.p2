@@ -16,7 +16,7 @@ import reactor.core.publisher.Mono;
 
 @Service
 public class FlightServiceImpl implements FlightService {
-	private static Logger log = LogManager.getLogger(HotelServiceImpl.class);
+	private static Logger log = LogManager.getLogger(FlightServiceImpl.class);
 
 	private FlightDao flightDao;
 

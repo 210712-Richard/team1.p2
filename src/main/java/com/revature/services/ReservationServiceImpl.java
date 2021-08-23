@@ -70,7 +70,7 @@ public class ReservationServiceImpl implements ReservationService {
 		return isAvailable(hotel.getId(), hotel.getRoomsAvailable(), ReservationType.HOTEL, res.getStarttime(), res.getDuration())
 				.flatMap(b -> {
 					//If there are rooms available
-					if (b) {
+					if (Boolean.TRUE.equals(b)) {
 						return vacDao.save(new VacationDto(vacation))
 							.flatMap(v -> resDao.save(new ReservationDto(res)))
 							.map(rDto -> rDto.getReservation());
@@ -103,7 +103,7 @@ public class ReservationServiceImpl implements ReservationService {
 		 return isAvailable(flight.getId(), flight.getOpenSeats(), ReservationType.FLIGHT, res.getStarttime(), res.getDuration())
 				.flatMap(b -> {
 					//If flight is available
-					if (b) {
+					if (Boolean.TRUE.equals(b)) {
 						return vacDao.save(new VacationDto(vacation))
 							.flatMap(v -> resDao.save(new ReservationDto(res)))
 							.map(rDto -> rDto.getReservation());
@@ -160,7 +160,7 @@ public class ReservationServiceImpl implements ReservationService {
 					&& ((rEndTime.isAfter(startTime) && !rEndTime.isAfter(endTime))
 							|| (r.getStarttime().isBefore(endTime) 
 									&& !r.getStarttime().isBefore(startTime))
-							|| (r.getStarttime().equals(startTime) && r.getDuration() == duration));
+							|| (r.getStarttime().equals(startTime) && duration.equals(r.getDuration())));
 				})
 				.collectList()
 				.map(rDtoList -> rDtoList.size());

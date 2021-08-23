@@ -25,7 +25,6 @@ public class FlightDto {
 	private String startingLocation;
 	private Double ticketPrice;
 	private Integer openSeats;
-	private Integer duration;
 
 	public FlightDto() {
 		super();
@@ -40,7 +39,6 @@ public class FlightDto {
 		this.setStartingLocation(f.getStartingLocation());
 		this.setTicketPrice(f.getTicketPrice());
 		this.setOpenSeats(f.getOpenSeats());
-		this.setDuration(f.getDuration());
 	}
 
 	public String getDestination() {
@@ -98,14 +96,6 @@ public class FlightDto {
 	public void setOpenSeats(Integer openSeats) {
 		this.openSeats = openSeats;
 	}
-	
-	public Integer getDuration() {
-		return duration;
-	}
-
-	public void setDuration(Integer duration) {
-		this.duration = duration;
-	}
 
 	public Flight getFlight() {
 		Flight f = new Flight();
@@ -117,13 +107,12 @@ public class FlightDto {
 		f.setStartingLocation(startingLocation);
 		f.setTicketPrice(ticketPrice);
 		f.setOpenSeats(openSeats);
-		f.setDuration(duration);
 		return f;
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(airline, departingDate, destination, id, openSeats, startingLocation, ticketPrice, duration);
+		return Objects.hash(airline, departingDate, destination, id, openSeats, startingLocation, ticketPrice);
 	}
 
 	@Override
@@ -139,15 +128,14 @@ public class FlightDto {
 				&& Objects.equals(destination, other.destination) && Objects.equals(id, other.id)
 				&& Objects.equals(openSeats, other.openSeats)
 				&& Objects.equals(startingLocation, other.startingLocation)
-				&& Objects.equals(ticketPrice, other.ticketPrice)
-		        && Objects.equals(duration, other.duration);
+				&& Objects.equals(ticketPrice, other.ticketPrice);
 	}
 
 	@Override
 	public String toString() {
 		return "FlightDto [destination=" + destination + ", id=" + id + ", airline=" + airline + ", departingDate="
 				+ departingDate + ", startingLocation=" + startingLocation + ", ticketPrice=" + ticketPrice
-				+ ", openSeats=" + openSeats + ",duration=" + duration + "]";
+				+ ", openSeats=" + openSeats + "]";
 	}
 
 }
