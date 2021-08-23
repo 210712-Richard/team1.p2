@@ -11,14 +11,17 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.revature.beans.Activity;
 import com.revature.beans.Reservation;
 import com.revature.beans.User;
 import com.revature.beans.UserType;
 import com.revature.beans.Vacation;
+import com.revature.data.ActivityDao;
 import com.revature.data.HotelDao;
 import com.revature.data.ReservationDao;
 import com.revature.data.UserDao;
 import com.revature.data.VacationDao;
+import com.revature.dto.ActivityDto;
 import com.revature.dto.ReservationDto;
 import com.revature.dto.UserDto;
 import com.revature.dto.VacationDto;
@@ -35,13 +38,17 @@ public class UserServiceImpl implements UserService {
 
 	private VacationDao vacDao;
 
-	private ReservationDao resDao; 
+	private ReservationDao resDao;
+
+	private ActivityDao actDao;
 
 	@Autowired
-	public UserServiceImpl(UserDao userDao, VacationDao vacDao, HotelDao hotelDao, ReservationDao resDao) {
+	public UserServiceImpl(UserDao userDao, VacationDao vacDao, HotelDao hotelDao, ReservationDao resDao,
+			ActivityDao actDao) {
 		this.userDao = userDao;
 		this.vacDao = vacDao;
 		this.resDao = resDao;
+		this.actDao = actDao;
 	}
 
 	@Override
@@ -53,7 +60,7 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public Mono<User> register(String username, String password, String email, String firstName, String lastName,
 			LocalDate birthday, UserType type) {
-		
+
 		User user = new User();
 		user.setUsername(username);
 		user.setPassword(password);
@@ -99,34 +106,52 @@ public class UserServiceImpl implements UserService {
 	public Mono<Boolean> checkAvailability(String newName) {
 		return userDao.existsByUsername(newName);
 	}
+
 	@Override
 	public Mono<Vacation> getVacation(String username, UUID id) {
 		Mono<Vacation> monoVac = vacDao.findByUsernameAndId(username, id).map(VacationDto::getVacation)
 				.switchIfEmpty(Mono.empty());
-		
-		Mono<List<Reservation>> reserveds = Flux.from(vacDao.findByUsernameAndId(username, id))
-				.map(vac -> {
-					if (vac.getReservations() == null) {
-						vac.setReservations(new ArrayList<>());
-					}
-					return vac.getReservations();
-				})
-				.flatMap(l -> {
-					log.debug("The list from the vacation: " + l);
-					if (l.isEmpty()) {
-						return Flux.fromIterable(new ArrayList<Reservation>());
-					}
-					else {
-						return Flux.fromIterable(l)
-						.flatMap(uuid -> resDao.findByUuid(uuid))
+		// Get the list of activities in the vacation
+		Mono<List<Activity>> activities = Flux.from(vacDao.findByUsernameAndId(username, id)).map(vac -> {
+			if (vac.getActivities() == null) {
+				vac.setActivities(new ArrayList<>());
+			}
+			return vac.getActivities();
+		}).flatMap(l -> {
+			log.debug("The list from the vacation: " + l);
+			if (l.isEmpty()) {
+				return Flux.fromIterable(new ArrayList<Activity>());
+			} else {
+				Flux<Vacation> fluxVac = Flux.from(monoVac).flatMap(v->{
+					return Flux.<Vacation>generate(sink -> sink.next(v));
+				});
+				return Flux.fromIterable(l).zipWith(fluxVac)
+						.flatMap(t ->  actDao.findByLocationAndId(t.getT2().getDestination(), t.getT1()))
+						.map(ActivityDto::getActivity);
+			}
+		}).collectList().switchIfEmpty(Mono.just(new ArrayList<Activity>()));
+
+		Mono<List<Reservation>> reserveds = Flux.from(vacDao.findByUsernameAndId(username, id)).map(vac -> {
+			if (vac.getReservations() == null) {
+				vac.setReservations(new ArrayList<>());
+			}
+			return vac.getReservations();
+		}).flatMap(l -> {
+			log.debug("The list from the vacation: " + l);
+			if (l.isEmpty()) {
+				return Flux.fromIterable(new ArrayList<Reservation>());
+			} else {
+				return Flux.fromIterable(l).flatMap(uuid -> resDao.findByUuid(uuid))
 						.map(ReservationDto::getReservation);
-					}
-				}).collectList()
-				.switchIfEmpty(Mono.just(new ArrayList<Reservation>()));
-				
-		
-		Mono<Tuple2<List<Reservation>, Vacation>> zippedMono = reserveds.zipWith(monoVac).switchIfEmpty(Mono.empty());
-		return zippedMono.map(t -> {
+			}
+		}).collectList().switchIfEmpty(Mono.just(new ArrayList<Reservation>()));
+		Mono<Vacation> zippedVacMono = activities.zipWith(monoVac).map(t -> {
+			t.getT2().setActivities(t.getT1());
+			return t.getT2();
+		});
+		Mono<Tuple2<List<Reservation>, Vacation>> zippedFinalMono = reserveds.zipWith(zippedVacMono)
+				.switchIfEmpty(Mono.empty());
+		return zippedFinalMono.map(t -> {
 			Vacation vac = t.getT2();
 			log.debug("Vacation received: " + vac);
 			List<Reservation> resList = t.getT1();
