@@ -96,9 +96,9 @@ class HotelServiceTest {
 		Hotel hotel2 = new Hotel();
 		hotel2.setId(UUID.randomUUID());
 		hotel2.setLocation(hotel.getLocation());
-		hotel.setName("Test2 Hotel");
-		hotel.setRoomsAvailable(70);
-		hotel.setCostPerNight(49.99);
+		hotel2.setName("Test2 Hotel");
+		hotel2.setRoomsAvailable(70);
+		hotel2.setCostPerNight(49.99);
 		
 		HotelDto[] hotels = {new HotelDto(hotel), new HotelDto(hotel2)};
 		

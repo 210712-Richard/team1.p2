@@ -18,6 +18,7 @@ import reactor.core.publisher.Mono;
 public class HotelServiceImpl implements HotelService{
 	private static Logger log = LogManager.getLogger(HotelServiceImpl.class);
 
+
 	private HotelDao hotelDao;
 	
 	@Autowired

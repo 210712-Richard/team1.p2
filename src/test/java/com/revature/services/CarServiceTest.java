@@ -13,9 +13,12 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
 import com.revature.beans.Car;
+import com.revature.beans.Hotel;
 import com.revature.data.CarDao;
 import com.revature.dto.CarDto;
+import com.revature.dto.HotelDto;
 
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
@@ -91,6 +94,39 @@ class CarServiceTest {
 		
 		assertEquals(car.getLocation(), stringCaptor.getValue(), "Assert that the string passed in is the correct string");
 		assertEquals(invalidId, uuidCaptor.getValue(), "Assert that the uuid passed is in the correct uuid");
+		
+	}
+	
+	@Test
+	void testGetCarsByLocationValid() {
+		Car car2 = new Car();
+		car2.setId(UUID.randomUUID());
+		car2.setLocation(car.getLocation());
+		car2.setMake("Chevy");
+		car2.setModel("Corrola");
+		car2.setYear(1980);
+		car2.setRentalPlace("Enterprise");
+		car2.setCostPerDay(199.99);
+		car2.setInUse(false);
+		
+		CarDto[] cars = {new CarDto(car), new CarDto(car2)};
+		
+		Mockito.when(carDao.findByLocation(car.getLocation())).thenReturn(Flux.fromArray(cars));
+		
+		Flux<Car> fluxCars = service.getCarsByLocation(car.getLocation());
+		
+		StepVerifier.create(fluxCars).expectNext(car).expectNext(car2).verifyComplete();
+		
+	}
+	
+	@Test
+	void tetGetCarsByLocationInvalid() {
+		
+		Mockito.when(carDao.findByLocation(car.getLocation())).thenReturn(Flux.empty());
+		
+		Flux<Car> fluxCars = service.getCarsByLocation(car.getLocation());
+		
+		StepVerifier.create(fluxCars).expectComplete().verify();
 		
 	}
 }
