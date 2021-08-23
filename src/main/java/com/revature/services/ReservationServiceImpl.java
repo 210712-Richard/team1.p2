@@ -94,7 +94,7 @@ public class ReservationServiceImpl implements ReservationService {
 				res.setVacationId(vacation.getId());
 				res.setId(UUID.randomUUID());
 				res.setReservedId(car.getId());
-				res.setReservedName(car.getMake()+" "+car.getModel());
+				res.setReservedName(car.getMake()+car.getModel());
 				res.setDuration(vacation.getDuration());
 				res.setCost(car.getCostPerDay() * res.getDuration());
 				res.setType(ReservationType.CAR);

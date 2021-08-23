@@ -8,10 +8,4 @@ When method post
 Then status 200
 And match response contains { username: 'test', birthday: '#notnull', type: '#notnull'}
 And match responseCookies contains { SESSION: '#notnull' }
-
-Scenario: send a request and fail to login
-
-Given url loginUrl
-And request { username: 'invalid', password: 'password' }
-When method post
-Then status 404
+And def sessionCookie = responseCookies.SESSION
