@@ -17,8 +17,8 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.WebSession;
 
 import com.revature.aspects.LoggedInMono;
+import com.revature.aspects.VacationerCheck;
 import com.revature.beans.User;
-import com.revature.beans.UserType;
 import com.revature.beans.Vacation;
 import com.revature.services.UserService;
 
@@ -76,17 +76,10 @@ public class UserControllerImpl implements UserController {
 
 	}
 
-	@LoggedInMono
+	@VacationerCheck
 	@PostMapping("{username}/vacations")
 	public Mono<ResponseEntity<Vacation>> createVacation(@RequestBody Vacation vacation,
 			@PathVariable("username") String username, WebSession session) {
-		User loggedUser = (User) session.getAttribute("loggedUser");
-
-		// If the logged in user is not the same user specified or is not a vacationer
-		if (loggedUser == null || !username.equals(loggedUser.getUsername())
-				|| !UserType.VACATIONER.equals(loggedUser.getType())) {
-			return Mono.just(ResponseEntity.status(403).build());
-		}
 
 		return userService.createVacation(username, vacation.getDestination(), vacation.getStartTime(),
 				vacation.getEndTime(), vacation.getPartySize(), vacation.getDuration()).flatMap(v -> {
