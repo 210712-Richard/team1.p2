@@ -70,7 +70,7 @@ public class ReservationServiceImpl implements ReservationService {
 		return isAvailable(hotel.getId(), hotel.getRoomsAvailable(), ReservationType.HOTEL, res.getStarttime(), res.getDuration())
 				.flatMap(b -> {
 					//If there are rooms available
-					if (b) {
+					if (Boolean.TRUE.equals(b)) {
 						return vacDao.save(new VacationDto(vacation))
 							.flatMap(v -> resDao.save(new ReservationDto(res)))
 							.map(rDto -> rDto.getReservation());
@@ -82,8 +82,37 @@ public class ReservationServiceImpl implements ReservationService {
 
 	@Override
 	public Mono<Reservation> reserveFlight(Flight flight, Vacation vacation) {
-		return null;
+		
+		// Create flight reservation.
+		 
+		Reservation res = new Reservation();
+		 res.setCost(flight.getTicketPrice());
+		 res.setDuration(0);
+		 res.setId(UUID.randomUUID());
+		 res.setReservedId(flight.getId());
+		 res.setReservedName(flight.getAirline());
+		 res.setStarttime(flight.getDepartingDate());
+		 res.setType(ReservationType.FLIGHT);
+		 res.setUsername(vacation.getUsername());
+		 res.setVacationId(vacation.getId());
+		 
+		 //add reservation 
+		 vacation.getReservations().add(res);
+		 vacation.setTotal(vacation.getTotal() + res.getCost());
+		 
+		 return isAvailable(flight.getId(), flight.getOpenSeats(), ReservationType.FLIGHT, res.getStarttime(), res.getDuration())
+				.flatMap(b -> {
+					//If flight is available
+					if (Boolean.TRUE.equals(b)) {
+						return vacDao.save(new VacationDto(vacation))
+							.flatMap(v -> resDao.save(new ReservationDto(res)))
+							.map(rDto -> rDto.getReservation());
+					}
+					return Mono.empty();
+				});
+				
 	}
+
 
 	@Override
 	public Mono<Reservation> reserveCar(Car car, Vacation vacation) {
@@ -130,7 +159,8 @@ public class ReservationServiceImpl implements ReservationService {
 					&& !r.getStatus().equals(ReservationStatus.CLOSED)
 					&& ((rEndTime.isAfter(startTime) && !rEndTime.isAfter(endTime))
 							|| (r.getStarttime().isBefore(endTime) 
-									&& !r.getStarttime().isBefore(startTime)));
+									&& !r.getStarttime().isBefore(startTime))
+							|| (r.getStarttime().equals(startTime) && duration.equals(r.getDuration())));
 				})
 				.collectList()
 				.map(rDtoList -> rDtoList.size());

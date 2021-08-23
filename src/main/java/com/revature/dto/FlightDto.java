@@ -107,7 +107,6 @@ public class FlightDto {
 		f.setStartingLocation(startingLocation);
 		f.setTicketPrice(ticketPrice);
 		f.setOpenSeats(openSeats);
-		
 		return f;
 	}
 
