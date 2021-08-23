@@ -52,7 +52,6 @@ public class AuthenticationAspect {
 
 		WebSession session = (WebSession) Stream.of(pjp.getArgs()).filter(WebSession.class::isInstance).findFirst()
 				.orElse(null);
-		
 
 		if (session == null) {
 			return Mono.just(ResponseEntity.status(401).build());
@@ -61,37 +60,37 @@ public class AuthenticationAspect {
 		User loggedUser = session.getAttribute("loggedUser");
 		log.debug("Logged In User: " + loggedUser);
 		String username = null;
-		
-		//Get the method signature
+
+		// Get the method signature
 		MethodSignature sig = (MethodSignature) pjp.getStaticPart().getSignature();
-		
-		//Get the method
+
+		// Get the method
 		Method method = sig.getMethod();
-		
-		//Get all annotated parameters
+
+		// Get all annotated parameters
 		Annotation[][] paramAnnotations = method.getParameterAnnotations();
-		
-		//Loop through annotated arguments
+
+		// Loop through annotated arguments
 		for (int i = 0; i < paramAnnotations.length; i++) {
-			//Loop through annotated arguments
+			// Loop through annotated arguments
 			for (Annotation annotate : paramAnnotations[i]) {
-				//If the annotation isn't a path variable, continue
+				// If the annotation isn't a path variable, continue
 				if (!(annotate instanceof PathVariable)) {
 					continue;
 				}
-				//Set the path variable
-				PathVariable pathVariable = (PathVariable) annotate;
-				//If the path variable isn't the username, continue
-				if (!"username".equals(pathVariable.value())) {
-					continue;
-				}
 				
-				//Set the username to the parameter location
-				username = (String) pjp.getArgs()[i];
-				log.debug("Username found: " + username);
+				// Set the path variable
+				PathVariable pathVariable = (PathVariable) annotate;
+				
+				// Make sure 
+				if ("username".equals(pathVariable.value())) {
+					// Set the username to the parameter location
+					username = (String) pjp.getArgs()[i];
+					log.debug("Username found: " + username);
+				}
+
 			}
 		}
-		
 
 		// If the logged in user is not the same user specified or is not a vacationer
 		if (loggedUser == null || username == null || !username.equals(loggedUser.getUsername())
@@ -99,7 +98,7 @@ public class AuthenticationAspect {
 			return Mono.just(ResponseEntity.status(403).build());
 		}
 
-		return null;
+		return pjp.proceed();
 	}
 
 	private Boolean isLoggedIn(Object[] args) {
