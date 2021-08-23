@@ -37,7 +37,6 @@ public class UserControllerImpl implements UserController {
 	}
 
 	@PostMapping
-
 	public Mono<ResponseEntity<User>> login(@RequestBody User user, WebSession session) {
 		if (user == null) {
 			return Mono.just(ResponseEntity.badRequest().build());
@@ -49,7 +48,7 @@ public class UserControllerImpl implements UserController {
 			}
 
 			else {
-				session.getAttributes().put("loggedUser", u);
+				session.getAttributes().put(LOGGED_USER, u);
 				return ResponseEntity.ok(u);
 			}
 		});
@@ -97,7 +96,7 @@ public class UserControllerImpl implements UserController {
 	@GetMapping("{username}/vacations/{vacationid}")
 	public Mono<ResponseEntity<Vacation>> getVacation(@PathVariable("username") String username,
 			@PathVariable("vacationid") String id, WebSession session) {
-		User loggedUser = (User) session.getAttribute("loggedUser");
+		User loggedUser = (User) session.getAttribute(LOGGED_USER);
 
 		if (loggedUser == null || !username.equals(loggedUser.getUsername())) {
 			return Mono.just(ResponseEntity.status(403).build());

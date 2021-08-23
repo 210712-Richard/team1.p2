@@ -23,7 +23,6 @@ import com.revature.data.ReservationDao;
 import com.revature.data.VacationDao;
 import com.revature.dto.ReservationDto;
 import com.revature.dto.VacationDto;
-
 import reactor.core.publisher.Mono;
 
 @Service
@@ -143,7 +142,35 @@ public class ReservationServiceImpl implements ReservationService {
 
 	@Override
 	public Mono<Reservation> confirmReservation(String resId) {
-		return null;
+		UUID id = UUID.fromString(resId);
+		return resDao.findByUuid(id).map(res -> {
+				Reservation r = res.getReservation();
+				
+				if(ReservationStatus.CLOSED != r.getStatus()) {
+					r.setStatus(ReservationStatus.CONFIRMED);
+					ReservationDto rdto = new ReservationDto(r);
+					resDao.save(rdto);
+					return r;
+				}
+	
+				return null;
+				
+		}).switchIfEmpty(Mono.just(new Reservation()));
+	}
+	
+	
+	// For testing purposes mainly
+	public Mono<Reservation> resetReservationStatus (String resId) {
+		UUID id = UUID.fromString(resId);
+		return resDao.findByUuid(id).single().map(res -> {
+				Reservation r = res.getReservation();
+				
+				r.setStatus(ReservationStatus.AWAITING);
+				ReservationDto rdto = new ReservationDto(r);
+				resDao.save(rdto);
+				return r;
+	
+		}).switchIfEmpty(Mono.just(new Reservation()));
 	}
 
 	private Mono<Boolean> isAvailable(UUID id, Integer available, ReservationType type, LocalDateTime startTime, Integer duration) {

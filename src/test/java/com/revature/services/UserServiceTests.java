@@ -33,7 +33,6 @@ import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
 class UserServiceTests {
-
 	// Tells Spring to put mocks into service
 	@InjectMocks
 	private UserServiceImpl service;
@@ -122,7 +121,7 @@ class UserServiceTests {
 				"Assert that the password passed in is different from user's password.");
 
 	}
-
+	
 	@Test
 	void testRegisterValid() {
 

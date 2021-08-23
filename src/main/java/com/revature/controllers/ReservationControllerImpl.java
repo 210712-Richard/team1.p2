@@ -4,6 +4,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -18,6 +19,7 @@ import com.revature.beans.Flight;
 import com.revature.beans.Hotel;
 import com.revature.beans.Reservation;
 import com.revature.beans.User;
+import com.revature.beans.UserType;
 import com.revature.beans.Vacation;
 import com.revature.services.CarService;
 import com.revature.services.FlightService;
@@ -50,11 +52,34 @@ public class ReservationControllerImpl implements ReservationController {
 
 	@Override
 	@LoggedInMono
+	@PostMapping("{resId}/hotel")
+	public Mono<ResponseEntity<Reservation>> reserveHotel(@RequestBody Hotel hotel, @PathVariable("resId") String resId,
+			WebSession session) {
+		return null;
+	}
+
+	
+	@Override
+	@LoggedInMono
+	@PostMapping("{resId}/flight")
+	public Mono<ResponseEntity<Reservation>> reserveFlight(@RequestBody Flight flight,
+			@PathVariable("resId") String resId, WebSession session) {
+		return null;
+	}
+
+	@Override
+	@LoggedInMono
+	@PostMapping("{resId}/car")
+	public Mono<ResponseEntity<Reservation>> reserveCar(@RequestBody Car car, @PathVariable("resId") String vacId,
+			WebSession session) {
+		return null;
+	}
+
 	@PostMapping
 	public Mono<ResponseEntity<Reservation>> createReservation(@RequestBody Reservation res, WebSession session) {
 
 		// Make sure the user is a vacationer account
-		User loggedUser = (User) session.getAttribute("loggedUser");
+		User loggedUser = (User) session.getAttribute(UserController.LOGGED_USER);
 		String username = loggedUser != null ? loggedUser.getUsername() : "";
 
 		// Make sure the required fields are not null
@@ -145,8 +170,49 @@ public class ReservationControllerImpl implements ReservationController {
 	@Override
 	@LoggedInMono
 	@PutMapping("{resId}/status")
-	public Mono<ResponseEntity<Reservation>> confirmReservation(@PathVariable("resId") String resId,
-			WebSession session) {
-		return null;
+	public Mono<ResponseEntity<Reservation>> confirmReservation(@PathVariable("resId") String resId, WebSession session) {
+		User loggedUser = session.getAttribute(UserController.LOGGED_USER);
+		if(loggedUser == null)
+			return Mono.just(ResponseEntity.status(401).build());
+		
+		if(loggedUser.getType() == UserType.VACATIONER)
+			return Mono.just(ResponseEntity.status(403).build());
+		
+		if(resId == null || resId.equals("")) 
+			return Mono.just(ResponseEntity.badRequest().build());
+		
+		return resService.confirmReservation(resId).map(res -> {
+			if(res.getReservedId() == null) {
+				log.debug("No results found with reservation ID: " + resId);
+				return ResponseEntity.notFound().build();
+			}
+					
+			log.debug("Confirmed resevation for " + res.getReservedName());			
+			return ResponseEntity.ok(res);
+		});
+	}
+	
+	// Implemented to reset effects of Karate tests
+	@LoggedInMono
+	@PatchMapping("{resId}/status")
+	public Mono<ResponseEntity<Reservation>> resetReservationStatus(@PathVariable("resId") String resId, WebSession session) {
+		User loggedUser = session.getAttribute(UserController.LOGGED_USER);
+		if(loggedUser == null)
+			return Mono.just(ResponseEntity.status(401).build());
+		
+		if(loggedUser.getType() == UserType.VACATIONER)
+			return Mono.just(ResponseEntity.status(403).build());
+		
+		if(resId == null || resId.equals("")) 
+			return Mono.just(ResponseEntity.badRequest().build());
+		
+		return resService.resetReservationStatus(resId).map(res -> {
+			log.debug("Resevation result from DB: " + res.toString());
+			if(res.getReservedId() == null) 
+				return ResponseEntity.notFound().build();
+					
+			log.debug("Resevation status for " + res.getReservedName() + " has been reset");			
+			return ResponseEntity.ok(res);
+		});
 	}
 }
