@@ -11,6 +11,7 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.revature.beans.Activity;
 import com.revature.beans.Reservation;
 import com.revature.beans.User;
 import com.revature.beans.UserType;
@@ -19,6 +20,7 @@ import com.revature.data.HotelDao;
 import com.revature.data.ReservationDao;
 import com.revature.data.UserDao;
 import com.revature.data.VacationDao;
+import com.revature.dto.ActivityDto;
 import com.revature.dto.ReservationDto;
 import com.revature.dto.UserDto;
 import com.revature.dto.VacationDto;
@@ -135,5 +137,31 @@ public class UserServiceImpl implements UserService {
 			return vac;
 		}).switchIfEmpty(Mono.just(new Vacation()));
 	}
+	
+	public Flux<Activity> getActivities(UUID id, String username) {
+        Mono<Vacation> monoVac = vacDao.findByUsernameAndId(username, id).map(VacationDto::getVacation)
+                .switchIfEmpty(Mono.empty());
+        // Get the list of activities in the vacation
+        return Flux.from(vacDao.findByUsernameAndId(username, id)).map(vac -> {
+            if (vac.getActivities() == null) {
+                vac.setActivities(new ArrayList<>());
+            }
+            return vac.getActivities();
+        }).flatMap(l -> {
+            log.debug("The list from the vacation: " + l);
+            if (l.isEmpty()) {
+                return Flux.fromIterable(new ArrayList<Activity>());
+            } else {
+                // Need to create an infinite flux to make sure all the activities are retrieved
+                Flux<Vacation> fluxVac = Flux.from(monoVac).flatMap(v -> Flux.<Vacation>generate(sink -> sink.next(v)));
+
+                // Zip the fluxes together and iterate until all the activities have been
+                // obtained.
+                return Flux.fromIterable(l).zipWith(fluxVac)
+                        .flatMap(t -> actDao.findByLocationAndId(t.getT2().getDestination(), t.getT1()))
+                        .map(ActivityDto::getActivity);
+            }
+        });
+    }
 
 }
