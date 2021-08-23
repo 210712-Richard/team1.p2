@@ -30,7 +30,7 @@ public class AuthenticationAspect {
 	public Object checkLoggedInMono(ProceedingJoinPoint pjp) throws Throwable {
 		log.trace("Checking if user is logged in");
 
-		if (Boolean.FALSE.equals(isLoggedIn(pjp))) {
+		if (Boolean.FALSE.equals(isLoggedIn(pjp.getArgs()))) {
 			return Mono.just(ResponseEntity.status(401).build());
 		}
 		return pjp.proceed();
@@ -40,7 +40,7 @@ public class AuthenticationAspect {
 	public Object checkLoggedInFlux(ProceedingJoinPoint pjp) throws Throwable {
 		log.trace("Checking if user is logged in");
 
-		if (Boolean.FALSE.equals(isLoggedIn(pjp))) {
+		if (Boolean.FALSE.equals(isLoggedIn(pjp.getArgs()))) {
 			return ResponseEntity.status(401).build();
 		}
 		return pjp.proceed();
@@ -50,7 +50,8 @@ public class AuthenticationAspect {
 	public Object checkVacationer(ProceedingJoinPoint pjp) throws Throwable {
 		log.trace("Checking to see if the user is a vacationer");
 
-		WebSession session = (WebSession) pjp.getTarget();
+		WebSession session = (WebSession) Stream.of(pjp.getArgs()).filter(WebSession.class::isInstance).findFirst()
+				.orElse(null);
 
 		if (session == null) {
 			return Mono.just(ResponseEntity.status(500).build());
@@ -100,9 +101,9 @@ public class AuthenticationAspect {
 		return pjp.proceed();
 	}
 
-	private Boolean isLoggedIn(ProceedingJoinPoint pjp) {
+	private Boolean isLoggedIn(Object[] args) {
 
-		WebSession session = (WebSession) pjp.getTarget();
+		WebSession session = (WebSession) Stream.of(args).filter(WebSession.class::isInstance).findFirst().orElse(null);
 		if (session == null) {
 			return false;
 		}

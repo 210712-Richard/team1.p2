@@ -49,32 +49,8 @@ public class ReservationControllerImpl implements ReservationController {
 		this.flightService = flightService;
 		this.carService = carService;
 	}
-
-	@Override
-	@LoggedInMono
-	@PostMapping("{resId}/hotel")
-	public Mono<ResponseEntity<Reservation>> reserveHotel(@RequestBody Hotel hotel, @PathVariable("resId") String resId,
-			WebSession session) {
-		return null;
-	}
-
 	
-	@Override
 	@LoggedInMono
-	@PostMapping("{resId}/flight")
-	public Mono<ResponseEntity<Reservation>> reserveFlight(@RequestBody Flight flight,
-			@PathVariable("resId") String resId, WebSession session) {
-		return null;
-	}
-
-	@Override
-	@LoggedInMono
-	@PostMapping("{resId}/car")
-	public Mono<ResponseEntity<Reservation>> reserveCar(@RequestBody Car car, @PathVariable("resId") String vacId,
-			WebSession session) {
-		return null;
-	}
-
 	@PostMapping
 	public Mono<ResponseEntity<Reservation>> createReservation(@RequestBody Reservation res, WebSession session) {
 
