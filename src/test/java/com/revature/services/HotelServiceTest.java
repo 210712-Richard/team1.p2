@@ -16,6 +16,7 @@ import com.revature.beans.Hotel;
 import com.revature.data.HotelDao;
 import com.revature.dto.HotelDto;
 
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
@@ -71,7 +72,7 @@ public class HotelServiceTest {
 	}
 	
 	@Test
-	void testGethotelInvalidId() {
+	void testGetHotelInvalidId() {
 		UUID invalidId = UUID.randomUUID();
 		
 		ArgumentCaptor<String> stringCaptor = ArgumentCaptor.forClass(String.class);
@@ -87,6 +88,36 @@ public class HotelServiceTest {
 		
 		assertEquals(hotel.getLocation(), stringCaptor.getValue(), "Assert that the string passed in is the correct string");
 		assertEquals(invalidId, uuidCaptor.getValue(), "Assert that the uuid passed is in the correct uuid");
+		
+	}
+	
+	@Test
+	void testGetHotelsByLocationValid() {
+		Hotel hotel2 = new Hotel();
+		hotel2.setId(UUID.randomUUID());
+		hotel2.setLocation(hotel.getLocation());
+		hotel.setName("Test2 Hotel");
+		hotel.setRoomsAvailable(70);
+		hotel.setCostPerNight(49.99);
+		
+		HotelDto[] hotels = {new HotelDto(hotel), new HotelDto(hotel2)};
+		
+		Mockito.when(hotelDao.findByLocation(hotel.getLocation())).thenReturn(Flux.fromArray(hotels));
+		
+		Flux<Hotel> fluxHotels = service.getHotelsByLocation(hotel.getLocation());
+		
+		StepVerifier.create(fluxHotels).expectNext(hotel).expectNext(hotel2).verifyComplete();
+		
+	}
+	
+	@Test
+	void tetGetHotelsByLocationInvalid() {
+		
+		Mockito.when(hotelDao.findByLocation(hotel.getLocation())).thenReturn(Flux.empty());
+		
+		Flux<Hotel> fluxHotels = service.getHotelsByLocation(hotel.getLocation());
+		
+		StepVerifier.create(fluxHotels).expectComplete().verify();
 		
 	}
 
