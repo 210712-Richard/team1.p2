@@ -96,7 +96,6 @@ class ReservationServiceTest {
 		flight.setOpenSeats(3);
 		flight.setTicketPrice(150.00);
 		flight.setDepartingDate(LocalDateTime.now());
-		flight.setDuration(8);
 		flight.setStartingLocation("Test City1, Test State1");
 	
 		car = new Car();
