@@ -7,6 +7,7 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -100,9 +101,28 @@ public class UserControllerImpl implements UserController {
 
 	@LoggedInMono
 	@Override
+	@GetMapping("{username}/vacations/{vacationid}")
 	public Mono<ResponseEntity<Vacation>> getVacation(@PathVariable("username") String username,
 			@PathVariable("vacationid") String id, WebSession session) {
-		return null;
+		User loggedUser = (User) session.getAttribute("loggedUser");
+
+		if (loggedUser == null || !username.equals(loggedUser.getUsername())) {
+			return Mono.just(ResponseEntity.status(403).build());
+		}
+		UUID vacId = null;
+		try {
+			vacId = UUID.fromString(id);
+		} catch (Exception e) {
+			return Mono.just(ResponseEntity.badRequest().build());
+		}
+		return userService.getVacation(username, vacId).map(v -> {
+			log.debug("Vacation received: " + v);
+			if (v.getId() == null) {
+				return ResponseEntity.notFound().build();
+			} else {
+				return ResponseEntity.ok(v);
+			}
+		});
 	}
 
 }
