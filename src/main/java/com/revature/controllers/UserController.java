@@ -9,6 +9,9 @@ import com.revature.beans.Vacation;
 import reactor.core.publisher.Mono;
 
 public interface UserController {
+	
+	String LOGGED_USER = "loggedUser";
+	
 	public Mono<ResponseEntity<User>> login(User user, WebSession session);
 
 	public Mono<ResponseEntity<Void>> logout(WebSession session);

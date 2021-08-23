@@ -81,7 +81,7 @@ class UserServiceTests {
 	}
 
 	@Test
-	public void testLoginValid() {
+	void testLoginValid() {
 		ArgumentCaptor<String> usernameCaptor = ArgumentCaptor.forClass(String.class);
 		ArgumentCaptor<String> passwordCaptor = ArgumentCaptor.forClass(String.class);
 
@@ -102,7 +102,7 @@ class UserServiceTests {
 	}
 
 	@Test
-	public void testLoginInvalid() {
+	void testLoginInvalid() {
 		ArgumentCaptor<String> usernameCaptor = ArgumentCaptor.forClass(String.class);
 		ArgumentCaptor<String> passwordCaptor = ArgumentCaptor.forClass(String.class);
 
@@ -123,10 +123,7 @@ class UserServiceTests {
 	}
 	
 	@Test
-	public void testLogout() {
-	}
-	
-	public void testRegisterValid() {
+	void testRegisterValid() {
 
 		// Capture arguments
 		ArgumentCaptor<UserDto> userCaptor = ArgumentCaptor.forClass(UserDto.class);
@@ -156,6 +153,7 @@ class UserServiceTests {
 
 	}
 
+	@Test
 	void testCreateVacationValid() {
 
 		Mockito.when(userDao.findByUsername(user.getUsername())).thenReturn(Mono.just(new UserDto(user)));

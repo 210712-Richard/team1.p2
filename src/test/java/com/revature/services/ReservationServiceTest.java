@@ -64,7 +64,7 @@ class ReservationServiceTest {
 	private Car car;
 
 	@BeforeAll
-	public static void beforeAll() {
+	static void beforeAll() {
 
 	}
 
@@ -285,7 +285,7 @@ class ReservationServiceTest {
 	}
 
 	@Test
-	public void testConfirmReservation() {
+	void testConfirmReservation() {
 
 		Reservation carRes = new Reservation();
 		carRes.setType(ReservationType.CAR);
