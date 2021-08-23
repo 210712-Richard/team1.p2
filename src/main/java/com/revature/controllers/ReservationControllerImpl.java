@@ -79,7 +79,7 @@ public class ReservationControllerImpl implements ReservationController {
 	public Mono<ResponseEntity<Reservation>> createReservation(@RequestBody Reservation res, WebSession session) {
 
 		// Make sure the user is a vacationer account
-		User loggedUser = (User) session.getAttribute("loggedUser");
+		User loggedUser = (User) session.getAttribute(UserController.LOGGED_USER);
 		String username = loggedUser != null ? loggedUser.getUsername() : "";
 
 		// Make sure the required fields are not null
@@ -171,7 +171,7 @@ public class ReservationControllerImpl implements ReservationController {
 	@LoggedInMono
 	@PutMapping("{resId}/status")
 	public Mono<ResponseEntity<Reservation>> confirmReservation(@PathVariable("resId") String resId, WebSession session) {
-		User loggedUser = session.getAttribute("loggedUser");
+		User loggedUser = session.getAttribute(UserController.LOGGED_USER);
 		if(loggedUser == null)
 			return Mono.just(ResponseEntity.status(401).build());
 		
@@ -196,7 +196,7 @@ public class ReservationControllerImpl implements ReservationController {
 	@LoggedInMono
 	@PatchMapping("{resId}/status")
 	public Mono<ResponseEntity<Reservation>> resetReservationStatus(@PathVariable("resId") String resId, WebSession session) {
-		User loggedUser = session.getAttribute("loggedUser");
+		User loggedUser = session.getAttribute(UserController.LOGGED_USER);
 		if(loggedUser == null)
 			return Mono.just(ResponseEntity.status(401).build());
 		
