@@ -1,10 +1,13 @@
 package com.revature.controllers;
 
+import java.util.UUID;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -13,8 +16,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.WebSession;
 
+import com.revature.aspects.LoggedInMono;
+import com.revature.aspects.VacationerCheck;
 import com.revature.beans.User;
-import com.revature.beans.UserType;
 import com.revature.beans.Vacation;
 import com.revature.services.UserService;
 
@@ -33,13 +37,29 @@ public class UserControllerImpl implements UserController {
 	}
 
 	@PostMapping
+
 	public Mono<ResponseEntity<User>> login(@RequestBody User user, WebSession session) {
-		return null;
+		if (user == null) {
+			return Mono.just(ResponseEntity.badRequest().build());
+		}
+
+		return userService.login(user.getUsername(), user.getPassword()).single().map(u -> {
+			if (u.getUsername() == null) {
+				return ResponseEntity.notFound().build();
+			}
+
+			else {
+				session.getAttributes().put("loggedUser", u);
+				return ResponseEntity.ok(u);
+			}
+		});
 	}
 
 	@DeleteMapping
 	public Mono<ResponseEntity<Void>> logout(WebSession session) {
-		return null;
+		session.invalidate();
+
+		return Mono.just(ResponseEntity.noContent().build());
 	}
 
 	@PutMapping("{username}")
@@ -57,21 +77,10 @@ public class UserControllerImpl implements UserController {
 
 	}
 
+	@VacationerCheck
 	@PostMapping("{username}/vacations")
 	public Mono<ResponseEntity<Vacation>> createVacation(@RequestBody Vacation vacation,
 			@PathVariable("username") String username, WebSession session) {
-		User loggedUser = (User) session.getAttribute("loggedUser");
-		log.debug("Logged in user: " + loggedUser);
-
-		// If the user is not logged in
-		if (loggedUser == null) {
-			return Mono.just(ResponseEntity.status(401).build());
-		}
-
-		// If the logged in user is not the same user specified or is not a vacationer
-		if (!username.equals(loggedUser.getUsername()) || !UserType.VACATIONER.equals(loggedUser.getType())) {
-			return Mono.just(ResponseEntity.status(403).build());
-		}
 
 		return userService.createVacation(username, vacation.getDestination(), vacation.getStartTime(),
 				vacation.getEndTime(), vacation.getPartySize(), vacation.getDuration()).flatMap(v -> {
@@ -81,6 +90,32 @@ public class UserControllerImpl implements UserController {
 						return Mono.just(ResponseEntity.status(201).body(v));
 					}
 				});
+	}
+
+	@LoggedInMono
+	@Override
+	@GetMapping("{username}/vacations/{vacationid}")
+	public Mono<ResponseEntity<Vacation>> getVacation(@PathVariable("username") String username,
+			@PathVariable("vacationid") String id, WebSession session) {
+		User loggedUser = (User) session.getAttribute("loggedUser");
+
+		if (loggedUser == null || !username.equals(loggedUser.getUsername())) {
+			return Mono.just(ResponseEntity.status(403).build());
+		}
+		UUID vacId = null;
+		try {
+			vacId = UUID.fromString(id);
+		} catch (Exception e) {
+			return Mono.just(ResponseEntity.badRequest().build());
+		}
+		return userService.getVacation(username, vacId).map(v -> {
+			log.debug("Vacation received: " + v);
+			if (v.getId() == null) {
+				return ResponseEntity.notFound().build();
+			} else {
+				return ResponseEntity.ok(v);
+			}
+		});
 	}
 
 }

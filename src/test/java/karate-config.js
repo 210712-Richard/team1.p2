@@ -6,7 +6,9 @@ function fn() {
 	}
 
 	var config = {
-		loginUrl: 'http://localhost:8080/users'
+		loginUrl: 'http://localhost:8080/users',
+		registerUrl: 'http://localhost:8080/users/newTest',
+		reservationUrl: 'http://localhost:8080/reservations'
 	}
 	
 	// don't waste time waiting for a server I didn't start

@@ -112,11 +112,33 @@ public class ReservationServiceImpl implements ReservationService {
 				});
 				
 	}
-	
+
 
 	@Override
-	public Mono<Reservation> reserveCar(Car car, Vacation vaction) {
-		return null;
+	public Mono<Reservation> reserveCar(Car car, Vacation vacation) {
+		// Create the car
+				Reservation res = new Reservation();
+
+				res.setUsername(vacation.getUsername());
+				res.setVacationId(vacation.getId());
+				res.setId(UUID.randomUUID());
+				res.setReservedId(car.getId());
+				res.setReservedName(car.getMake()+car.getModel());
+				res.setDuration(vacation.getDuration());
+				res.setCost(car.getCostPerDay() * res.getDuration());
+				res.setType(ReservationType.CAR);
+				res.setStarttime(vacation.getStartTime());
+
+				// Save the reservation and the vacation and return the reservation
+				if (Boolean.FALSE.equals(car.getInUse())) {
+					// Add the reservation to the vacation
+					vacation.getReservations().add(res);
+					vacation.setTotal(vacation.getTotal() + res.getCost());
+					return vacDao.save(new VacationDto(vacation))
+							.flatMap(v -> resDao.save(new ReservationDto(res)))
+							.map(ReservationDto::getReservation);
+				}
+				return Mono.empty();
 	}
 
 	@Override
@@ -137,11 +159,12 @@ public class ReservationServiceImpl implements ReservationService {
 					&& !r.getStatus().equals(ReservationStatus.CLOSED)
 					&& ((rEndTime.isAfter(startTime) && !rEndTime.isAfter(endTime))
 							|| (r.getStarttime().isBefore(endTime) 
-									&& !r.getStarttime().isBefore(startTime)));
+									&& !r.getStarttime().isBefore(startTime))
+							|| (r.getStarttime().equals(startTime) && r.getDuration() == duration));
 				})
 				.collectList()
 				.map(rDtoList -> rDtoList.size());
 		
 		return intMono.map(i -> i < available);
 	}
-}	
+}

@@ -9,15 +9,16 @@ import org.springframework.stereotype.Service;
 
 import com.revature.beans.Flight;
 import com.revature.data.FlightDao;
+import com.revature.dto.FlightDto;
 
 import reactor.core.publisher.Mono;
 
 @Service
-public class FlightServiceImpl implements FlightService{
+public class FlightServiceImpl implements FlightService {
 	private static Logger log = LogManager.getLogger(HotelServiceImpl.class);
 
 	private FlightDao flightDao;
-	
+
 	@Autowired
 	public FlightServiceImpl(FlightDao flightDao) {
 		this.flightDao = flightDao;
@@ -25,7 +26,8 @@ public class FlightServiceImpl implements FlightService{
 
 	@Override
 	public Mono<Flight> getFlight(String destination, UUID id) {
-		return flightDao.findByDestinationAndId(destination, id).map(fDto -> fDto.getFlight());
+		return flightDao.findByDestinationAndId(destination, id).map(FlightDto::getFlight)
+				.switchIfEmpty(Mono.just(new Flight()));
 	}
 
 }
