@@ -9,9 +9,3 @@ When method post
 Then status 201
 And match response contains { username: "test", id: "#notnull", destination: "Los Angeles, CA", startTime: "2021-08-19T10:00:00", endTime: "2021-08-21T10:00:00", partySize: 4, duration: 2}
 And def vacObj = response
-<<<<<<< HEAD
-
-
-
-=======
->>>>>>> 64d8b18bb92d65eba73ea9170de6b4753a85ce79

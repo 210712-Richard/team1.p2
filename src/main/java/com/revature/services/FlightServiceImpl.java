@@ -11,6 +11,7 @@ import com.revature.beans.Flight;
 import com.revature.data.FlightDao;
 import com.revature.dto.FlightDto;
 
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Service
@@ -28,6 +29,11 @@ public class FlightServiceImpl implements FlightService {
 	public Mono<Flight> getFlight(String destination, UUID id) {
 		return flightDao.findByDestinationAndId(destination, id).map(FlightDto::getFlight)
 				.switchIfEmpty(Mono.just(new Flight()));
+	}
+	
+	@Override
+	public Flux<Flight> getFlightsByDestination(String destination) {
+		return flightDao.findByDestination(destination).map(FlightDto::getFlight);
 	}
 
 }

@@ -9,9 +9,9 @@ import org.springframework.stereotype.Service;
 
 import com.revature.beans.Car;
 import com.revature.data.CarDao;
-
 import com.revature.dto.CarDto;
 
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Service
@@ -32,5 +32,10 @@ public class CarServiceImpl implements CarService {
 		return carDao.findByLocationAndId(destination, id)
 				.map(CarDto::getCar)
 				.switchIfEmpty(Mono.just(new Car()));
+	}
+	
+	@Override
+	public Flux<Car> getCarsByLocation(String location) {
+		return carDao.findByLocation(location).map(CarDto::getCar);
 	}
 }

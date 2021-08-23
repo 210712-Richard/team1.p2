@@ -6,9 +6,14 @@ Background:
 	* def loggedIn = call read('classpath:login/login.feature')
 	* def vacObj = vac.vacObj
 
+Given url 'http://localhost:8080/cars/Los%20Angeles,%20CA'
+When method get
+Then status 200
+And match each response contains { id: '#notnull' }
+And def car = response[0]
 
 Given url 'http://localhost:8080/reservations'
-And request {type: CAR, reservedId: d1113b33-d001-4408-948c-462bb2a79aaf, vacationId: '#(vacObj.id)' }
+And request {type: CAR, reservedId: '#(car.id)', vacationId: '#(vacObj.id)' }
 And cookie SESSION = loggedIn.sessionCookie 
 When method post
 Then status 200
