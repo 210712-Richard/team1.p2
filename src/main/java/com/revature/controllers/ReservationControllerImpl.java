@@ -18,7 +18,6 @@ import com.revature.beans.Flight;
 import com.revature.beans.Hotel;
 import com.revature.beans.Reservation;
 import com.revature.beans.User;
-import com.revature.beans.UserType;
 import com.revature.beans.Vacation;
 import com.revature.services.CarService;
 import com.revature.services.FlightService;
@@ -56,20 +55,21 @@ public class ReservationControllerImpl implements ReservationController {
 
 		// Make sure the user is a vacationer account
 		User loggedUser = (User) session.getAttribute("loggedUser");
+		String username = loggedUser != null ? loggedUser.getUsername() : "";
 
 		// Make sure the required fields are not null
 		if (res == null || res.getReservedId() == null || res.getVacationId() == null || res.getType() == null) {
 			return Mono.just(ResponseEntity.status(400).build());
 		}
 		// Get the vacation and make sure the id is correct
-		Mono<Vacation> monoVac = userService.getVacation(loggedUser.getUsername(), res.getVacationId());
+		Mono<Vacation> monoVac = userService.getVacation(username, res.getVacationId());
 
 		// Need to do different operations based on what is being reserved
 		switch (res.getType()) {
 		// Used to see if we are reserving a hotel
 		case HOTEL:
 			// Check to make sure the vacation and hotel exist before making the reservation
-			Mono<Hotel> monoHotel = userService.getVacation(loggedUser.getUsername(), res.getVacationId())
+			Mono<Hotel> monoHotel = userService.getVacation(username, res.getVacationId())
 					// If the vacation wasn't found, just return an empty Hotel object
 					.flatMap(v -> v.getId() != null ? hotelService.getHotel(v.getDestination(), res.getReservedId())
 							: Mono.just(new Hotel()));
@@ -93,7 +93,7 @@ public class ReservationControllerImpl implements ReservationController {
 		case FLIGHT:
 			// Check to make sure the vacation and flight exist before making the
 			// reservation
-			Mono<Flight> monoFlight = userService.getVacation(loggedUser.getUsername(), res.getVacationId())
+			Mono<Flight> monoFlight = userService.getVacation(username, res.getVacationId())
 					// If the vacation wasn't found, just return an empty Flight object
 					.flatMap(v -> v.getId() != null ? flightService.getFlight(v.getDestination(), res.getReservedId())
 							: Mono.just(new Flight()));
@@ -117,7 +117,7 @@ public class ReservationControllerImpl implements ReservationController {
 		case CAR:
 			// Check to make sure the vacation and flight exist before making the
 			// reservation
-			Mono<Car> monoCar = userService.getVacation(loggedUser.getUsername(), res.getVacationId())
+			Mono<Car> monoCar = userService.getVacation(username, res.getVacationId())
 					// If the vacation wasn't found, just return an empty Car object
 					.flatMap(v -> v.getId() != null ? carService.getCar(v.getDestination(), res.getReservedId())
 							: Mono.just(new Car()));
