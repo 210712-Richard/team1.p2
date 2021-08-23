@@ -122,11 +122,13 @@ public class UserServiceImpl implements UserService {
 			if (l.isEmpty()) {
 				return Flux.fromIterable(new ArrayList<Activity>());
 			} else {
-				Flux<Vacation> fluxVac = Flux.from(monoVac).flatMap(v->{
-					return Flux.<Vacation>generate(sink -> sink.next(v));
-				});
+				//Need to create an infinite flux to make sure all the activities are retrieved
+				Flux<Vacation> fluxVac = Flux.from(monoVac)
+						.flatMap(v -> Flux.<Vacation>generate(sink -> sink.next(v)));
+				
+				//Zip the fluxes together and iterate until all the activities have been obtained.
 				return Flux.fromIterable(l).zipWith(fluxVac)
-						.flatMap(t ->  actDao.findByLocationAndId(t.getT2().getDestination(), t.getT1()))
+						.flatMap(t -> actDao.findByLocationAndId(t.getT2().getDestination(), t.getT1()))
 						.map(ActivityDto::getActivity);
 			}
 		}).collectList().switchIfEmpty(Mono.just(new ArrayList<Activity>()));
@@ -145,10 +147,14 @@ public class UserServiceImpl implements UserService {
 						.map(ReservationDto::getReservation);
 			}
 		}).collectList().switchIfEmpty(Mono.just(new ArrayList<Reservation>()));
+		
+		//Need to first set the activities
 		Mono<Vacation> zippedVacMono = activities.zipWith(monoVac).map(t -> {
 			t.getT2().setActivities(t.getT1());
 			return t.getT2();
 		});
+		
+		//Then set the reservations and return
 		Mono<Tuple2<List<Reservation>, Vacation>> zippedFinalMono = reserveds.zipWith(zippedVacMono)
 				.switchIfEmpty(Mono.empty());
 		return zippedFinalMono.map(t -> {
