@@ -6,7 +6,7 @@ Background:
 	* def loggedIn = call read('classpath:login/login.feature')
 	* def vacObj = vac.vacObj
 
-Given url 'http://localhost:8080/users/test/activities/#(vacObj.id) '
+Given url 'http://localhost:8080/users/test/activities/'+vacObj.id
 When method get
 Then status 200
 And match each response contains { id: '#notnull' }

@@ -8,7 +8,6 @@ import com.revature.beans.Activity;
 import reactor.core.publisher.Flux;
 
 public interface ActivityController {
-	public Flux<ResponseEntity<Activity>> viewActivities(String vacId, WebSession session);
-	public Flux<ResponseEntity<Activity>> viewAllActivities(String location, WebSession session);
+	public ResponseEntity<Flux<Activity>> viewAllActivities(String location, WebSession session);
 
 }

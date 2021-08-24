@@ -95,9 +95,6 @@ class UserServiceTests {
 		vac.setUsername(user.getUsername());
 		vac.setId(UUID.randomUUID());
 		vac.setDestination("Los Angeles, CA");
-		List<Activity> activities = new ArrayList<Activity>();
-		activities.add(act);
-		vac.setActivities(activities);
 		vac.setPartySize(4);
 		vac.setDuration(1);
 		vac.setStartTime(LocalDateTime.now());

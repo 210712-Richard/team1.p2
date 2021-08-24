@@ -125,27 +125,21 @@ public class UserControllerImpl implements UserController {
 	
 	@LoggedInFlux
 	@GetMapping("{username}/activities/{vacationid}")
-	public Flux<ResponseEntity<Activity>> getActivities(@PathVariable("username") String username, 
+	public ResponseEntity<Flux<Activity>> getActivities(@PathVariable("username") String username, 
 			@PathVariable("vacationid") String id, WebSession session) {
+		log.trace("running getactivities");
 		User loggedUser = (User) session.getAttribute(LOGGED_USER);
 
 		if (loggedUser == null || !username.equals(loggedUser.getUsername())) {
-			return Flux.just(ResponseEntity.status(403).build());
+			return ResponseEntity.status(401).body(Flux.empty());
 		}
 		UUID vacId = null;
 		try {
 			vacId = UUID.fromString(id);
 		} catch (Exception e) {
-			return Flux.just(ResponseEntity.badRequest().build());
+			return ResponseEntity.badRequest().body(Flux.empty());
 		}
-		return userService.getActivities(vacId, username).map(a -> { 
-			log.debug("Activity received: " + a);
-			if (a.getId() == null) {
-				return ResponseEntity.notFound().build();
-			} else {
-				return ResponseEntity.ok(a);
-			}
-		});
+		return ResponseEntity.ok(userService.getActivities(vacId, username));
 
 	}
 
