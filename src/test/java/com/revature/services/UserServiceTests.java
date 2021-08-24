@@ -6,7 +6,11 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Period;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
+import reactor.core.publisher.Flux;
+
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -17,14 +21,17 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
+import com.revature.beans.Activity;
 import com.revature.beans.Reservation;
 import com.revature.beans.ReservationType;
 import com.revature.beans.User;
 import com.revature.beans.UserType;
 import com.revature.beans.Vacation;
+import com.revature.data.ActivityDao;
 import com.revature.data.ReservationDao;
 import com.revature.data.UserDao;
 import com.revature.data.VacationDao;
+import com.revature.dto.ActivityDto;
 import com.revature.dto.ReservationDto;
 import com.revature.dto.UserDto;
 import com.revature.dto.VacationDto;
@@ -46,8 +53,13 @@ class UserServiceTests {
 
 	@Mock
 	private ReservationDao resDao;
+	
+	@Mock
+	private ActivityDao actDao;
 
 	private User user;
+	
+	private Activity act;
 
 	private Vacation vac;
 
@@ -69,11 +81,23 @@ class UserServiceTests {
 		user.setEmail("test@email.com");
 		user.setBirthday(LocalDate.now());
 		user.setType(UserType.VACATIONER);
+		
+		act = new Activity();
+		act.setLocation("Los Angeles, CA");
+		act.setId(UUID.randomUUID());
+		act.setName("TestActivity");
+		act.setDescription("A test activity");
+		act.setCost(400.00);
+		act.setDate(LocalDateTime.now().plusDays(2));
+		act.setMaxParticipants(5);
 
 		vac = new Vacation();
 		vac.setUsername(user.getUsername());
 		vac.setId(UUID.randomUUID());
 		vac.setDestination("Los Angeles, CA");
+		List<Activity> activities = new ArrayList<Activity>();
+		activities.add(act);
+		vac.setActivities(activities);
 		vac.setPartySize(4);
 		vac.setDuration(1);
 		vac.setStartTime(LocalDateTime.now());
@@ -288,6 +312,12 @@ class UserServiceTests {
 		Mono<Vacation> vacMono = service.getVacation(wrongUsername, vac.getId());
 
 		StepVerifier.create(vacMono).expectNextMatches(vDto -> vDto.getId() == null).verifyComplete();
+	}
+	
+	@Test
+	void testGetActivities() {
+		Mockito.when(actDao.findByLocationAndId(vac.getDestination(), vac.getId()))
+			.thenReturn(Flux.just(new ActivityDto(act)));
 	}
 
 }
