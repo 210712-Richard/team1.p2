@@ -137,11 +137,55 @@ public class UserServiceImpl implements UserService {
 	}
     
 	public Mono<User> deleteUserAccount(String username) {
-		userDao.deleteByUsername(username);
-		
+        Mono<User> user = userDao.findByUsername(username).map(UserDto::getUser)
+                .switchIfEmpty(Mono.empty());
+        Mono<List<Vacations>> vac = Flux.from(userDao.findByUsername(username)
+        		.map(u -> {
+					if (u.getVacations() == null) {
+						u.setVacations(new ArrayList<>());
+					}
+					return u.getVacations();
+        		Mono<List<Reservation>> reserveds = Flux.from(vacDao.findByUsername(username))
+				.map(v-> {
+					if (v.getReservations() == null) {
+						v.setReservations(new ArrayList<>());
+					}
+					return v.getReservations();
+				})
+				.flatMap(r -> {
+					log.debug("The list from the reservation: " + r);
+					if (r.isNotEmpty()) {
+						return Flux.fromIterable(r)
+								.flatMap(uuid -> resDao.deleteById(uuid))
+								.map(ReservationDto::getReservation);
+					}
+				})
+					
+					.flatMap(v -> {
+						log.debug("The list from the vacation: " + v);
+						if (v.isNotEmpty()) {
+							return Flux.fromIterable(v)
+									.flatMap(username -> vacDao.deleteById(username))
+									.map(VacationDto::getVacations);
+						}
+					})
+						.flatMap(u -> {
+							log.debug("user: " + u);
+							if (u.isNotEmpty()) {
+								return Flux.fromIterable(l)
+										.flatMap(username -> userDao.deleteByUsername(username))
+										.map(UserDto::getUser);
+							}
+						});
+        		}
 	}
-	
 }
+						
+		
+	
+	
+
+   
 	
     		 
     			 

@@ -20,5 +20,5 @@ public interface VacationDao extends ReactiveCassandraRepository<VacationDto, St
 
 	Mono<VacationDto> deletebyUsername(String username);
 
-	Mono<User> deleteByUsername(String username);
+	
 }
