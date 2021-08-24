@@ -175,6 +175,8 @@ public class ReservationServiceImpl implements ReservationService {
 	}
 
 	private Mono<Boolean> isAvailable(UUID resId, UUID id, Integer available, ReservationType type, LocalDateTime startTime, Integer duration) {
+		log.trace("Checking if reservations are available");
+		
 		// Get when the reservation would end
 		LocalDateTime endTime = startTime.plus(Period.of(0, 0, duration));
 		
@@ -206,25 +208,13 @@ public class ReservationServiceImpl implements ReservationService {
 	
 	@Override
 	public Mono<Reservation> rescheduleReservation(Reservation res, LocalDateTime startTime, Integer duration){
-		Integer offset = 0;
-		LocalDateTime endTime = startTime.plus(Period.of(0, 0, duration));
-		log.debug("End Time from new start time and duration: " + endTime);
-		LocalDateTime rEndTime = res.getStarttime().plus(Period.of(0, 0, res.getDuration()));
-		log.debug("End Time from old start time and duration: " + rEndTime);
-		
-		if (((rEndTime.isAfter(startTime) && !rEndTime.isAfter(endTime))
-							|| (res.getStarttime().isBefore(endTime) 
-									&& !res.getStarttime().isBefore(startTime))
-							|| (res.getStarttime().equals(startTime) 
-									&& duration.equals(res.getDuration())))){
-			offset = 1;
-		}
-		
-		log.debug("The offset for checking reservations: " + offset);
 		
 		res.setStarttime(startTime);
-		res.setDuration(duration);
+		if (!res.getType().equals(ReservationType.FLIGHT)) {
+			res.setDuration(duration);
+		}
 		log.debug("New Reservation: " + res);
+		
 		return vacDao.findByUsernameAndId(res.getUsername(), res.getVacationId())
 				.flatMap(v -> {
 					switch(res.getType()) {
@@ -240,21 +230,23 @@ public class ReservationServiceImpl implements ReservationService {
 											return Mono.empty();
 										}));
 					case CAR:
-						carDao.findByLocationAndId(v.getDestination(), res.getReservedId())
+						return carDao.findByLocationAndId(v.getDestination(), res.getReservedId())
 						.flatMap(c -> isAvailable(res.getId(), c.getId(), 1, ReservationType.CAR, res.getStarttime(), res.getDuration())
 								.flatMap(b -> {
 									//If there are spots available
 									if (Boolean.TRUE.equals(b)) {
-											return resDao.save(new ReservationDto(res))
-											.map(rDto -> rDto.getReservation());
+										log.debug("The reservation can work");								
+										return resDao.save(new ReservationDto(res))
+										.map(rDto -> rDto.getReservation());
 									}
 									return Mono.empty();
 								}));
 					
 					case FLIGHT:
-						flightDao.findByDestinationAndId(v.getDestination(), res.getReservedId())
+						return flightDao.findByDestinationAndId(v.getDestination(), res.getReservedId())
 						.flatMap(f -> isAvailable(res.getId(), f.getId(), f.getOpenSeats(), ReservationType.FLIGHT, res.getStarttime(), res.getDuration())
 								.flatMap(b -> {
+									log.debug("Checked if flights were available");
 									//If there are rooms available
 									if (Boolean.TRUE.equals(b)) {
 											return resDao.save(new ReservationDto(res))
