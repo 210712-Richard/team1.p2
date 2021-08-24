@@ -22,6 +22,7 @@ import com.revature.beans.User;
 import com.revature.beans.Vacation;
 import com.revature.services.UserService;
 
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @RestController
@@ -116,12 +117,16 @@ public class UserControllerImpl implements UserController {
 			}
 		});
 	}
+
+	@VacationerCheck
+	@DeleteMapping("{username}")
+	public Mono<ResponseEntity<Void>> deleteUser(@PathVariable("username") String username, WebSession session) {
+		User loggedUser = (User) session.getAttribute(LOGGED_USER);
+		session.invalidate();
+		return Flux.from(userService.login(username, loggedUser.getPassword())).map(u -> u.getVacations())
+				.flatMap(l -> Flux.fromIterable(l)).flatMap(uuid -> userService.getVacation(username, uuid))
+				.collectList().map(list -> userService.deleteUser(username, list))
+				.map(v -> ResponseEntity.status(204).build());
+	}
 	
-	@DeleteMapping("/{username}")
-    public ResponseEntity<User> delete(@PathVariable("username") String username) {
-        userService.deletebyUsername(username);
-        return ResponseEntity.noContent().build();
-    }
-
-
 }

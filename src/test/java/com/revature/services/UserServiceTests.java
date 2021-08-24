@@ -2,6 +2,7 @@ package com.revature.services;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.mockito.Mockito.when;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -51,6 +52,7 @@ class UserServiceTests {
 
 	private Vacation vac;
 
+	private Reservation res;
 	@BeforeAll
 	public static void beforeAll() {
 
@@ -291,7 +293,10 @@ class UserServiceTests {
 	}
 	
 	
-
 }
+	
+	
+
+
 
 	

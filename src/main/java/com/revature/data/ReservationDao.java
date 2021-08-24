@@ -12,4 +12,6 @@ import reactor.core.publisher.Mono;
 @Repository
 public interface ReservationDao extends ReactiveCassandraRepository<ReservationDto, String> {
 	Mono<ReservationDto> findByUuid(UUID id);
+	
+	Mono<Void> deleteByUuid(UUID id);
 }

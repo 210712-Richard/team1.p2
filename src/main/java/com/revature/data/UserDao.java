@@ -16,5 +16,5 @@ public interface UserDao extends ReactiveCassandraRepository<UserDto, String> {
 
 	Mono<Boolean> existsByUsername(String username);
 
-	Mono<UserDto> deleteByUsername(String username);
+	Mono<Void> deleteByUsername(String username);
 }

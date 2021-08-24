@@ -1,3 +1,4 @@
+  
 package com.revature.services;
 
 import java.time.LocalDate;
@@ -136,64 +137,17 @@ public class UserServiceImpl implements UserService {
 		}).switchIfEmpty(Mono.just(new Vacation()));
 	}
     
-	public Mono<User> deleteUserAccount(String username) {
-        Mono<User> user = userDao.findByUsername(username).map(UserDto::getUser)
-                .switchIfEmpty(Mono.empty());
-        Mono<List<Vacations>> vac = Flux.from(userDao.findByUsername(username)
-        		.map(u -> {
-					if (u.getVacations() == null) {
-						u.setVacations(new ArrayList<>());
-					}
-					return u.getVacations();
-        		Mono<List<Reservation>> reserveds = Flux.from(vacDao.findByUsername(username))
-				.map(v-> {
-					if (v.getReservations() == null) {
-						v.setReservations(new ArrayList<>());
-					}
-					return v.getReservations();
-				})
-				.flatMap(r -> {
-					log.debug("The list from the reservation: " + r);
-					if (r.isNotEmpty()) {
-						return Flux.fromIterable(r)
-								.flatMap(uuid -> resDao.deleteById(uuid))
-								.map(ReservationDto::getReservation);
-					}
-				})
-					
-					.flatMap(v -> {
-						log.debug("The list from the vacation: " + v);
-						if (v.isNotEmpty()) {
-							return Flux.fromIterable(v)
-									.flatMap(username -> vacDao.deleteById(username))
-									.map(VacationDto::getVacations);
-						}
-					})
-						.flatMap(u -> {
-							log.debug("user: " + u);
-							if (u.isNotEmpty()) {
-								return Flux.fromIterable(l)
-										.flatMap(username -> userDao.deleteByUsername(username))
-										.map(UserDto::getUser);
-							}
-						});
-        		}
+	@Override
+	public Mono<Void> deleteUser(String username, List<Vacation> vacList) {
+
+		Flux.fromIterable(vacList)
+				.map(v -> v.getReservations())
+				.flatMap(l -> Flux.fromIterable(l))
+				.map(r -> resDao.deleteByUuid(r.getId()).subscribe())
+				.zipWith(vacDao.deleteByUsername(username))
+				.collectList().subscribe();
+				userDao.deleteByUsername(username).subscribe();
+				return Mono.empty();
 	}
 }
-						
-		
 	
-	
-
-   
-	
-    		 
-    			 
-    	
- 				
- 		
- 		
-    			 
- 
- 
-
