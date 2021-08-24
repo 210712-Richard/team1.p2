@@ -23,6 +23,7 @@ import com.revature.data.ReservationDao;
 import com.revature.data.VacationDao;
 import com.revature.dto.ReservationDto;
 import com.revature.dto.VacationDto;
+
 import reactor.core.publisher.Mono;
 
 @Service
@@ -66,7 +67,7 @@ public class ReservationServiceImpl implements ReservationService {
 		vacation.setTotal(vacation.getTotal() + res.getCost());
 
 		// Save the reservation and the vacation and return the reservation
-		return isAvailable(hotel.getId(), hotel.getRoomsAvailable(), ReservationType.HOTEL, res.getStarttime(), res.getDuration())
+		return isAvailable(res.getId(), hotel.getId(), hotel.getRoomsAvailable(), ReservationType.HOTEL, res.getStarttime(), res.getDuration())
 				.flatMap(b -> {
 					//If there are rooms available
 					if (Boolean.TRUE.equals(b)) {
@@ -99,7 +100,7 @@ public class ReservationServiceImpl implements ReservationService {
 		 vacation.getReservations().add(res);
 		 vacation.setTotal(vacation.getTotal() + res.getCost());
 		 
-		 return isAvailable(flight.getId(), flight.getOpenSeats(), ReservationType.FLIGHT, res.getStarttime(), res.getDuration())
+		 return isAvailable(res.getId(), flight.getId(), flight.getOpenSeats(), ReservationType.FLIGHT, res.getStarttime(), res.getDuration())
 				.flatMap(b -> {
 					//If flight is available
 					if (Boolean.TRUE.equals(b)) {
@@ -173,7 +174,7 @@ public class ReservationServiceImpl implements ReservationService {
 		}).switchIfEmpty(Mono.just(new Reservation()));
 	}
 
-	private Mono<Boolean> isAvailable(UUID id, Integer available, ReservationType type, LocalDateTime startTime, Integer duration) {
+	private Mono<Boolean> isAvailable(UUID resId, UUID id, Integer available, ReservationType type, LocalDateTime startTime, Integer duration) {
 		// Get when the reservation would end
 		LocalDateTime endTime = startTime.plus(Period.of(0, 0, duration));
 		
@@ -181,7 +182,8 @@ public class ReservationServiceImpl implements ReservationService {
 		Mono<Integer> intMono = resDao.findAll().map(rDto -> rDto.getReservation())
 				.filter(r -> {
 					LocalDateTime rEndTime = r.getStarttime().plus(Period.of(0, 0, duration));
-					return r.getReservedId().equals(id) 
+					return !r.getId().equals(resId)
+					&& r.getReservedId().equals(id) 
 					&& r.getType().equals(type)
 					&& !r.getStatus().equals(ReservationStatus.CLOSED)
 					&& ((rEndTime.isAfter(startTime) && !rEndTime.isAfter(endTime))
@@ -193,5 +195,76 @@ public class ReservationServiceImpl implements ReservationService {
 				.map(rDtoList -> rDtoList.size());
 		
 		return intMono.map(i -> i < available);
+	}
+
+	@Override
+	public Mono<Reservation> getReservation(UUID resId) {
+		return resDao.findByUuid(resId)
+				.map(r -> r.getReservation())
+				.switchIfEmpty(Mono.just(new Reservation()));
+	}
+	
+	@Override
+	public Mono<Reservation> rescheduleReservation(Reservation res, LocalDateTime startTime, Integer duration){
+		Integer offset = 0;
+		LocalDateTime endTime = startTime.plus(Period.of(0, 0, duration));
+		log.debug("End Time from new start time and duration: " + endTime);
+		LocalDateTime rEndTime = res.getStarttime().plus(Period.of(0, 0, res.getDuration()));
+		log.debug("End Time from old start time and duration: " + rEndTime);
+		
+		if (((rEndTime.isAfter(startTime) && !rEndTime.isAfter(endTime))
+							|| (res.getStarttime().isBefore(endTime) 
+									&& !res.getStarttime().isBefore(startTime))
+							|| (res.getStarttime().equals(startTime) 
+									&& duration.equals(res.getDuration())))){
+			offset = 1;
+		}
+		
+		log.debug("The offset for checking reservations: " + offset);
+		
+		res.setStarttime(startTime);
+		res.setDuration(duration);
+		log.debug("New Reservation: " + res);
+		return vacDao.findByUsernameAndId(res.getUsername(), res.getVacationId())
+				.flatMap(v -> {
+					switch(res.getType()) {
+					case HOTEL:
+						return hotelDao.findByLocationAndId(v.getDestination(), res.getReservedId())
+								.flatMap(h -> isAvailable(res.getId(), h.getId(), h.getRoomsAvailable(), ReservationType.HOTEL, res.getStarttime(), res.getDuration())
+										.flatMap(b -> {
+											//If there are rooms available
+											if (Boolean.TRUE.equals(b)) {
+													return resDao.save(new ReservationDto(res))
+													.map(rDto -> rDto.getReservation());
+											}
+											return Mono.empty();
+										}));
+					case CAR:
+						carDao.findByLocationAndId(v.getDestination(), res.getReservedId())
+						.flatMap(c -> isAvailable(res.getId(), c.getId(), 1, ReservationType.CAR, res.getStarttime(), res.getDuration())
+								.flatMap(b -> {
+									//If there are spots available
+									if (Boolean.TRUE.equals(b)) {
+											return resDao.save(new ReservationDto(res))
+											.map(rDto -> rDto.getReservation());
+									}
+									return Mono.empty();
+								}));
+					
+					case FLIGHT:
+						flightDao.findByDestinationAndId(v.getDestination(), res.getReservedId())
+						.flatMap(f -> isAvailable(res.getId(), f.getId(), f.getOpenSeats(), ReservationType.FLIGHT, res.getStarttime(), res.getDuration())
+								.flatMap(b -> {
+									//If there are rooms available
+									if (Boolean.TRUE.equals(b)) {
+											return resDao.save(new ReservationDto(res))
+											.map(rDto -> rDto.getReservation());
+									}
+									return Mono.empty();
+								}));
+					default:
+						return Mono.empty();
+					}
+				});
 	}
 }

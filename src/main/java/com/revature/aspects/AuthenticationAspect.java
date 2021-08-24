@@ -100,6 +100,28 @@ public class AuthenticationAspect {
 
 		return pjp.proceed();
 	}
+	
+	@Around("checkStaffHook()")
+	public Object checkStaff(ProceedingJoinPoint pjp) throws Throwable {
+		log.trace("Checking to see if the user is a staff member");
+
+		WebSession session = (WebSession) Stream.of(pjp.getArgs()).filter(WebSession.class::isInstance).findFirst()
+				.orElse(null);
+
+		if (session == null) {
+			return Mono.just(ResponseEntity.status(500).build());
+		}
+
+		User loggedUser = session.getAttribute("loggedUser");
+		log.debug("Logged In User: " + loggedUser);
+
+		// If the logged in user is not the same user specified or is not a vacationer
+		if (loggedUser == null || UserType.VACATIONER.equals(loggedUser.getType())) {
+			return Mono.just(ResponseEntity.status(403).build());
+		}
+
+		return pjp.proceed();
+	}
 
 	private Boolean isLoggedIn(Object[] args) {
 
@@ -123,6 +145,11 @@ public class AuthenticationAspect {
 
 	@Pointcut("@annotation(com.revature.aspects.VacationerCheck)")
 	private void checkVacationerHook() {
+		/* Empty */
+	}
+	
+	@Pointcut("@annotation(com.revature.aspects.StaffCheck)")
+	private void checkStaffHook() {
 		/* Empty */
 	}
 }
