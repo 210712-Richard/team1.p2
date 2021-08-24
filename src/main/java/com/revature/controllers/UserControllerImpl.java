@@ -16,12 +16,16 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.WebSession;
 
+import com.revature.aspects.LoggedInFlux;
 import com.revature.aspects.LoggedInMono;
 import com.revature.aspects.VacationerCheck;
+import com.revature.beans.Activity;
 import com.revature.beans.User;
 import com.revature.beans.Vacation;
+import com.revature.services.ActivityService;
 import com.revature.services.UserService;
 
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @RestController
@@ -30,10 +34,12 @@ public class UserControllerImpl implements UserController {
 	private static Logger log = LogManager.getLogger(UserControllerImpl.class);
 
 	UserService userService;
+	ActivityService activityService;
 
 	@Autowired
-	public UserControllerImpl(UserService userService) {
+	public UserControllerImpl(UserService userService, ActivityService activityService) {
 		this.userService = userService;
+		this.activityService = activityService;
 	}
 
 	@PostMapping
@@ -115,6 +121,32 @@ public class UserControllerImpl implements UserController {
 				return ResponseEntity.ok(v);
 			}
 		});
+	}
+	
+	@LoggedInFlux
+	@GetMapping("{username}/activities/{vacationid}")
+	public Flux<ResponseEntity<Activity>> getActivities(@PathVariable("username") String username, 
+			@PathVariable("vacationid") String id, WebSession session) {
+		User loggedUser = (User) session.getAttribute(LOGGED_USER);
+
+		if (loggedUser == null || !username.equals(loggedUser.getUsername())) {
+			return Flux.just(ResponseEntity.status(403).build());
+		}
+		UUID vacId = null;
+		try {
+			vacId = UUID.fromString(id);
+		} catch (Exception e) {
+			return Flux.just(ResponseEntity.badRequest().build());
+		}
+		return userService.getActivities(vacId, username).map(a -> { 
+			log.debug("Activity received: " + a);
+			if (a.getId() == null) {
+				return ResponseEntity.notFound().build();
+			} else {
+				return ResponseEntity.ok(a);
+			}
+		});
+
 	}
 
 }

@@ -16,6 +16,7 @@ import com.revature.beans.Reservation;
 import com.revature.beans.User;
 import com.revature.beans.UserType;
 import com.revature.beans.Vacation;
+import com.revature.data.ActivityDao;
 import com.revature.data.HotelDao;
 import com.revature.data.ReservationDao;
 import com.revature.data.UserDao;
@@ -38,12 +39,15 @@ public class UserServiceImpl implements UserService {
 	private VacationDao vacDao;
 
 	private ReservationDao resDao; 
+	
+	private ActivityDao actDao;
 
 	@Autowired
-	public UserServiceImpl(UserDao userDao, VacationDao vacDao, HotelDao hotelDao, ReservationDao resDao) {
+	public UserServiceImpl(UserDao userDao, VacationDao vacDao, HotelDao hotelDao, ReservationDao resDao, ActivityDao actDao) {
 		this.userDao = userDao;
 		this.vacDao = vacDao;
 		this.resDao = resDao;
+		this.actDao = actDao;
 	}
 
 	@Override
@@ -138,6 +142,7 @@ public class UserServiceImpl implements UserService {
 		}).switchIfEmpty(Mono.just(new Vacation()));
 	}
 	
+	@Override
 	public Flux<Activity> getActivities(UUID id, String username) {
         Mono<Vacation> monoVac = vacDao.findByUsernameAndId(username, id).map(VacationDto::getVacation)
                 .switchIfEmpty(Mono.empty());

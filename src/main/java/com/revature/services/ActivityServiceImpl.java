@@ -30,32 +30,6 @@ public class ActivityServiceImpl implements ActivityService {
 		this.vacDao=vacDao;
 	}
 	
-	@Override
-	public Flux<Activity> getActivities(UUID id, String username) {
-		Mono<Vacation> monoVac = vacDao.findByUsernameAndId(username, id).map(VacationDto::getVacation);
-
-		return Flux.from(vacDao.findByUsernameAndId(username, id)).map(vac -> {
-			if (vac.getActivities() == null) {
-				vac.setActivities(new ArrayList<>());
-			}
-			return vac.getActivities();
-		}).flatMap(l -> {
-			log.debug("The list from the vacation: " + l);
-			if (l.isEmpty()) {
-				return Flux.fromIterable(new ArrayList<Activity>());
-			} else {
-				//Need to create an infinite flux to make sure all the activities are retrieved
-				Flux<Vacation> fluxVac = Flux.from(monoVac)
-						.flatMap(v -> Flux.<Vacation>generate(sink -> sink.next(v)));
-				
-				//Zip the fluxes together and iterate until all the activities have been obtained.
-				return Flux.fromIterable(l).zipWith(fluxVac)
-						.flatMap(t -> actDao.findByLocationAndId(t.getT2().getDestination(), t.getT1()))
-						.map(ActivityDto::getActivity);
-			}
-		});
-	
-	}
 
 	@Override
 	public Flux<Activity> getAllActivities(String location) {
