@@ -129,5 +129,6 @@ class FlightServiceTest {
 		
 		StepVerifier.create(fluxFlights).expectComplete().verify();
 		
-	}
+	}	
+
 }

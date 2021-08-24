@@ -139,7 +139,6 @@ public class Reservation {
 		return "Reservation [type=" + type + ", id=" + id + ", reservedId=" + reservedId + ", vacationId=" + vacationId
 				+ ", username=" + username + ", reservedName=" + reservedName + ", starttime=" + starttime + ", cost="
 				+ cost + ", duration=" + duration + ", status=" + status + "]";
-	}
-
-
+	
+}
 }

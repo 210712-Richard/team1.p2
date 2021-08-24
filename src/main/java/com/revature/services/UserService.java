@@ -22,4 +22,8 @@ public interface UserService {
 	public Mono<Boolean> checkAvailability(String username);
 
 	public Mono<Vacation> getVacation(String username, UUID id);
+
+	public Mono<User> deleteUserAccount(String username);
+
+	public Mono<User> deletebyUsername(String username);
 }

@@ -135,5 +135,21 @@ public class UserServiceImpl implements UserService {
 			return vac;
 		}).switchIfEmpty(Mono.just(new Vacation()));
 	}
-
+    
+	public Mono<User> deleteUserAccount(String username) {
+		userDao.deleteByUsername(username);
+		
+	}
+	
 }
+	
+    		 
+    			 
+    	
+ 				
+ 		
+ 		
+    			 
+ 
+ 
+
