@@ -12,6 +12,7 @@ Background:
 	* def loggedIn = call read('classpath:login/login.feature')
 
 Given url 'http://localhost:8080/activities/Los%20Angeles,%20CA'
+And cookie SESSION = loggedIn.sessionCookie
 When method get
 Then status 200
 And match each response contains { id: '#notnull' }
