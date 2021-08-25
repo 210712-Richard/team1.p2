@@ -18,6 +18,6 @@ public interface ReservationService {
 	public Mono<Reservation> confirmReservation(String resId);
 	public Mono<Reservation> resetReservationStatus(String resId);
 	public Mono<Reservation> getReservation(UUID resId);
-	public Mono<Reservation> rescheduleReservation(Reservation res, LocalDateTime startTime, Integer duration);
+	public Mono<Reservation> rescheduleReservation(Reservation res, UUID newReservedId, LocalDateTime startTime, Integer duration);
 }
 

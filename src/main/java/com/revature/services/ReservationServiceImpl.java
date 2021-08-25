@@ -2,6 +2,7 @@ package com.revature.services;
 
 import java.time.LocalDateTime;
 import java.time.Period;
+import java.time.ZoneOffset;
 import java.util.UUID;
 
 import org.apache.logging.log4j.LogManager;
@@ -21,6 +22,7 @@ import com.revature.data.FlightDao;
 import com.revature.data.HotelDao;
 import com.revature.data.ReservationDao;
 import com.revature.data.VacationDao;
+import com.revature.dto.FlightDto;
 import com.revature.dto.ReservationDto;
 import com.revature.dto.VacationDto;
 
@@ -186,7 +188,10 @@ public class ReservationServiceImpl implements ReservationService {
 							|| (r.getType().equals(ReservationType.FLIGHT) && startTime.equals(r.getStarttime())));
 		}).collectList().map(rDtoList -> rDtoList.size());
 
-		return intMono.map(i -> i < available);
+		return intMono.map(i -> {
+			log.debug("Amount in database for " + type + ": " + i);
+			return i < available;
+		});
 	}
 
 	@Override
@@ -195,69 +200,111 @@ public class ReservationServiceImpl implements ReservationService {
 	}
 
 	@Override
-	public Mono<Reservation> rescheduleReservation(Reservation res, LocalDateTime startTime, Integer duration) {
-
-		res.setStarttime(startTime);
+	public Mono<Reservation> rescheduleReservation(Reservation res, UUID newReservedId, LocalDateTime startTime,
+			Integer duration) {
 
 		return vacDao.findByUsernameAndId(res.getUsername(), res.getVacationId()).flatMap(v -> {
-			if (!res.getType().equals(ReservationType.FLIGHT)) {
-				Integer oldDur = res.getDuration();
-				Double oldCost = res.getCost();
-				res.setDuration(duration);
-				res.setCost(res.getCost() / oldDur * res.getDuration());
-				v.setTotal(v.getTotal() - oldCost + res.getCost());
-			}
-			log.debug("New Reservation: " + res);
-			return vacDao.save(v);
-		}).flatMap(v -> {
 			switch (res.getType()) {
 			case HOTEL:
-				return rescheduleHotel(res, v.getDestination());
+				return rescheduleHotel(res, v, startTime, duration);
 			case CAR:
-				return rescheduleCar(res, v.getDestination());
+				return rescheduleCar(res, v, startTime, duration);
 			case FLIGHT:
-				return rescheduleFlight(res, v.getDestination());
+				if (newReservedId != null) {
+					return rescheduleFlight(res, v, newReservedId, res.getStarttime(), 0);
+				}
+				return rescheduleFlight(res, v, res.getReservedId(), startTime, 0);
 			default:
 				return Mono.empty();
 			}
 		});
 	}
-	
-	private Mono<Reservation> rescheduleHotel(Reservation res, String location){
-		return hotelDao.findByLocationAndId(location, res.getReservedId())
+
+	private Mono<Reservation> rescheduleHotel(Reservation res, VacationDto vac, LocalDateTime startTime,
+			Integer duration) {
+		return hotelDao.findByLocationAndId(vac.getDestination(), res.getReservedId())
 				.flatMap(h -> isAvailable(res.getId(), h.getId(), h.getRoomsAvailable(), ReservationType.HOTEL,
-						res.getStarttime(), res.getDuration()).flatMap(b -> {
+						startTime, duration).flatMap(b -> {
 							// If there are rooms available
 							if (Boolean.TRUE.equals(b)) {
-								return resDao.save(new ReservationDto(res)).map(rDto -> rDto.getReservation());
+								res.setStarttime(startTime);
+								Integer oldDur = res.getDuration();
+								Double oldCost = res.getCost();
+								res.setDuration(duration);
+								res.setCost(res.getCost() / oldDur * res.getDuration());
+								vac.setTotal(vac.getTotal() - oldCost + res.getCost());
+								log.debug("New Vacation: " + vac);
+								log.debug("New Reservation: " + res);
+								return resDao.save(new ReservationDto(res)).zipWith(vacDao.save(vac))
+										.map(t -> t.getT1().getReservation());
 							}
 							return Mono.empty();
 						}));
 	}
 
-	private Mono<Reservation> rescheduleCar(Reservation res, String location){
-		return carDao.findByLocationAndId(location, res.getReservedId())
-				.flatMap(c -> isAvailable(res.getId(), c.getId(), 1, ReservationType.CAR, res.getStarttime(),
-						res.getDuration()).flatMap(b -> {
-							// If there are spots available
-							if (Boolean.TRUE.equals(b)) {
-								log.debug("The reservation will be rescheduled");
-								return resDao.save(new ReservationDto(res)).map(rDto -> rDto.getReservation());
-							}
-							return Mono.empty();
-						}));
+	private Mono<Reservation> rescheduleCar(Reservation res, VacationDto vac, LocalDateTime startTime,
+			Integer duration) {
+		return carDao.findByLocationAndId(vac.getDestination(), res.getReservedId()).flatMap(
+				c -> isAvailable(res.getId(), c.getId(), 1, ReservationType.CAR, startTime, duration).flatMap(b -> {
+					// If there are spots available
+					if (Boolean.TRUE.equals(b)) {
+						log.debug("The reservation will be rescheduled");
+						res.setStarttime(startTime);
+						Integer oldDur = res.getDuration();
+						Double oldCost = res.getCost();
+						res.setDuration(duration);
+						res.setCost(res.getCost() / oldDur * res.getDuration());
+						vac.setTotal(vac.getTotal() - oldCost + res.getCost());
+						log.debug("New Vacation: " + vac);
+						log.debug("New Reservation: " + res);
+						return resDao.save(new ReservationDto(res)).zipWith(vacDao.save(vac))
+								.map(t -> t.getT1().getReservation());
+					}
+					return Mono.empty();
+				}));
 	}
-	
-	private Mono<Reservation> rescheduleFlight(Reservation res, String location) {
 
-		return flightDao.findByDestinationAndId(location, res.getReservedId())
+	private Mono<Reservation> rescheduleFlight(Reservation res, VacationDto vac, UUID newReservedId,
+			LocalDateTime startTime, Integer duration) {
+		return flightDao.findByDestinationAndId(vac.getDestination(), newReservedId)
 				.flatMap(f -> isAvailable(res.getId(), f.getId(), f.getOpenSeats(), ReservationType.FLIGHT,
-						res.getStarttime(), res.getDuration()).flatMap(b -> {
+						LocalDateTime.ofInstant(f.getDepartingDate(), ZoneOffset.UTC), duration)
+						.flatMap(b -> {
 							log.debug("Checked if flights were available");
 							// If there are rooms available
 							if (Boolean.TRUE.equals(b)) {
+								log.debug("Changing the reservation");
+								if (res.getReservedId() != newReservedId) {
+									return flightDao.findByDestinationAndId(vac.getDestination(), newReservedId)
+											.zipWith(
+													flightDao.findByDestinationAndId(vac.getDestination(), res.getId()))
+											.flatMap(t -> {
+												FlightDto oldFlight = t.getT1();
+												log.debug("The old flight: " + oldFlight);
+												FlightDto newFlight = t.getT2();
+												log.debug("The new flight" + newFlight);
+												vac.getReservations().remove(oldFlight.getId());
+												vac.getReservations().add(newFlight.getId());
+												vac.setTotal(vac.getTotal() - oldFlight.getTicketPrice()
+														+ newFlight.getTicketPrice());
+												log.debug("New Reservation: " + res);
+												log.debug("Vacation changed to: " + vac);
+												return resDao.save(new ReservationDto(res)).zipWith(vacDao.save(vac))
+														.map(tuple -> tuple.getT1().getReservation());
+											});
+								}
 								log.debug("The reservation will be rescheduled");
-								return resDao.save(new ReservationDto(res)).map(rDto -> rDto.getReservation());
+								log.debug("The reservation will be rescheduled");
+								res.setStarttime(startTime);
+								Integer oldDur = res.getDuration();
+								Double oldCost = res.getCost();
+								res.setDuration(duration);
+								res.setCost(res.getCost() / oldDur * res.getDuration());
+								vac.setTotal(vac.getTotal() - oldCost + res.getCost());
+								log.debug("New Vacation: " + vac);
+								log.debug("New Reservation: " + res);
+								return resDao.save(new ReservationDto(res)).zipWith(vacDao.save(vac))
+										.map(t -> t.getT1().getReservation());
 							}
 							return Mono.empty();
 						}));
