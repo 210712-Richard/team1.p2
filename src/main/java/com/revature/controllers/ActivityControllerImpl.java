@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.WebSession;
 
-import com.revature.aspects.LoggedInFlux;
 import com.revature.beans.Activity;
 import com.revature.beans.User;
 import com.revature.services.ActivityService;

@@ -7,7 +7,6 @@ import org.springframework.stereotype.Service;
 
 import com.revature.beans.Activity;
 import com.revature.data.ActivityDao;
-import com.revature.data.VacationDao;
 
 import reactor.core.publisher.Flux;
 
@@ -16,13 +15,11 @@ public class ActivityServiceImpl implements ActivityService {
 	private static Logger log = LogManager.getLogger(ActivityServiceImpl.class);
 	
 	private ActivityDao actDao;
-	private VacationDao vacDao;
 	
 	@Autowired
-	public ActivityServiceImpl(ActivityDao actDao, VacationDao vacDao) {
+	public ActivityServiceImpl(ActivityDao actDao) {
 		super();
 		this.actDao=actDao;
-		this.vacDao=vacDao;
 	}
 	
 
