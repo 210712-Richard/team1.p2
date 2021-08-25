@@ -20,3 +20,4 @@ public interface ReservationService {
 	public Mono<Reservation> getReservation(UUID resId);
 	public Mono<Reservation> rescheduleReservation(Reservation res, LocalDateTime startTime, Integer duration);
 }
+

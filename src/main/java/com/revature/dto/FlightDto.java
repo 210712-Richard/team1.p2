@@ -136,6 +136,7 @@ public class FlightDto {
 		return "FlightDto [destination=" + destination + ", id=" + id + ", airline=" + airline + ", departingDate="
 				+ departingDate + ", startingLocation=" + startingLocation + ", ticketPrice=" + ticketPrice
 				+ ", openSeats=" + openSeats + "]";
+	
 	}
 
 }
