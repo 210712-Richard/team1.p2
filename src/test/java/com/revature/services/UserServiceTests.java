@@ -313,6 +313,7 @@ class UserServiceTests {
 	        
 	        assertEquals(user.getUsername(), usernameCaptor.getValue(),"Assert username passed in is the same username.");
 	        assertEquals(user.getUsername(), vacUsernameCaptor.getValue(),"Assert username passed in is the same username.");
+<<<<<<< HEAD
 	}
 	
 	@Test
@@ -334,6 +335,8 @@ class UserServiceTests {
 	        
 	        assertEquals(user.getUsername(), usernameCaptor.getValue(),"Assert username passed in is the same username.");
 	        assertEquals(user.getUsername(), vacUsernameCaptor.getValue(),"Assert username passed in is the same username.");
+=======
+>>>>>>> 2c084f71bcb1abbb3678eb3e00ce8163ea4a9261
 	}
 }
 	   
