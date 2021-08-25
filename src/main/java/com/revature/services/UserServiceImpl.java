@@ -39,8 +39,8 @@ public class UserServiceImpl implements UserService {
 
 	private VacationDao vacDao;
 
-	private ReservationDao resDao;
-
+	private ReservationDao resDao; 
+	
 	private ActivityDao actDao;
 
 	@Autowired
@@ -140,7 +140,7 @@ public class UserServiceImpl implements UserService {
 			}
 			return vac.getReservations();
 		}).flatMap(l -> {
-			log.debug("The list from the vacation: " + l);
+			log.debug("The list from the vacation: %s", l);
 			if (l.isEmpty()) {
 				return Flux.fromIterable(new ArrayList<Reservation>());
 			} else {
@@ -167,6 +167,37 @@ public class UserServiceImpl implements UserService {
 			return vac;
 		}).switchIfEmpty(Mono.just(new Vacation()));
 	}
+	
+	@Override
+	public Flux<Activity> getActivities(UUID vacId, String username) {
+		Mono<VacationDto> monoVacDto = vacDao.findByUsernameAndId(username, vacId);
+		if (monoVacDto == null) {
+			return Flux.empty();
+		}
+        Mono<Vacation> monoVac = monoVacDto.map(VacationDto::getVacation)
+                .switchIfEmpty(Mono.empty());
+        // Get the list of activities in the vacation
+        return Flux.from(vacDao.findByUsernameAndId(username, vacId)).map(vac -> {
+            if (vac.getActivities() == null) {
+                vac.setActivities(new ArrayList<>());
+            }
+            return vac.getActivities();
+        }).flatMap(l -> {
+            log.debug("The list from the vacation: " + l);
+            if (l.isEmpty()) {
+                return Flux.fromIterable(new ArrayList<Activity>());
+            } else {
+                // Need to create an infinite flux to make sure all the activities are retrieved
+                Flux<Vacation> fluxVac = Flux.from(monoVac).flatMap(v -> Flux.<Vacation>generate(sink -> sink.next(v)));
+
+                // Zip the fluxes together and iterate until all the activities have been
+                // obtained.
+                return Flux.fromIterable(l).zipWith(fluxVac)
+                        .flatMap(t -> actDao.findByLocationAndId(t.getT2().getDestination(), t.getT1()))
+                        .map(ActivityDto::getActivity);
+            }
+        });
+    }
     
 	@Override
 	public Mono<Void> deleteUser(String username, List<Vacation> vacList) {
@@ -181,4 +212,3 @@ public class UserServiceImpl implements UserService {
 				return Mono.empty();
 	}
 }
-	
