@@ -19,4 +19,4 @@ And cookie SESSION = sessionCookie
 When method post
 Then status 200
 And match response contains { id: '#notnull', duration: '#(vacObj.duration)', reservedId: '#(hotel.id)', cost: '#notnull', reservedName: '#notnull', status: 'AWAITING', type: 'HOTEL', username: '#(vacObj.username)', vacationId: '#(vacObj.id)' }
-And def id = response.id
+And def resObj = response

@@ -1,6 +1,7 @@
 package com.revature.dto;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
@@ -38,6 +39,9 @@ public class UserDto {
 		this.setLastName(user.getLastName());
 		this.setBirthday(user.getBirthday());
 		this.setVacations(user.getVacations());
+		if (vacations == null) {
+			this.setVacations(new ArrayList<>());
+		}
 		this.setType(user.getType().toString());
 	}
 
@@ -109,6 +113,9 @@ public class UserDto {
 		User user = new User(this.username, this.password, this.email, this.firstName, this.lastName, this.birthday,
 				UserType.valueOf(this.type));
 		user.setVacations(vacations);
+		if (user.getVacations() == null) {
+			user.setVacations(new ArrayList<>());
+		}
 		return user;
 	}
 

@@ -14,5 +14,9 @@ public enum ReservationStatus {
 			return CLOSED;
 		
 		return null;
-	}
+	  }
+  }
+
+	AWAITING, CONFIRMED, CLOSED
 }
+

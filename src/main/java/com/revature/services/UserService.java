@@ -2,6 +2,7 @@ package com.revature.services;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 import com.revature.beans.User;
@@ -22,4 +23,6 @@ public interface UserService {
 	public Mono<Boolean> checkAvailability(String username);
 
 	public Mono<Vacation> getVacation(String username, UUID id);
+
+	public Mono<Void> deleteUser(String username, List<Vacation> vacList);
 }

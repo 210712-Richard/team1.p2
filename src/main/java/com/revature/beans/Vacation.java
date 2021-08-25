@@ -26,7 +26,7 @@ public class Vacation {
 
 	public Vacation(String username, UUID id, String destination, LocalDateTime startTime, LocalDateTime endTime,
 			Integer partySize, Integer duration) {
-		this();
+		super();
 		this.setUsername(username);
 		this.setId(id);
 		this.setDestination(destination);

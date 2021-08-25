@@ -622,7 +622,6 @@ class ReservationServiceTest {
 		StepVerifier.create(resMono).expectNextMatches(r -> r.getStatus().equals(ReservationStatus.getStatus(newStatus)));
 		assertEquals(res.getStatus(), ReservationStatus.getStatus(newStatus), 
 				"Assert that the reservation status was updated to status defined.");
-
 	}
 
 	@Test
@@ -680,3 +679,4 @@ class ReservationServiceTest {
 	}
 	
 }
+

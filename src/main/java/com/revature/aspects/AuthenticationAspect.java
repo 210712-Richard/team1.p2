@@ -124,5 +124,6 @@ public class AuthenticationAspect {
 	@Pointcut("@annotation(com.revature.aspects.VacationerCheck)")
 	private void checkVacationerHook() {
 		/* Empty */
-	}
+	
+}
 }

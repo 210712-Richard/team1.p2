@@ -15,4 +15,6 @@ public interface VacationDao extends ReactiveCassandraRepository<VacationDto, St
 	Flux<VacationDto> findByUsername(String username);
 
 	Mono<VacationDto> findByUsernameAndId(String username, UUID id);
+
+	Mono<Void> deleteByUsername(String username);
 }
