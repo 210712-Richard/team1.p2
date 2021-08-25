@@ -7,6 +7,8 @@ import static org.mockito.Mockito.when;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Period;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import org.junit.jupiter.api.BeforeAll;
@@ -292,8 +294,30 @@ class UserServiceTests {
 		StepVerifier.create(vacMono).expectNextMatches(vDto -> vDto.getId() == null).verifyComplete();
 	}
 	
-	
+	@Test
+	void testdeleteUser() {
+		
+		 List<Vacation> vacList = new ArrayList<Vacation>();
+		 vacList.add(vac );
+		 String username = "username" ;
+		 
+		 ArgumentCaptor<String> usernameCaptor = ArgumentCaptor.forClass(String.class);
+			
+	     Mono<Void> monoUser = service.deleteUser(username , vacList);
+	        
+	        StepVerifier.create(monoUser).expectNextMatches(u -> u.equals(user.getUsername())).verifyComplete();
+	        Mockito.verify(userDao).deleteByUsername(usernameCaptor.capture());
+	        
+	        assertEquals(user.getUsername(), usernameCaptor.getValue(),"Assert username passed in is the same username.");
+		
+	}
 }
+	   
+		
+		
+		
+		
+        	
 	
 	
 

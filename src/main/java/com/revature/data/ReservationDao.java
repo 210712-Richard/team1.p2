@@ -5,6 +5,7 @@ import java.util.UUID;
 import org.springframework.data.cassandra.repository.ReactiveCassandraRepository;
 import org.springframework.stereotype.Repository;
 
+import com.revature.beans.Reservation;
 import com.revature.dto.ReservationDto;
 
 import reactor.core.publisher.Mono;
