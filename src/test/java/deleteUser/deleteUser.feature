@@ -8,9 +8,8 @@ And cookie SESSION = loggedIn.sessionCookie
 And method delete
 Then status 204
 
-Given url loginUrl
-And request {username: 'test', password: 'password' }
-And method post
-Then status 404
-
-def reg = call read('classpath:Register:register.feature)
+# Re-register test
+Given url 'http://localhost:8080/users/test'
+And request { username: 'test', password: 'password', email: 'test@email.com',  firstName:'Test', lastName:'User', birthday: '2000-01-01', type:'VACATIONER'}
+When method put
+Then status 201
