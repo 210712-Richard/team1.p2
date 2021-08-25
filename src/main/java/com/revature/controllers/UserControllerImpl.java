@@ -71,7 +71,7 @@ public class UserControllerImpl implements UserController {
 	public Mono<ResponseEntity<User>> register(@RequestBody User u, @PathVariable("username") String username) {
 		// check to see if that username is available
 		return userService.checkAvailability(username).flatMap(b -> {
-			if (!b) {
+			if (Boolean.FALSE.equals(b)) {
 				return userService.register(username, u.getPassword(), u.getEmail(), u.getFirstName(), u.getLastName(),
 						u.getBirthday(), u.getType()).map(user -> ResponseEntity.status(201).body(user));
 			} else {
@@ -141,6 +141,16 @@ public class UserControllerImpl implements UserController {
 		}
 		return ResponseEntity.ok(userService.getActivities(vacId, username));
 
+	@VacationerCheck
+	@DeleteMapping("{username}")
+	public Mono<ResponseEntity<Void>> deleteUser(@PathVariable("username") String username, WebSession session) {
+		User loggedUser = (User) session.getAttribute(LOGGED_USER);
+		loggedUser = loggedUser == null ? new User() : loggedUser;
+		session.invalidate();
+		return Flux.from(userService.login(username, loggedUser.getPassword())).map(u -> u.getVacations())
+				.flatMap(l -> Flux.fromIterable(l)).flatMap(uuid -> userService.getVacation(username, uuid))
+				.collectList().map(list -> userService.deleteUser(username, list))
+				.map(v -> ResponseEntity.status(204).build());
 	}
 
 }

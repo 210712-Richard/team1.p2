@@ -17,7 +17,7 @@ import com.revature.beans.ReservationType;
 
 @Table("reservation")
 public class ReservationDto {
-	@PrimaryKeyColumn(name = "id", ordinal = 1, type = PrimaryKeyType.PARTITIONED)
+	@PrimaryKeyColumn(name = "id", ordinal = 0, type = PrimaryKeyType.PARTITIONED)
 	private UUID uuid;
 	@PrimaryKeyColumn(name = "type", ordinal = 1, type = PrimaryKeyType.CLUSTERED, ordering = Ordering.DESCENDING)
 	private String type;

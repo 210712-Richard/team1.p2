@@ -2,6 +2,7 @@ package com.revature.services;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 import com.revature.beans.Activity;
@@ -26,4 +27,6 @@ public interface UserService {
 	public Mono<Vacation> getVacation(String username, UUID id);
 
 	public Flux<Activity> getActivities(UUID id, String username);
+}
+	public Mono<Void> deleteUser(String username, List<Vacation> vacList);
 }
