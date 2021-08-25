@@ -2,6 +2,8 @@ package com.revature.services;
 
 import java.time.LocalDateTime;
 import java.time.Period;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import org.apache.logging.log4j.LogManager;
@@ -23,6 +25,8 @@ import com.revature.data.ReservationDao;
 import com.revature.data.VacationDao;
 import com.revature.dto.ReservationDto;
 import com.revature.dto.VacationDto;
+
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Service
@@ -139,26 +143,78 @@ public class ReservationServiceImpl implements ReservationService {
 				}
 				return Mono.empty();
 	}
-
-	@Override
-	public Mono<Reservation> confirmReservation(String resId) {
-		UUID id = UUID.fromString(resId);
-		return resDao.findByUuid(id).map(res -> {
-				Reservation r = res.getReservation();
-				
-				if(ReservationStatus.CLOSED != r.getStatus()) {
-					r.setStatus(ReservationStatus.CONFIRMED);
-					ReservationDto rdto = new ReservationDto(r);
-					resDao.save(rdto);
-					return r;
-				}
 	
-				return null;
-				
-		}).switchIfEmpty(Mono.just(new Reservation()));
+	@Override
+	public Mono<Reservation> findReservation(String resId) {
+		UUID id = UUID.fromString(resId);
+		log.debug("called findReservation with ID: " + resId);
+		return resDao.findByUuid(id).map(res -> {
+			Reservation r = res.getReservation() 
+					== null ? new Reservation() : res.getReservation();
+			log.debug("Returning result: " + r);
+			return r;
+		});
+		
 	}
 	
+	@Override
+	public Mono<Reservation> updateReservation(String resId, String status) {
+		// Assume user auth and input verification has been performed by
+		// controller layer when this function is called
+		UUID id = UUID.fromString(resId);
+		
+		Mono<Reservation> monoRes = resDao.findByUuid(id).flatMap(res -> {
+			Reservation r = res.getReservation() == null ? 
+					new Reservation() : res.getReservation();
+			ReservationStatus resStatus = ReservationStatus.getStatus(status);
+			if(r.getId() == null || resStatus == null) {
+				log.debug("updateReservation called, no result from DB");
+				r = new Reservation();
+			}
+			
+			r.setStatus((resStatus));
+			log.debug("Value of r: " + r);
+
+			return Mono.just(r);
+		});
+
+			return monoRes.flatMap(res -> {
+				if(res.getId() == null) {
+					return Mono.just(res);
+				}
+				
+				resDao.save(new ReservationDto(res)).subscribe();
+				vacDao.findByUsernameAndId(res.getUsername(), res.getVacationId())
+			.map(vac -> {
+				Vacation v = vac.getVacation();
+				Reservation updatedRes = null;
+				for(Reservation reservation : v.getReservations()) {
+					if(reservation.getId() == res.getId()) {
+						log.debug("Updating reservation status in vacation's list");
+						reservation.setStatus(ReservationStatus.getStatus(status));
+						updatedRes = reservation;
+					}
+				}
+				return updatedRes;
+			});
+				return Mono.just(res);
+		});
+	}
 	
+	@Override
+	public Flux<Reservation> getReservations(String username, String vacId) {
+		UUID id = UUID.fromString(vacId);
+		return vacDao.findByUsernameAndId(username, id).map(vdto -> {
+			Vacation v = vdto == null ? new VacationDto().getVacation() : vdto.getVacation();
+			log.debug("getReservations called. Vacation Result: " + v);
+			return v;
+		}).flatMapMany(v -> {
+			log.debug("Reservations List: " + v.getReservations());
+			Flux<Reservation> reservations = Flux.fromIterable(v.getReservations());
+			return reservations;
+		});
+	}
+		
 	// For testing purposes mainly
 	public Mono<Reservation> resetReservationStatus (String resId) {
 		UUID id = UUID.fromString(resId);
