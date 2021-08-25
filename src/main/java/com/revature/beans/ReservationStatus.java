@@ -1,7 +1,13 @@
 package com.revature.beans;
 
 public enum ReservationStatus {
-	AWAITING, CONFIRMED, CLOSED;
+	AWAITING("Awaiting"), CONFIRMED("confirmed"), CLOSED("closed");
+	
+	private String value;
+	
+	ReservationStatus(String value) {
+		this.value = value;
+	}
 
 	public static ReservationStatus getStatus(String value) {
 		if(value.equalsIgnoreCase("awaiting") || value.equalsIgnoreCase("pending"))
