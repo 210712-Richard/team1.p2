@@ -312,7 +312,24 @@ class UserServiceTests {
 	}
 	
 	@Test
-	void testGetActivities() {
+	void testGetActivitiesInvalid() {
+		Mockito.when(actDao.findByLocationAndId(null, null))
+			.thenReturn(Flux.empty());
+	}	
+	@Test
+	void testGetActivitiesInvalidId() {
+		Mockito.when(actDao.findByLocationAndId(vac.getDestination(), null))
+			.thenReturn(Flux.empty());
+	}
+	
+	@Test
+	void testGetActivitiesInvalidLocation() {
+		Mockito.when(actDao.findByLocationAndId(null, vac.getId()))
+			.thenReturn(Flux.empty());
+	}
+	
+	@Test
+	void testGetActivitiesValid() {
 		Mockito.when(actDao.findByLocationAndId(vac.getDestination(), vac.getId()))
 			.thenReturn(Flux.just(new ActivityDto(act)));
 	}

@@ -57,9 +57,21 @@ class ActivityServiceTest {
 		act.setMaxParticipants(5);
 		
 	}
-
+	
 	@Test
-	void testGetAllActivities() {
+	void testGetAllActivitiesInvalidLocation() {
+		Mockito.when(actDao.findByLocation(null))
+		.thenReturn(Flux.empty());
+	}
+	
+	@Test
+	void testGetAllActivitiesEmptyLocation() {
+		Mockito.when(actDao.findByLocation("The Moon"))
+		.thenReturn(Flux.empty());
+	}
+	
+	@Test
+	void testGetAllActivitiesValid() {
 		Mockito.when(actDao.findByLocation(act.getLocation()))
 		.thenReturn(Flux.just(new ActivityDto(act)));
 	}
