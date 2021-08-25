@@ -56,10 +56,11 @@ class UserServiceTests {
 	private ActivityDao actDao;
 
 	private User user;
+	
+	private Activity act;
 
 	private Vacation vac;
 
-	private Reservation res;
 	@BeforeAll
 	public static void beforeAll() {
 
@@ -78,6 +79,15 @@ class UserServiceTests {
 		user.setEmail("test@email.com");
 		user.setBirthday(LocalDate.now());
 		user.setType(UserType.VACATIONER);
+		
+		act = new Activity();
+		act.setLocation("Los Angeles, CA");
+		act.setId(UUID.randomUUID());
+		act.setName("TestActivity");
+		act.setDescription("A test activity");
+		act.setCost(400.00);
+		act.setDate(LocalDateTime.now().plusDays(2));
+		act.setMaxParticipants(5);
 
 		vac = new Vacation();
 		vac.setUsername(user.getUsername());
@@ -373,6 +383,31 @@ class UserServiceTests {
 	}
 	
 	@Test
+	void testGetActivities() {
+
+		List<Activity> vacActs = vac.getActivities();
+		vacActs.add(act);
+		vac.setActivities(vacActs);
+		
+		Mockito.when(vacDao.findByUsernameAndId(user.getUsername(), vac.getId()))
+			.thenReturn(Mono.just(new VacationDto(vac)));
+		Mockito.when(actDao.findByLocationAndId(vac.getDestination(), act.getId()))
+		.thenReturn(Mono.just(new ActivityDto(act)));
+		Mockito.when(actDao.findByLocationAndId(null, act.getId()))
+		.thenReturn(Mono.empty());
+		Mockito.when(actDao.findByLocationAndId(vac.getDestination(), null))
+		.thenReturn(Mono.empty());
+		Mockito.when(actDao.findByLocationAndId(null,null))
+		.thenReturn(Mono.empty());
+	
+		StepVerifier.create(service.getActivities(vac.getId(), user.getUsername())).expectNext(act).verifyComplete();
+		StepVerifier.create(service.getActivities(null, user.getUsername())).verifyComplete();
+		StepVerifier.create(service.getActivities(vac.getId(), null)).verifyComplete();
+		StepVerifier.create(service.getActivities(null,null)).verifyComplete();
+		
+	}
+  
+  @Test
 	void testDeleteUser() {
 		
 		 List<Vacation> vacList = new ArrayList<Vacation>();
@@ -416,15 +451,4 @@ class UserServiceTests {
 	
 	
 }
-	   
-		
-		
-		
-		
-        	
-	
-	
-
-
-
 	

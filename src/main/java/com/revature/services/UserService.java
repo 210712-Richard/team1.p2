@@ -5,10 +5,12 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
+import com.revature.beans.Activity;
 import com.revature.beans.User;
 import com.revature.beans.UserType;
 import com.revature.beans.Vacation;
 
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 public interface UserService {
@@ -23,6 +25,8 @@ public interface UserService {
 	public Mono<Boolean> checkAvailability(String username);
 
 	public Mono<Vacation> getVacation(String username, UUID id);
+
+	public Flux<Activity> getActivities(UUID id, String username);
 
 	public Mono<Void> deleteUser(String username, List<Vacation> vacList);
 }
