@@ -140,7 +140,7 @@ public class UserServiceImpl implements UserService {
 			}
 			return vac.getReservations();
 		}).flatMap(l -> {
-			log.debug("The list from the vacation: " + l);
+			log.debug("The list from the vacation: %s", l);
 			if (l.isEmpty()) {
 				return Flux.fromIterable(new ArrayList<Reservation>());
 			} else {
