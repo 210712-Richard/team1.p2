@@ -27,6 +27,6 @@ public interface UserService {
 	public Mono<Vacation> getVacation(String username, UUID id);
 
 	public Flux<Activity> getActivities(UUID id, String username);
-}
+
 	public Mono<Void> deleteUser(String username, List<Vacation> vacList);
 }

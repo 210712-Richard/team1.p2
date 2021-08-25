@@ -44,13 +44,6 @@ public class UserServiceImpl implements UserService {
 	private ActivityDao actDao;
 
 	@Autowired
-	public UserServiceImpl(UserDao userDao, VacationDao vacDao, HotelDao hotelDao, ReservationDao resDao, ActivityDao actDao) {
-
-  private ReservationDao resDao;
-
-	private ActivityDao actDao;
-
-	@Autowired
 	public UserServiceImpl(UserDao userDao, VacationDao vacDao, HotelDao hotelDao, ReservationDao resDao,
 			ActivityDao actDao) {
 		this.userDao = userDao;
@@ -176,11 +169,15 @@ public class UserServiceImpl implements UserService {
 	}
 	
 	@Override
-	public Flux<Activity> getActivities(UUID id, String username) {
-        Mono<Vacation> monoVac = vacDao.findByUsernameAndId(username, id).map(VacationDto::getVacation)
+	public Flux<Activity> getActivities(UUID vacId, String username) {
+		Mono<VacationDto> monoVacDto = vacDao.findByUsernameAndId(username, vacId);
+		if (monoVacDto == null) {
+			return Flux.empty();
+		}
+        Mono<Vacation> monoVac = monoVacDto.map(VacationDto::getVacation)
                 .switchIfEmpty(Mono.empty());
         // Get the list of activities in the vacation
-        return Flux.from(vacDao.findByUsernameAndId(username, id)).map(vac -> {
+        return Flux.from(vacDao.findByUsernameAndId(username, vacId)).map(vac -> {
             if (vac.getActivities() == null) {
                 vac.setActivities(new ArrayList<>());
             }
@@ -201,8 +198,6 @@ public class UserServiceImpl implements UserService {
             }
         });
     }
-
-}
     
 	@Override
 	public Mono<Void> deleteUser(String username, List<Vacation> vacList) {

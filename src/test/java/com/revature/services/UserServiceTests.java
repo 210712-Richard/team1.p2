@@ -36,6 +36,7 @@ import com.revature.dto.ReservationDto;
 import com.revature.dto.UserDto;
 import com.revature.dto.VacationDto;
 
+import jdk.internal.net.http.common.Log;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
@@ -386,26 +387,28 @@ class UserServiceTests {
 	}
 	
 	@Test
-	void testGetActivitiesInvalid() {
-		Mockito.when(actDao.findByLocationAndId(null, null))
-			.thenReturn(Flux.empty());
-	}	
-	@Test
-	void testGetActivitiesInvalidId() {
+	void testGetActivities() {
+
+		List<Activity> vacActs = vac.getActivities();
+		vacActs.add(act);
+		vac.setActivities(vacActs);
+		
+		Mockito.when(vacDao.findByUsernameAndId(user.getUsername(), vac.getId()))
+			.thenReturn(Mono.just(new VacationDto(vac)));
+		Mockito.when(actDao.findByLocationAndId(vac.getDestination(), act.getId()))
+		.thenReturn(Mono.just(new ActivityDto(act)));
+		Mockito.when(actDao.findByLocationAndId(null, act.getId()))
+		.thenReturn(Mono.empty());
 		Mockito.when(actDao.findByLocationAndId(vac.getDestination(), null))
-			.thenReturn(Flux.empty());
-	}
+		.thenReturn(Mono.empty());
+		Mockito.when(actDao.findByLocationAndId(null,null))
+		.thenReturn(Mono.empty());
 	
-	@Test
-	void testGetActivitiesInvalidLocation() {
-		Mockito.when(actDao.findByLocationAndId(null, vac.getId()))
-			.thenReturn(Flux.empty());
-	}
-	
-	@Test
-	void testGetActivitiesValid() {
-		Mockito.when(actDao.findByLocationAndId(vac.getDestination(), vac.getId()))
-			.thenReturn(Flux.just(new ActivityDto(act)));
+		StepVerifier.create(service.getActivities(vac.getId(), user.getUsername())).expectNext(act).verifyComplete();
+		StepVerifier.create(service.getActivities(null, user.getUsername())).verifyComplete();
+		StepVerifier.create(service.getActivities(vac.getId(), null)).verifyComplete();
+		StepVerifier.create(service.getActivities(null,null)).verifyComplete();
+		
 	}
   
   @Test

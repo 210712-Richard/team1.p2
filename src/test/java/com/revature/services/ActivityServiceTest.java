@@ -9,6 +9,7 @@ import java.util.UUID;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
@@ -21,8 +22,12 @@ import com.revature.data.ActivityDao;
 import com.revature.dto.ActivityDto;
 
 import reactor.core.publisher.Flux;
+import reactor.test.StepVerifier;
 
 class ActivityServiceTest {
+	
+	@InjectMocks
+	private ActivityServiceImpl actService;
 	
 	@Mock
 	private ActivityDao actDao;
@@ -59,21 +64,17 @@ class ActivityServiceTest {
 	}
 	
 	@Test
-	void testGetAllActivitiesInvalidLocation() {
-		Mockito.when(actDao.findByLocation(null))
-		.thenReturn(Flux.empty());
-	}
-	
-	@Test
-	void testGetAllActivitiesEmptyLocation() {
+	void testGetAllActivities() {
 		Mockito.when(actDao.findByLocation("The Moon"))
 		.thenReturn(Flux.empty());
-	}
-	
-	@Test
-	void testGetAllActivitiesValid() {
+		Mockito.when(actDao.findByLocation(null))
+		.thenReturn(Flux.empty());
 		Mockito.when(actDao.findByLocation(act.getLocation()))
 		.thenReturn(Flux.just(new ActivityDto(act)));
+		
+		StepVerifier.create(actService.getAllActivities(null)).verifyComplete();
+		StepVerifier.create(actService.getAllActivities("The Moon")).verifyComplete();
+		StepVerifier.create(actService.getAllActivities(act.getLocation())).expectNext(act).verifyComplete();
 	}
 
 }

@@ -140,6 +140,7 @@ public class UserControllerImpl implements UserController {
 			return ResponseEntity.badRequest().body(Flux.empty());
 		}
 		return ResponseEntity.ok(userService.getActivities(vacId, username));
+	}
 
 	@VacationerCheck
 	@DeleteMapping("{username}")
