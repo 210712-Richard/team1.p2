@@ -10,6 +10,5 @@ import reactor.core.publisher.Mono;
 public interface ReservationController {
 	public Mono<ResponseEntity<Reservation>> createReservation(Reservation res, WebSession session);
 	public Mono<ResponseEntity<Reservation>> updateReservationStatus(String resId, String status, WebSession session);
-	public Mono<ResponseEntity<Reservation>> confirmReservation(String resId, WebSession session);
 	public Mono<ResponseEntity<Reservation>> rescheduleReservation(Reservation res, String resId, WebSession session);
 }
