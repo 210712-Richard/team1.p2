@@ -667,8 +667,6 @@ class ReservationServiceTest {
 
 		StepVerifier.create(resMono).expectError().verify();
 	}
-	
-}
 
 	@Test
 	void testGetReservationValid() {
