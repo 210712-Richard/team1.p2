@@ -5,7 +5,6 @@ import java.util.UUID;
 import org.springframework.data.cassandra.repository.ReactiveCassandraRepository;
 import org.springframework.stereotype.Repository;
 
-import com.revature.beans.Vacation;
 import com.revature.dto.VacationDto;
 
 import reactor.core.publisher.Flux;

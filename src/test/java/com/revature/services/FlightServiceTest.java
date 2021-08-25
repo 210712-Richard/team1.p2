@@ -14,9 +14,7 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
 import com.revature.beans.Flight;
-import com.revature.beans.Flight;
 import com.revature.data.FlightDao;
-import com.revature.dto.FlightDto;
 import com.revature.dto.FlightDto;
 
 import reactor.core.publisher.Flux;
