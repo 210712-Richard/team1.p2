@@ -20,10 +20,5 @@ public interface ReservationService {
 	public Mono<Reservation> updateReservation(String resId, String status);
 	public Flux<Reservation> getReservations(String username, String vacId);
 	public Mono<Reservation> rescheduleReservation(Reservation res, LocalDateTime startTime, Integer duration);
-	private Mono<Reservation> rescheduleHotel(Reservation res, String location);
-	private Mono<Reservation> rescheduleCar(Reservation res, String location);
-	private Mono<Reservation> rescheduleFlight(Reservation res, String location);
-	private Mono<Boolean> isAvailable(UUID resId, UUID id, Integer available, ReservationType type, LocalDateTime startTime, Integer duration);
-
 }
 
