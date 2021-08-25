@@ -183,7 +183,7 @@ public class ReservationServiceImpl implements ReservationService {
 					&& !r.getStatus().equals(ReservationStatus.CLOSED)
 					&& ((!r.getType().equals(ReservationType.FLIGHT) 
 							&& (!startTime.isAfter(rEndTime) && !endTime.isBefore(r.getStarttime())))
-							|| (r.getType().equals(ReservationType.FLIGHT) && startTime.equals(startTime)));
+							|| (r.getType().equals(ReservationType.FLIGHT) && startTime.equals(r.getStarttime())));
 		}).collectList().map(rDtoList -> rDtoList.size());
 
 		return intMono.map(i -> i < available);
@@ -210,7 +210,9 @@ public class ReservationServiceImpl implements ReservationService {
 			log.debug("New Reservation: " + res);
 			return vacDao.save(v);
 		}).flatMap(v -> {
+			Integer space = 0;
 			switch (res.getType()) {
+			
 			case HOTEL:
 				return hotelDao.findByLocationAndId(v.getDestination(), res.getReservedId())
 						.flatMap(h -> isAvailable(res.getId(), h.getId(), h.getRoomsAvailable(), ReservationType.HOTEL,
