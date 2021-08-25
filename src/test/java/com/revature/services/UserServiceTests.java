@@ -59,7 +59,6 @@ class UserServiceTests {
 
 	private Vacation vac;
 
-	private Reservation res;
 	@BeforeAll
 	public static void beforeAll() {
 
