@@ -313,31 +313,8 @@ class UserServiceTests {
 	        
 	        assertEquals(user.getUsername(), usernameCaptor.getValue(),"Assert username passed in is the same username.");
 	        assertEquals(user.getUsername(), vacUsernameCaptor.getValue(),"Assert username passed in is the same username.");
-<<<<<<< HEAD
 	}
 	
-	@Test
-	void testdeleteUserInvalid() {
-		
-		 List<Vacation> vacList = new ArrayList<Vacation>();
-		 vacList.add(vac);
-		 Mockito.when(userDao.deleteByUsername(user.getUsername())).thenReturn(Mono.empty());
-		 Mockito.when(resDao.deleteByUuid(Mockito.any())).thenReturn(Mono.empty());
-		 Mockito.when(vacDao.deleteByUsername(user.getUsername())).thenReturn(Mono.empty());
-		 ArgumentCaptor<String> usernameCaptor = ArgumentCaptor.forClass(String.class);
-		 ArgumentCaptor<String> vacUsernameCaptor = ArgumentCaptor.forClass(String.class);
-			
-	     Mono<Void> monoUser = service.deleteUser(user.getUsername(), vacList);
-	        
-	        StepVerifier.create(monoUser).expectError(NullPointerException.class);
-	        Mockito.verify(userDao).deleteByUsername(usernameCaptor.capture());
-	        Mockito.verify(vacDao).deleteByUsername(vacUsernameCaptor.capture());
-	        
-	        assertEquals(user.getUsername(), usernameCaptor.getValue(),"Assert username passed in is the same username.");
-	        assertEquals(user.getUsername(), vacUsernameCaptor.getValue(),"Assert username passed in is the same username.");
-=======
->>>>>>> 2c084f71bcb1abbb3678eb3e00ce8163ea4a9261
-	}
 }
 	   
 		
