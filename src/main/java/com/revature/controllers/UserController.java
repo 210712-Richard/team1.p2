@@ -21,5 +21,7 @@ public interface UserController {
 	public Mono<ResponseEntity<Vacation>> createVacation(Vacation vacation, String username, WebSession session);
 
 	public Mono<ResponseEntity<Vacation>> getVacation(String username, String id, WebSession session);
+	
+	public Mono<ResponseEntity<Void>> deleteUser(String username, WebSession session);
 
 }
