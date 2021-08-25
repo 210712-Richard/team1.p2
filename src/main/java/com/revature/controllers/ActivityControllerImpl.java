@@ -19,7 +19,7 @@ import reactor.core.publisher.Flux;
 @RestController
 @RequestMapping("/activities")
 public class ActivityControllerImpl implements ActivityController {
-	private static Logger log = LogManager.getLogger(ReservationControllerImpl.class);
+	private static Logger log = LogManager.getLogger(ActivityControllerImpl.class);
 
 	private ActivityService actService;
 	
