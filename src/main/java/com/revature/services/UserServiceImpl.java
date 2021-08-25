@@ -1,3 +1,4 @@
+  
 package com.revature.services;
 
 import java.time.LocalDate;
@@ -166,5 +167,18 @@ public class UserServiceImpl implements UserService {
 			return vac;
 		}).switchIfEmpty(Mono.just(new Vacation()));
 	}
+    
+	@Override
+	public Mono<Void> deleteUser(String username, List<Vacation> vacList) {
 
+		Flux.fromIterable(vacList)
+				.map(v -> v.getReservations())
+				.flatMap(l -> Flux.fromIterable(l))
+				.map(r -> resDao.deleteByUuid(r.getId()).subscribe())
+				.zipWith(vacDao.deleteByUsername(username))
+				.collectList().subscribe();
+				userDao.deleteByUsername(username).subscribe();
+				return Mono.empty();
+	}
 }
+	

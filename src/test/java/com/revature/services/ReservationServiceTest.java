@@ -617,5 +617,5 @@ class ReservationServiceTest {
 
 		Mockito.verifyNoInteractions(vacDao);
 	}
-
 }
+

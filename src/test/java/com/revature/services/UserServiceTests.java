@@ -6,6 +6,8 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Period;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import org.junit.jupiter.api.BeforeAll;
@@ -57,6 +59,7 @@ class UserServiceTests {
 
 	private Vacation vac;
 
+	private Reservation res;
 	@BeforeAll
 	public static void beforeAll() {
 
@@ -368,5 +371,60 @@ class UserServiceTests {
 
 		StepVerifier.create(vacMono).expectNextMatches(vDto -> vDto.getId() == null).verifyComplete();
 	}
-
+	
+	@Test
+	void testDeleteUser() {
+		
+		 List<Vacation> vacList = new ArrayList<Vacation>();
+		 vacList.add(vac);
+		 Mockito.when(userDao.deleteByUsername(user.getUsername())).thenReturn(Mono.empty());
+		 Mockito.when(resDao.deleteByUuid(Mockito.any())).thenReturn(Mono.empty());
+		 Mockito.when(vacDao.deleteByUsername(user.getUsername())).thenReturn(Mono.empty());
+		 ArgumentCaptor<String> usernameCaptor = ArgumentCaptor.forClass(String.class);
+		 ArgumentCaptor<String> vacUsernameCaptor = ArgumentCaptor.forClass(String.class);
+			
+	     Mono<Void> monoUser = service.deleteUser(user.getUsername(), vacList);
+	        
+	        StepVerifier.create(monoUser).expectComplete().verify();
+	        Mockito.verify(userDao).deleteByUsername(usernameCaptor.capture());
+	        Mockito.verify(vacDao).deleteByUsername(vacUsernameCaptor.capture());
+	        
+	        assertEquals(user.getUsername(), usernameCaptor.getValue(),"Assert username passed in is the same username.");
+	        assertEquals(user.getUsername(), vacUsernameCaptor.getValue(),"Assert username passed in is the same username.");
+	}
+	
+	@Test
+	void testdeleteUserInvalid() {
+		
+		 List<Vacation> vacList = new ArrayList<Vacation>();
+		 vacList.add(null);
+		 Mockito.when(userDao.deleteByUsername(user.getUsername())).thenReturn(Mono.empty());
+		 Mockito.when(resDao.deleteByUuid(Mockito.any())).thenReturn(Mono.empty());
+		 Mockito.when(vacDao.deleteByUsername(user.getUsername())).thenReturn(Mono.empty());
+		 ArgumentCaptor<String> usernameCaptor = ArgumentCaptor.forClass(String.class);
+		 ArgumentCaptor<String> vacUsernameCaptor = ArgumentCaptor.forClass(String.class);
+			
+	     Mono<Void> monoUser = service.deleteUser(user.getUsername(), vacList);
+	        
+	        StepVerifier.create(monoUser).expectError(NullPointerException.class);
+	        Mockito.verify(userDao).deleteByUsername(usernameCaptor.capture());
+	        Mockito.verify(vacDao).deleteByUsername(vacUsernameCaptor.capture());
+	        
+	        assertEquals(user.getUsername(), usernameCaptor.getValue(),"Assert username passed in is the same username.");
+	        assertEquals(user.getUsername(), vacUsernameCaptor.getValue(),"Assert username passed in is the same username.");
+	}
+	
+	
 }
+	   
+		
+		
+		
+		
+        	
+	
+	
+
+
+
+	
