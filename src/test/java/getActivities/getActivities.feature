@@ -6,7 +6,7 @@ Background:
 	* def vac = call read('classpath:createVacation/createVacation.feature')
 	* def vacObj = vac.vacObj
 
-Given url 'http://localhost:8080/users/test/activities/'+vacObj.id
+Given url 'http://localhost:8080/users/test/vacations/'+vacObj.id+'/activities'
 When method get
 Then status 401
 
@@ -17,7 +17,7 @@ Background:
 	* def vacObj = vac.vacObj
 	* def loggedIn = call read('classpath:login/login.feature')
 
-Given url 'http://localhost:8080/users/test/activities/'+vacObj.id
+Given url 'http://localhost:8080/users/test/vacations/'+vacObj.id+'/activities'
 And cookie SESSION = loggedIn.sessionCookie
 When method get
 Then status 200

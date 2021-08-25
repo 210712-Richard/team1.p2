@@ -124,7 +124,7 @@ public class UserControllerImpl implements UserController {
 	}
 	
 	@LoggedInFlux
-	@GetMapping("{username}/vacations/{vacationid}/activities/")
+	@GetMapping("{username}/vacations/{vacationid}/activities")
 	public ResponseEntity<Flux<Activity>> getActivities(@PathVariable("username") String username, 
 			@PathVariable("vacationid") String id, WebSession session) {
 		log.trace("running getactivities");

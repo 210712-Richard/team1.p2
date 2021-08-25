@@ -1,10 +1,7 @@
 package com.revature.services;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.Period;
 import java.util.UUID;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -17,7 +14,6 @@ import org.mockito.MockitoAnnotations;
 import com.revature.beans.Activity;
 import com.revature.beans.User;
 import com.revature.beans.UserType;
-import com.revature.beans.Vacation;
 import com.revature.data.ActivityDao;
 import com.revature.dto.ActivityDto;
 
@@ -36,7 +32,6 @@ class ActivityServiceTest {
 	
 	private Activity act;
 
-	private Vacation vac;
 
 	@BeforeEach
 	public void beforeEach() {

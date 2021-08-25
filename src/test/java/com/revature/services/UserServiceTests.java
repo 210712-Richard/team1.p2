@@ -9,8 +9,6 @@ import java.time.Period;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import reactor.core.publisher.Flux;
-
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -36,7 +34,6 @@ import com.revature.dto.ReservationDto;
 import com.revature.dto.UserDto;
 import com.revature.dto.VacationDto;
 
-import jdk.internal.net.http.common.Log;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
@@ -64,7 +61,6 @@ class UserServiceTests {
 
 	private Vacation vac;
 
-	private Reservation res;
 	@BeforeAll
 	public static void beforeAll() {
 
