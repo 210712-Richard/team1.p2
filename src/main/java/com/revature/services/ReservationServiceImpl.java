@@ -210,7 +210,8 @@ public class ReservationServiceImpl implements ReservationService {
 			return reservations;
 		});
 	}
-		
+	
+	@Override
 	private Mono<Boolean> isAvailable(UUID resId, UUID id, Integer available, ReservationType type,
 			LocalDateTime startTime, Integer duration) {
 		log.trace("Checking if reservations are available");
@@ -229,11 +230,6 @@ public class ReservationServiceImpl implements ReservationService {
 		}).collectList().map(rDtoList -> rDtoList.size());
 
 		return intMono.map(i -> i < available);
-	}
-
-	@Override
-	public Mono<Reservation> getReservation(UUID resId) {
-		return resDao.findByUuid(resId).map(r -> r.getReservation()).switchIfEmpty(Mono.just(new Reservation()));
 	}
 
 	@Override
@@ -265,6 +261,7 @@ public class ReservationServiceImpl implements ReservationService {
 		});
 	}
 	
+	@Override
 	private Mono<Reservation> rescheduleHotel(Reservation res, String location){
 		return hotelDao.findByLocationAndId(location, res.getReservedId())
 				.flatMap(h -> isAvailable(res.getId(), h.getId(), h.getRoomsAvailable(), ReservationType.HOTEL,
@@ -277,6 +274,7 @@ public class ReservationServiceImpl implements ReservationService {
 						}));
 	}
 
+	@Override
 	private Mono<Reservation> rescheduleCar(Reservation res, String location){
 		return carDao.findByLocationAndId(location, res.getReservedId())
 				.flatMap(c -> isAvailable(res.getId(), c.getId(), 1, ReservationType.CAR, res.getStarttime(),
@@ -290,6 +288,7 @@ public class ReservationServiceImpl implements ReservationService {
 						}));
 	}
 	
+	@Override
 	private Mono<Reservation> rescheduleFlight(Reservation res, String location) {
 
 		return flightDao.findByDestinationAndId(location, res.getReservedId())
@@ -303,6 +302,5 @@ public class ReservationServiceImpl implements ReservationService {
 							}
 							return Mono.empty();
 						}));
-
 	}
 }
