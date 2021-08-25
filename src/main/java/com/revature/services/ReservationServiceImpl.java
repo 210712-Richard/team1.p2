@@ -210,7 +210,6 @@ public class ReservationServiceImpl implements ReservationService {
 			log.debug("New Reservation: " + res);
 			return vacDao.save(v);
 		}).flatMap(v -> {
-			Integer space = 0;
 			switch (res.getType()) {
 			
 			case HOTEL:

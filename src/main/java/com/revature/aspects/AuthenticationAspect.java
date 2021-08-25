@@ -18,6 +18,7 @@ import org.springframework.web.server.WebSession;
 
 import com.revature.beans.User;
 import com.revature.beans.UserType;
+import com.revature.controllers.UserController;
 
 import reactor.core.publisher.Mono;
 
@@ -57,7 +58,7 @@ public class AuthenticationAspect {
 			return Mono.just(ResponseEntity.status(500).build());
 		}
 
-		User loggedUser = session.getAttribute("loggedUser");
+		User loggedUser = session.getAttribute(UserController.LOGGED_USER);
 		log.debug("Logged In User: " + loggedUser);
 		String username = null;
 
@@ -112,7 +113,7 @@ public class AuthenticationAspect {
 			return Mono.just(ResponseEntity.status(500).build());
 		}
 
-		User loggedUser = session.getAttribute("loggedUser");
+		User loggedUser = session.getAttribute(UserController.LOGGED_USER);
 		log.debug("Logged In User: " + loggedUser);
 
 		// If the logged in user is not the same user specified or is not a vacationer
@@ -129,7 +130,7 @@ public class AuthenticationAspect {
 		if (session == null) {
 			return false;
 		}
-		User loggedUser = (User) session.getAttribute("loggedUser");
+		User loggedUser = (User) session.getAttribute(UserController.LOGGED_USER);
 		log.debug("Logged In user: " + loggedUser);
 
 		return loggedUser != null;
