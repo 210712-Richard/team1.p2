@@ -19,8 +19,6 @@ public interface ReservationService {
 	public Mono<Reservation> findReservation(String resId);
 	public Mono<Reservation> updateReservation(String resId, String status);
 	public Flux<Reservation> getReservations(String username, String vacId);
-	public Mono<Reservation> resetReservationStatus(String resId);
-	public Mono<Reservation> getReservation(UUID resId);
 	public Mono<Reservation> rescheduleReservation(Reservation res, LocalDateTime startTime, Integer duration);
 }
 
