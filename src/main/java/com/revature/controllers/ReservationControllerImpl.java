@@ -1,5 +1,7 @@
 package com.revature.controllers;
 
+import java.util.UUID;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +20,7 @@ import com.revature.beans.Car;
 import com.revature.beans.Flight;
 import com.revature.beans.Hotel;
 import com.revature.beans.Reservation;
+import com.revature.beans.ReservationType;
 import com.revature.beans.User;
 import com.revature.beans.UserType;
 import com.revature.beans.Vacation;
@@ -49,7 +52,7 @@ public class ReservationControllerImpl implements ReservationController {
 		this.flightService = flightService;
 		this.carService = carService;
 	}
-	
+
 	@LoggedInMono
 	@PostMapping
 	public Mono<ResponseEntity<Reservation>> createReservation(@RequestBody Reservation res, WebSession session) {
@@ -146,49 +149,93 @@ public class ReservationControllerImpl implements ReservationController {
 	@Override
 	@LoggedInMono
 	@PutMapping("{resId}/status")
-	public Mono<ResponseEntity<Reservation>> confirmReservation(@PathVariable("resId") String resId, WebSession session) {
+	public Mono<ResponseEntity<Reservation>> confirmReservation(@PathVariable("resId") String resId,
+			WebSession session) {
 		User loggedUser = session.getAttribute(UserController.LOGGED_USER);
-		if(loggedUser == null)
+		if (loggedUser == null)
 			return Mono.just(ResponseEntity.status(401).build());
-		
-		if(loggedUser.getType() == UserType.VACATIONER)
+
+		if (loggedUser.getType() == UserType.VACATIONER)
 			return Mono.just(ResponseEntity.status(403).build());
-		
-		if(resId == null || resId.equals("")) 
+
+		if (resId == null || resId.equals(""))
 			return Mono.just(ResponseEntity.badRequest().build());
-		
+
 		return resService.confirmReservation(resId).map(res -> {
-			if(res.getReservedId() == null) {
+			if (res.getReservedId() == null) {
 				log.debug("No results found with reservation ID: " + resId);
 				return ResponseEntity.notFound().build();
 			}
-					
-			log.debug("Confirmed resevation for " + res.getReservedName());			
+
+			log.debug("Confirmed resevation for " + res.getReservedName());
+			return ResponseEntity.ok(res);
+		});
+	}
+
+	// Implemented to reset effects of Karate tests
+	@LoggedInMono
+	@PatchMapping("{resId}/status")
+	public Mono<ResponseEntity<Reservation>> resetReservationStatus(@PathVariable("resId") String resId,
+			WebSession session) {
+		User loggedUser = session.getAttribute(UserController.LOGGED_USER);
+		if (loggedUser == null)
+			return Mono.just(ResponseEntity.status(401).build());
+
+		if (loggedUser.getType() == UserType.VACATIONER)
+			return Mono.just(ResponseEntity.status(403).build());
+
+		if (resId == null || resId.equals(""))
+			return Mono.just(ResponseEntity.badRequest().build());
+
+		return resService.resetReservationStatus(resId).map(res -> {
+			log.debug("Resevation result from DB: " + res.toString());
+			if (res.getReservedId() == null)
+				return ResponseEntity.notFound().build();
+
+			log.debug("Resevation status for " + res.getReservedName() + " has been reset");
 			return ResponseEntity.ok(res);
 		});
 	}
 	
-	// Implemented to reset effects of Karate tests
 	@LoggedInMono
-	@PatchMapping("{resId}/status")
-	public Mono<ResponseEntity<Reservation>> resetReservationStatus(@PathVariable("resId") String resId, WebSession session) {
+	@PutMapping("{resId}/startTime/duration")
+	public Mono<ResponseEntity<Reservation>> rescheduleReservation(@RequestBody Reservation res, @PathVariable("resId") String resId,
+			WebSession session) {
 		User loggedUser = session.getAttribute(UserController.LOGGED_USER);
-		if(loggedUser == null)
-			return Mono.just(ResponseEntity.status(401).build());
+		UUID id = null;
 		
-		if(loggedUser.getType() == UserType.VACATIONER)
-			return Mono.just(ResponseEntity.status(403).build());
-		
-		if(resId == null || resId.equals("")) 
+		//Make sure the res id is a uuid
+		try {
+			id = UUID.fromString(resId);
+			log.debug("Reservation ID: %s", resId);
+		} catch (Exception e) {
 			return Mono.just(ResponseEntity.badRequest().build());
+		}
 		
-		return resService.resetReservationStatus(resId).map(res -> {
-			log.debug("Resevation result from DB: " + res.toString());
-			if(res.getReservedId() == null) 
-				return ResponseEntity.notFound().build();
-					
-			log.debug("Resevation status for " + res.getReservedName() + " has been reset");			
-			return ResponseEntity.ok(res);
+		//Need to first get the reservation
+		return resService.getReservation(id).flatMap(r ->{
+			log.debug("Reservation received: %s", r);
+			
+			//If no reservation was found, return a 404
+			if (r.getId() == null) {
+				log.debug("No reservation found");
+				return Mono.just(ResponseEntity.notFound().build());
+			}
+			
+			//If the user is allowed to change the reservation, change the reservation and send back the reservation
+			else if ((r.getUsername().equals(loggedUser.getUsername())
+					&& !r.getType().equals(ReservationType.FLIGHT)) 
+					|| r.getType().toString().equals(loggedUser.getType().toString().split("_")[0])) {
+				log.debug("Reservation has been found and user can change startTime and duration");
+				return resService.rescheduleReservation(r, res.getStarttime(), res.getDuration())
+						.map(re -> ResponseEntity.ok(re))
+						//If an empty mono was returned, that means there is a scheduling conflict
+						.switchIfEmpty(Mono.just(ResponseEntity.status(409).build()));
+			}
+			
+			//The user cannot change this reservation
+			log.debug("User cannot change startTime and duration for this reservation");
+			return Mono.just(ResponseEntity.status(403).build());
 		});
 	}
 }
