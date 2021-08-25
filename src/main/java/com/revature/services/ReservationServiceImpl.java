@@ -181,7 +181,7 @@ public class ReservationServiceImpl implements ReservationService {
 			LocalDateTime rEndTime = r.getStarttime().plus(Period.of(0, 0, duration));
 			return !r.getId().equals(resId) && r.getReservedId().equals(id) && r.getType().equals(type)
 					&& !r.getStatus().equals(ReservationStatus.CLOSED)
-					&& ((!r.getType().equals(ReservationType.FLIGHT) 
+					&& ((!r.getType().equals(ReservationType.FLIGHT)
 							&& (!startTime.isAfter(rEndTime) && !endTime.isBefore(r.getStarttime())))
 							|| (r.getType().equals(ReservationType.FLIGHT) && startTime.equals(r.getStarttime())));
 		}).collectList().map(rDtoList -> rDtoList.size());
@@ -211,43 +211,56 @@ public class ReservationServiceImpl implements ReservationService {
 			return vacDao.save(v);
 		}).flatMap(v -> {
 			switch (res.getType()) {
-			
 			case HOTEL:
-				return hotelDao.findByLocationAndId(v.getDestination(), res.getReservedId())
-						.flatMap(h -> isAvailable(res.getId(), h.getId(), h.getRoomsAvailable(), ReservationType.HOTEL,
-								res.getStarttime(), res.getDuration()).flatMap(b -> {
-									// If there are rooms available
-									if (Boolean.TRUE.equals(b)) {
-										return resDao.save(new ReservationDto(res)).map(rDto -> rDto.getReservation());
-									}
-									return Mono.empty();
-								}));
+				return rescheduleHotel(res, v.getDestination());
 			case CAR:
-				return carDao.findByLocationAndId(v.getDestination(), res.getReservedId())
-						.flatMap(c -> isAvailable(res.getId(), c.getId(), 1, ReservationType.CAR, res.getStarttime(),
-								res.getDuration()).flatMap(b -> {
-									// If there are spots available
-									if (Boolean.TRUE.equals(b)) {
-										log.debug("The reservation can work");
-										return resDao.save(new ReservationDto(res)).map(rDto -> rDto.getReservation());
-									}
-									return Mono.empty();
-								}));
-
+				return rescheduleCar(res, v.getDestination());
 			case FLIGHT:
-				return flightDao.findByDestinationAndId(v.getDestination(), res.getReservedId())
-						.flatMap(f -> isAvailable(res.getId(), f.getId(), f.getOpenSeats(), ReservationType.FLIGHT,
-								res.getStarttime(), res.getDuration()).flatMap(b -> {
-									log.debug("Checked if flights were available");
-									// If there are rooms available
-									if (Boolean.TRUE.equals(b)) {
-										return resDao.save(new ReservationDto(res)).map(rDto -> rDto.getReservation());
-									}
-									return Mono.empty();
-								}));
+				return rescheduleFlight(res, v.getDestination());
 			default:
 				return Mono.empty();
 			}
 		});
+	}
+	
+	private Mono<Reservation> rescheduleHotel(Reservation res, String location){
+		return hotelDao.findByLocationAndId(location, res.getReservedId())
+				.flatMap(h -> isAvailable(res.getId(), h.getId(), h.getRoomsAvailable(), ReservationType.HOTEL,
+						res.getStarttime(), res.getDuration()).flatMap(b -> {
+							// If there are rooms available
+							if (Boolean.TRUE.equals(b)) {
+								return resDao.save(new ReservationDto(res)).map(rDto -> rDto.getReservation());
+							}
+							return Mono.empty();
+						}));
+	}
+
+	private Mono<Reservation> rescheduleCar(Reservation res, String location){
+		return carDao.findByLocationAndId(location, res.getReservedId())
+				.flatMap(c -> isAvailable(res.getId(), c.getId(), 1, ReservationType.CAR, res.getStarttime(),
+						res.getDuration()).flatMap(b -> {
+							// If there are spots available
+							if (Boolean.TRUE.equals(b)) {
+								log.debug("The reservation will be rescheduled");
+								return resDao.save(new ReservationDto(res)).map(rDto -> rDto.getReservation());
+							}
+							return Mono.empty();
+						}));
+	}
+	
+	private Mono<Reservation> rescheduleFlight(Reservation res, String location) {
+
+		return flightDao.findByDestinationAndId(location, res.getReservedId())
+				.flatMap(f -> isAvailable(res.getId(), f.getId(), f.getOpenSeats(), ReservationType.FLIGHT,
+						res.getStarttime(), res.getDuration()).flatMap(b -> {
+							log.debug("Checked if flights were available");
+							// If there are rooms available
+							if (Boolean.TRUE.equals(b)) {
+								log.debug("The reservation will be rescheduled");
+								return resDao.save(new ReservationDto(res)).map(rDto -> rDto.getReservation());
+							}
+							return Mono.empty();
+						}));
+
 	}
 }
