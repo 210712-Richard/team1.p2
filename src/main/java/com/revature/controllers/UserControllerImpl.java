@@ -60,6 +60,7 @@ public class UserControllerImpl implements UserController {
 		});
 	}
 
+	@LoggedInMono
 	@DeleteMapping
 	public Mono<ResponseEntity<Void>> logout(WebSession session) {
 		session.invalidate();
@@ -90,7 +91,7 @@ public class UserControllerImpl implements UserController {
 		return userService.createVacation(username, vacation.getDestination(), vacation.getStartTime(),
 				vacation.getEndTime(), vacation.getPartySize(), vacation.getDuration()).flatMap(v -> {
 					if (v.getId() == null) {
-						return Mono.just(ResponseEntity.status(400).build());
+						return Mono.just(ResponseEntity.badRequest().build());
 					} else {
 						return Mono.just(ResponseEntity.status(201).body(v));
 					}
@@ -127,17 +128,11 @@ public class UserControllerImpl implements UserController {
 	@GetMapping("{username}/vacations/{vacationid}/activities")
 	public ResponseEntity<Flux<Activity>> getActivities(@PathVariable("username") String username, 
 			@PathVariable("vacationid") String id, WebSession session) {
-		log.trace("running getactivities");
-		User loggedUser = (User) session.getAttribute(LOGGED_USER);
-
-		if (loggedUser == null || !username.equals(loggedUser.getUsername())) {
-			return ResponseEntity.status(401).body(Flux.empty());
-		}
 		UUID vacId = null;
 		try {
 			vacId = UUID.fromString(id);
 		} catch (Exception e) {
-			return ResponseEntity.badRequest().body(Flux.empty());
+			return ResponseEntity.badRequest().build();
 		}
 		return ResponseEntity.ok(userService.getActivities(vacId, username));
 	}
