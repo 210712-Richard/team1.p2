@@ -18,7 +18,7 @@ import org.springframework.web.server.WebSession;
 
 import com.revature.beans.User;
 import com.revature.beans.UserType;
-import com.revature.controllers.UserController;
+import com.revature.controller.UserController;
 
 import reactor.core.publisher.Mono;
 
@@ -154,4 +154,3 @@ public class AuthenticationAspect {
 		/* Empty */
 	}
 }
-

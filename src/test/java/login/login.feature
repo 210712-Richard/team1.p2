@@ -2,7 +2,6 @@ Feature: Login as test
 
 Scenario: send a request and login successfully
 
-  
 Given url loginUrl
 And request { username: 'test', password: 'password' }
 When method post

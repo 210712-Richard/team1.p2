@@ -210,5 +210,28 @@ public class UserServiceImpl implements UserService {
 				.collectList().subscribe();
 				userDao.deleteByUsername(username).subscribe();
 				return Mono.empty();
+	
+	
+   }
+
+	@Override
+	public Mono<Activity> chooseActivities(String username, String location, UUID id, String name,
+			String description, Double cost, LocalDateTime date, Integer maxParticipants){
+		
+	   Activity activity = new Activity(location,id,name,description,cost,date,maxParticipants);
+	      
+		return vacDao.findByUsernameAndId(username, id).flatMap(v -> {
+			
+			if (v.getActivities() == null) {
+				v.setActivities(new ArrayList<>());
+			}
+			v.getActivities().add(id);
+			return vacDao.save(v).map(l->l.getVacation());
+		}).zipWith(actDao.save(new ActivityDto(activity))).flatMap(t -> Mono.just(t.getT2().getActivity()));
+		
 	}
+	
+	
+	
 }
+	

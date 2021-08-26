@@ -2,6 +2,7 @@ package com.revature.services;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.mockito.Mockito.when;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -19,17 +20,14 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
-import com.revature.beans.Activity;
 import com.revature.beans.Reservation;
 import com.revature.beans.ReservationType;
 import com.revature.beans.User;
 import com.revature.beans.UserType;
 import com.revature.beans.Vacation;
-import com.revature.data.ActivityDao;
 import com.revature.data.ReservationDao;
 import com.revature.data.UserDao;
 import com.revature.data.VacationDao;
-import com.revature.dto.ActivityDto;
 import com.revature.dto.ReservationDto;
 import com.revature.dto.UserDto;
 import com.revature.dto.VacationDto;
@@ -51,16 +49,12 @@ class UserServiceTests {
 
 	@Mock
 	private ReservationDao resDao;
-	
-	@Mock
-	private ActivityDao actDao;
 
 	private User user;
-	
-	private Activity act;
 
 	private Vacation vac;
 
+	private Reservation res;
 	@BeforeAll
 	public static void beforeAll() {
 
@@ -79,15 +73,6 @@ class UserServiceTests {
 		user.setEmail("test@email.com");
 		user.setBirthday(LocalDate.now());
 		user.setType(UserType.VACATIONER);
-		
-		act = new Activity();
-		act.setLocation("Los Angeles, CA");
-		act.setId(UUID.randomUUID());
-		act.setName("TestActivity");
-		act.setDescription("A test activity");
-		act.setCost(400.00);
-		act.setDate(LocalDateTime.now().plusDays(2));
-		act.setMaxParticipants(5);
 
 		vac = new Vacation();
 		vac.setUsername(user.getUsername());
@@ -240,7 +225,7 @@ class UserServiceTests {
 	}
 
 	@Test
-	void testGetVacationValidEmptyReservationList() {
+	void testGetVacationValidEmptyList() {
 		Mockito.when(vacDao.findByUsernameAndId(user.getUsername(), vac.getId()))
 				.thenReturn(Mono.just(new VacationDto(vac)));
 
@@ -253,7 +238,7 @@ class UserServiceTests {
 	}
 
 	@Test
-	void testGetVacationValidNullReservationList() {
+	void testGetVacationValidNullList() {
 		vac.setReservations(null);
 
 		Mockito.when(vacDao.findByUsernameAndId(user.getUsername(), vac.getId()))
@@ -274,7 +259,7 @@ class UserServiceTests {
 	}
 
 	@Test
-	void testGetVacationValidNonEmptyReservationList() {
+	void testGetVacationValidNonEmptyList() {
 
 		// Create a reservation to be added to the list
 		Reservation res = new Reservation();
@@ -296,79 +281,6 @@ class UserServiceTests {
 		StepVerifier.create(vacMono).expectNextMatches(vDto -> vDto.equals(vac)).verifyComplete();
 
 	}
-	
-	@Test
-	void testGetVacationValidEmptyActivityList() {
-		Mockito.when(vacDao.findByUsernameAndId(user.getUsername(), vac.getId()))
-				.thenReturn(Mono.just(new VacationDto(vac)));
-
-		Mono<Vacation> vacMono = service.getVacation(user.getUsername(), vac.getId());
-
-		StepVerifier.create(vacMono).expectNextMatches(vDto -> vDto.equals(vac)).verifyComplete();
-
-		Mockito.verifyNoInteractions(actDao);
-
-	}
-
-	@Test
-	void testGetVacationValidNullActivityList() {
-		vac.setActivities(null);
-
-		Mockito.when(vacDao.findByUsernameAndId(user.getUsername(), vac.getId()))
-				.thenReturn(Mono.just(new VacationDto(vac)));
-
-		Mono<Vacation> vacMono = service.getVacation(user.getUsername(), vac.getId());
-
-		StepVerifier.create(vacMono).expectNextMatches(vDto -> {
-			return vac.getId().equals(vDto.getId()) && vac.getReservations().equals(vDto.getReservations())
-					&& vac.getDestination().equals(vDto.getDestination())
-					&& vac.getDuration().equals(vDto.getDuration()) && vac.getStartTime().equals(vDto.getStartTime())
-					&& vac.getEndTime().equals(vDto.getEndTime()) && vac.getPartySize().equals(vDto.getPartySize())
-					&& vac.getUsername().equals(vDto.getUsername()) && vac.getTotal().equals(vDto.getTotal())
-					&& vDto.getActivities() != null;
-		}).verifyComplete();
-
-		Mockito.verifyNoInteractions(resDao);
-	}
-
-	@Test
-	void testGetVacationValidNonEmptyActivityList() {
-
-		// Create a reservation to be added to the list
-		Reservation res = new Reservation();
-		res.setUsername(vac.getUsername());
-		res.setVacationId(vac.getId());
-		res.setId(UUID.randomUUID());
-		res.setDuration(vac.getDuration());
-		res.setType(ReservationType.HOTEL);
-		res.setStarttime(vac.getStartTime());
-		
-		Activity act1 = new Activity();
-		act1.setId(UUID.randomUUID());
-		act1.setName("Activity1");
-		act1.setLocation(vac.getDestination());
-		act1.setDate(LocalDateTime.now());
-		
-		Activity act2 = new Activity();
-		act2.setId(UUID.randomUUID());
-		act2.setName("Activity2");
-		act2.setLocation(vac.getDestination());
-		act2.setDate(LocalDateTime.now());
-
-		vac.getActivities().add(act1);
-		vac.getActivities().add(act2);
-
-		Mockito.when(vacDao.findByUsernameAndId(user.getUsername(), vac.getId()))
-				.thenReturn(Mono.just(new VacationDto(vac)));
-		Mockito.when(resDao.findByUuid(res.getId())).thenReturn(Mono.just(new ReservationDto(res)));
-		Mockito.when(actDao.findByLocationAndId(vac.getDestination(), act1.getId())).thenReturn(Mono.just(new ActivityDto(act1)));
-		Mockito.when(actDao.findByLocationAndId(vac.getDestination(), act2.getId())).thenReturn(Mono.just(new ActivityDto(act2)));
-
-		Mono<Vacation> vacMono = service.getVacation(user.getUsername(), vac.getId());
-
-		StepVerifier.create(vacMono).expectNextMatches(vDto -> vDto.equals(vac)).verifyComplete();
-
-	}
 
 	@Test
 	void testGetVacationInvalid() {
@@ -383,32 +295,7 @@ class UserServiceTests {
 	}
 	
 	@Test
-	void testGetActivities() {
-
-		List<Activity> vacActs = vac.getActivities();
-		vacActs.add(act);
-		vac.setActivities(vacActs);
-		
-		Mockito.when(vacDao.findByUsernameAndId(user.getUsername(), vac.getId()))
-			.thenReturn(Mono.just(new VacationDto(vac)));
-		Mockito.when(actDao.findByLocationAndId(vac.getDestination(), act.getId()))
-		.thenReturn(Mono.just(new ActivityDto(act)));
-		Mockito.when(actDao.findByLocationAndId(null, act.getId()))
-		.thenReturn(Mono.empty());
-		Mockito.when(actDao.findByLocationAndId(vac.getDestination(), null))
-		.thenReturn(Mono.empty());
-		Mockito.when(actDao.findByLocationAndId(null,null))
-		.thenReturn(Mono.empty());
-	
-		StepVerifier.create(service.getActivities(vac.getId(), user.getUsername())).expectNext(act).verifyComplete();
-		StepVerifier.create(service.getActivities(null, user.getUsername())).verifyComplete();
-		StepVerifier.create(service.getActivities(vac.getId(), null)).verifyComplete();
-		StepVerifier.create(service.getActivities(null,null)).verifyComplete();
-		
-	}
-  
-  @Test
-	void testDeleteUser() {
+	void testdeleteUser() {
 		
 		 List<Vacation> vacList = new ArrayList<Vacation>();
 		 vacList.add(vac);
@@ -451,4 +338,15 @@ class UserServiceTests {
 	
 	
 }
+	   
+		
+		
+		
+		
+        	
+	
+	
+
+
+
 	

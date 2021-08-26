@@ -146,4 +146,5 @@ public class UserDto {
 				+ ", type=" + type + "]";
 	}
 
+
 }
