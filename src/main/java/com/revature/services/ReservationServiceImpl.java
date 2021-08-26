@@ -2,8 +2,6 @@ package com.revature.services;
 
 import java.time.LocalDateTime;
 import java.time.Period;
-import java.util.ArrayList;
-import java.util.List;
 import java.time.ZoneOffset;
 
 import java.util.UUID;
@@ -150,7 +148,6 @@ public class ReservationServiceImpl implements ReservationService {
 		return resDao.findByUuid(id).map(res -> {
 			Reservation r = res.getReservation() 
 					== null ? new Reservation() : res.getReservation();
-			log.debug("Returning result: " + r);
 			return r;
 		});
 		
@@ -209,8 +206,7 @@ public class ReservationServiceImpl implements ReservationService {
 			return v;
 		}).flatMapMany(v -> {
 			log.debug("Reservations List: " + v.getReservations());
-			Flux<Reservation> reservations = Flux.fromIterable(v.getReservations());
-			return reservations;
+			return Flux.fromIterable(v.getReservations());
 		});
 	}
 	

@@ -7,11 +7,9 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -167,10 +165,8 @@ public class ReservationControllerImpl implements ReservationController {
 			return Mono.just(ResponseEntity.status(403).build());
 
 		log.debug("calling find reservation");
-		Mono<Reservation> monoRes = resService.findReservation(resId).flatMap(res -> {
-			return Mono.just(res);
-
-		}).switchIfEmpty(Mono.just(new Reservation()));
+		Mono<Reservation> monoRes = resService.findReservation(resId).flatMap(res -> Mono.just(res))
+				.switchIfEmpty(Mono.just(new Reservation()));
 
 		return monoRes.single().flatMap(r -> {
 			if (r.getId() == null)
