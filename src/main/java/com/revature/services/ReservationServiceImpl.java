@@ -200,11 +200,6 @@ public class ReservationServiceImpl implements ReservationService {
 		});
 	}
 	
-		@Override
-	public Mono<Reservation> getReservation(UUID resId) {
-		return resDao.findByUuid(resId).map(r -> r.getReservation()).switchIfEmpty(Mono.just(new Reservation()));
-	}
-	
 	@Override
 	public Flux<Reservation> getReservations(String username, String vacId) {
 		UUID id = UUID.fromString(vacId);
