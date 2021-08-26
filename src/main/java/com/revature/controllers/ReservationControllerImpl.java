@@ -198,59 +198,60 @@ class ReservationControllerImpl implements ReservationController {
 			return ResponseEntity.ok(res);
 		});
 	}
-	
+
 	@LoggedInMono
 	@PatchMapping("{resId}")
-	public Mono<ResponseEntity<Reservation>> rescheduleReservation(@RequestBody Reservation res, @PathVariable("resId") String resId,
-			WebSession session) {
-		
-		//Make sure the start time, duration, and the reserved id is not null
-		if ((res.getStarttime() == null && res.getDuration() == null)
-			&& res.getReservedId() == null) {
+	public Mono<ResponseEntity<Reservation>> rescheduleReservation(@RequestBody Reservation res,
+			@PathVariable("resId") String resId, WebSession session) {
+
+		// Make sure the start time, duration, and the reserved id is not null
+		if ((res.getStarttime() == null || res.getDuration() == null) && res.getReservedId() == null) {
 			return Mono.just(ResponseEntity.badRequest().build());
 		}
-		//Check to see if the duration is negative or if the 
-		if (res.getReservedId() == null && 
-				(LocalDateTime.now().isAfter(res.getStarttime()) || res.getDuration() < 0)) {
+		// Check to see if the duration is negative or if the
+		if (res.getReservedId() == null && (LocalDateTime.now().isAfter(res.getStarttime()) || res.getDuration() < 0)) {
 			log.debug("Invalid time");
 			return Mono.just(ResponseEntity.badRequest().build());
 		}
 		User loggedUser = session.getAttribute(UserController.LOGGED_USER);
 		UUID id = null;
-		
-		//Make sure the res id is a uuid
+
+		// Make sure the res id is a uuid
 		try {
 			id = UUID.fromString(resId);
 			log.debug("Reservation ID: {}", resId);
 		} catch (Exception e) {
 			return Mono.just(ResponseEntity.badRequest().build());
 		}
-		
-		//Need to first get the reservation
-		return resService.getReservation(id).flatMap(r ->{
+
+		// Need to first get the reservation
+		return resService.getReservation(id).flatMap(r -> {
 			log.debug("Reservation received: {}", r);
-			
-			//If no reservation was found, return a 404
+
+			// If no reservation was found, return a 404
 			if (r.getId() == null) {
 				log.debug("No reservation found");
 				return Mono.just(ResponseEntity.notFound().build());
 			}
-			
-			//If the user is allowed to change the reservation, change the reservation and send back the reservation
-			else if (ReservationStatus.AWAITING.equals(r.getStatus()) 
+
+			// If the user is allowed to change the reservation, change the reservation and
+			// send back the reservation
+			else if (ReservationStatus.AWAITING.equals(r.getStatus())
 					&& (r.getUsername().equals(loggedUser.getUsername())
-							|| r.getType().toString()
-							.equals(loggedUser.getType().toString().split("_")[0]))
-					&& (!r.getType().equals(ReservationType.FLIGHT) || res.getReservedId() != null)) {
-				log.debug("UserType: {}, ReservationType: {}, Username: {}", loggedUser.getType(), r.getType(), loggedUser.getUsername());
+							|| r.getType().toString().equals(loggedUser.getType().toString().split("_")[0]))
+					&& (!loggedUser.getType().equals(UserType.VACATIONER) || 
+							(!r.getType().equals(ReservationType.FLIGHT)
+							|| res.getReservedId() != null))) {
+				log.debug("UserType: {}, ReservationType: {}, Username: {}", loggedUser.getType(), r.getType(),
+						loggedUser.getUsername());
 				log.debug("Reservation has been found and user can change startTime and duration");
 				return resService.rescheduleReservation(r, res.getReservedId(), res.getStarttime(), res.getDuration())
 						.map(re -> ResponseEntity.ok(re))
-						//If an empty mono was returned, that means there is a scheduling conflict
+						// If an empty mono was returned, that means there is a scheduling conflict
 						.switchIfEmpty(Mono.just(ResponseEntity.status(409).build()));
 			}
-			
-			//The user cannot change this reservation
+
+			// The user cannot change this reservation
 			log.debug("User cannot change startTime and duration for this reservation");
 			return Mono.just(ResponseEntity.status(403).build());
 		});

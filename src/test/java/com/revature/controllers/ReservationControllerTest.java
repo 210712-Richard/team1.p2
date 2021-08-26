@@ -18,6 +18,7 @@ import com.revature.beans.Car;
 import com.revature.beans.Flight;
 import com.revature.beans.Hotel;
 import com.revature.beans.Reservation;
+import com.revature.beans.ReservationStatus;
 import com.revature.beans.ReservationType;
 import com.revature.beans.User;
 import com.revature.beans.UserType;
@@ -496,5 +497,346 @@ class ReservationControllerTest {
 				session);
 		
 		StepVerifier.create(monoRes).expectNext(ResponseEntity.status(403).build()).verifyComplete();
+	}
+	
+	@Test
+	void testRescheduleReservationInvalidVacationerFlightDurationStartTime() {
+		Mockito.when(session.getAttribute(UserController.LOGGED_USER)).thenReturn(user);
+
+		Reservation res = new Reservation();
+		res.setId(UUID.randomUUID());
+		res.setReservedId(flight.getId());
+		res.setReservedName(flight.getAirline());
+		res.setStarttime(vac.getStartTime());
+		res.setCost(flight.getTicketPrice());
+		res.setVacationId(vac.getId());
+		res.setDuration(vac.getDuration());
+		res.setUsername(user.getUsername());
+		res.setType(ReservationType.FLIGHT);
+
+		Reservation returnRes = new Reservation();
+		returnRes.setId(res.getId());
+		returnRes.setReservedName(flight.getAirline());
+		returnRes.setReservedId(null);
+		returnRes.setStarttime(vac.getStartTime().plus(Period.of(0, 0, 5)));
+		returnRes.setCost(flight.getTicketPrice());
+		returnRes.setVacationId(vac.getId());
+		returnRes.setDuration(vac.getDuration() + 1);
+		returnRes.setUsername(user.getUsername());
+		returnRes.setType(ReservationType.FLIGHT);
+
+		Mockito.when(resService.getReservation(res.getId())).thenReturn(Mono.just(res));
+		Mockito.when(resService.rescheduleReservation(res, null, returnRes.getStarttime(), returnRes.getDuration()))
+				.thenReturn(Mono.just(returnRes));
+
+		Mono<ResponseEntity<Reservation>> monoRes = controller.rescheduleReservation(returnRes, res.getId().toString(),
+				session);
+		
+		StepVerifier.create(monoRes).expectNext(ResponseEntity.status(403).build()).verifyComplete();
+	}
+	
+	@Test
+	void testRescheduleReservationInvalidReservationStatus() {
+		Mockito.when(session.getAttribute(UserController.LOGGED_USER)).thenReturn(user);
+
+		Reservation res = new Reservation();
+		res.setId(UUID.randomUUID());
+		res.setReservedId(flight.getId());
+		res.setReservedName(flight.getAirline());
+		res.setStarttime(vac.getStartTime());
+		res.setCost(flight.getTicketPrice());
+		res.setVacationId(vac.getId());
+		res.setDuration(vac.getDuration());
+		res.setUsername(user.getUsername());
+		res.setType(ReservationType.HOTEL);
+		res.setStatus(ReservationStatus.CONFIRMED);
+
+		Reservation returnRes = new Reservation();
+		returnRes.setId(res.getId());
+		returnRes.setReservedName(flight.getAirline());
+		returnRes.setReservedId(null);
+		returnRes.setStarttime(vac.getStartTime().plus(Period.of(0, 0, 5)));
+		returnRes.setCost(flight.getTicketPrice());
+		returnRes.setVacationId(vac.getId());
+		returnRes.setDuration(vac.getDuration() + 1);
+		returnRes.setUsername(user.getUsername());
+		returnRes.setType(ReservationType.HOTEL);
+
+		Mockito.when(resService.getReservation(res.getId())).thenReturn(Mono.just(res));
+		Mockito.when(resService.rescheduleReservation(res, null, returnRes.getStarttime(), returnRes.getDuration()))
+				.thenReturn(Mono.just(returnRes));
+
+		Mono<ResponseEntity<Reservation>> monoRes = controller.rescheduleReservation(returnRes, res.getId().toString(),
+				session);
+		
+		StepVerifier.create(monoRes).expectNext(ResponseEntity.status(403).build()).verifyComplete();
+	}
+	
+	@Test
+	void testRescheduleReservationInvalidConflict() {
+		Mockito.when(session.getAttribute(UserController.LOGGED_USER)).thenReturn(user);
+
+		Reservation res = new Reservation();
+		res.setId(UUID.randomUUID());
+		res.setReservedId(flight.getId());
+		res.setReservedName(flight.getAirline());
+		res.setStarttime(vac.getStartTime());
+		res.setCost(flight.getTicketPrice());
+		res.setVacationId(vac.getId());
+		res.setDuration(vac.getDuration());
+		res.setUsername(user.getUsername());
+		res.setType(ReservationType.HOTEL);
+
+		Reservation returnRes = new Reservation();
+		returnRes.setId(res.getId());
+		returnRes.setReservedName(flight.getAirline());
+		returnRes.setReservedId(null);
+		returnRes.setStarttime(vac.getStartTime().plus(Period.of(0, 0, 5)));
+		returnRes.setCost(flight.getTicketPrice());
+		returnRes.setVacationId(vac.getId());
+		returnRes.setDuration(vac.getDuration() + 1);
+		returnRes.setUsername(user.getUsername());
+		returnRes.setType(ReservationType.HOTEL);
+
+		Mockito.when(resService.getReservation(res.getId())).thenReturn(Mono.just(res));
+		Mockito.when(resService.rescheduleReservation(res, null, returnRes.getStarttime(), returnRes.getDuration()))
+				.thenReturn(Mono.empty());
+
+		Mono<ResponseEntity<Reservation>> monoRes = controller.rescheduleReservation(returnRes, res.getId().toString(),
+				session);
+		
+		StepVerifier.create(monoRes).expectNext(ResponseEntity.status(409).build()).verifyComplete();
+	}
+	
+	@Test
+	void testRescheduleReservationInvalidStartTimeNull() {
+		Mockito.when(session.getAttribute(UserController.LOGGED_USER)).thenReturn(user);
+
+		Reservation res = new Reservation();
+		res.setId(UUID.randomUUID());
+		res.setReservedId(flight.getId());
+		res.setReservedName(flight.getAirline());
+		res.setStarttime(vac.getStartTime());
+		res.setCost(flight.getTicketPrice());
+		res.setVacationId(vac.getId());
+		res.setDuration(vac.getDuration());
+		res.setUsername(user.getUsername());
+		res.setType(ReservationType.HOTEL);
+
+		Reservation returnRes = new Reservation();
+		returnRes.setId(res.getId());
+		returnRes.setReservedName(flight.getAirline());
+		returnRes.setReservedId(null);
+		returnRes.setStarttime(null);
+		returnRes.setCost(flight.getTicketPrice());
+		returnRes.setVacationId(vac.getId());
+		returnRes.setDuration(vac.getDuration() + 1);
+		returnRes.setUsername(user.getUsername());
+		returnRes.setType(ReservationType.HOTEL);
+
+		Mono<ResponseEntity<Reservation>> monoRes = controller.rescheduleReservation(returnRes, res.getId().toString(),
+				session);
+		
+		StepVerifier.create(monoRes).expectNext(ResponseEntity.badRequest().build()).verifyComplete();
+
+		Mockito.verifyNoInteractions(resService);
+	}
+	
+	@Test
+	void testRescheduleReservationInvalidDurationNull() {
+		Mockito.when(session.getAttribute(UserController.LOGGED_USER)).thenReturn(user);
+
+		Reservation res = new Reservation();
+		res.setId(UUID.randomUUID());
+		res.setReservedId(flight.getId());
+		res.setReservedName(flight.getAirline());
+		res.setStarttime(vac.getStartTime());
+		res.setCost(flight.getTicketPrice());
+		res.setVacationId(vac.getId());
+		res.setDuration(vac.getDuration());
+		res.setUsername(user.getUsername());
+		res.setType(ReservationType.HOTEL);
+
+		Reservation returnRes = new Reservation();
+		returnRes.setId(res.getId());
+		returnRes.setReservedName(flight.getAirline());
+		returnRes.setReservedId(null);
+		returnRes.setStarttime(vac.getStartTime());
+		returnRes.setCost(flight.getTicketPrice());
+		returnRes.setVacationId(vac.getId());
+		returnRes.setDuration(null);
+		returnRes.setUsername(user.getUsername());
+		returnRes.setType(ReservationType.HOTEL);
+
+
+		Mono<ResponseEntity<Reservation>> monoRes = controller.rescheduleReservation(returnRes, res.getId().toString(),
+				session);
+		
+		StepVerifier.create(monoRes).expectNext(ResponseEntity.badRequest().build()).verifyComplete();
+	
+		Mockito.verifyNoInteractions(resService);
+	}
+	
+	@Test
+	void testRescheduleReservationInvalidAllNull() {
+		Mockito.when(session.getAttribute(UserController.LOGGED_USER)).thenReturn(user);
+
+		Reservation res = new Reservation();
+		res.setId(UUID.randomUUID());
+		res.setReservedId(flight.getId());
+		res.setReservedName(flight.getAirline());
+		res.setStarttime(vac.getStartTime());
+		res.setCost(flight.getTicketPrice());
+		res.setVacationId(vac.getId());
+		res.setDuration(vac.getDuration());
+		res.setUsername(user.getUsername());
+		res.setType(ReservationType.HOTEL);
+
+		Reservation returnRes = new Reservation();
+		returnRes.setId(res.getId());
+		returnRes.setReservedName(flight.getAirline());
+		returnRes.setReservedId(null);
+		returnRes.setStarttime(null);
+		returnRes.setCost(flight.getTicketPrice());
+		returnRes.setVacationId(vac.getId());
+		returnRes.setDuration(null);
+		returnRes.setUsername(user.getUsername());
+		returnRes.setType(ReservationType.HOTEL);
+
+		
+
+		Mono<ResponseEntity<Reservation>> monoRes = controller.rescheduleReservation(returnRes, res.getId().toString(),
+				session);
+		
+		StepVerifier.create(monoRes).expectNext(ResponseEntity.badRequest().build()).verifyComplete();
+
+		Mockito.verifyNoInteractions(resService);
+
+	}
+	
+	@Test
+	void testRescheduleReservationInvalidStartTimeBeforeNow() {
+		Mockito.when(session.getAttribute(UserController.LOGGED_USER)).thenReturn(user);
+
+		Reservation res = new Reservation();
+		res.setId(UUID.randomUUID());
+		res.setReservedId(flight.getId());
+		res.setReservedName(flight.getAirline());
+		res.setStarttime(vac.getStartTime());
+		res.setCost(flight.getTicketPrice());
+		res.setVacationId(vac.getId());
+		res.setDuration(vac.getDuration());
+		res.setUsername(user.getUsername());
+		res.setType(ReservationType.HOTEL);
+
+		Reservation returnRes = new Reservation();
+		returnRes.setId(res.getId());
+		returnRes.setReservedName(flight.getAirline());
+		returnRes.setReservedId(null);
+		returnRes.setStarttime(LocalDateTime.now().minus(Period.of(0, 0, 1)));
+		returnRes.setCost(flight.getTicketPrice());
+		returnRes.setVacationId(vac.getId());
+		returnRes.setDuration(vac.getDuration() + 1);
+		returnRes.setUsername(user.getUsername());
+		returnRes.setType(ReservationType.HOTEL);
+
+		Mono<ResponseEntity<Reservation>> monoRes = controller.rescheduleReservation(returnRes, res.getId().toString(),
+				session);
+		
+		StepVerifier.create(monoRes).expectNext(ResponseEntity.badRequest().build()).verifyComplete();
+	
+		Mockito.verifyNoInteractions(resService);
+	}
+	
+	@Test
+	void testRescheduleReservationDurationNegative() {
+		Mockito.when(session.getAttribute(UserController.LOGGED_USER)).thenReturn(user);
+
+		Reservation res = new Reservation();
+		res.setId(UUID.randomUUID());
+		res.setReservedId(flight.getId());
+		res.setReservedName(flight.getAirline());
+		res.setStarttime(vac.getStartTime());
+		res.setCost(flight.getTicketPrice());
+		res.setVacationId(vac.getId());
+		res.setDuration(vac.getDuration());
+		res.setUsername(user.getUsername());
+		res.setType(ReservationType.HOTEL);
+
+		Reservation returnRes = new Reservation();
+		returnRes.setId(res.getId());
+		returnRes.setReservedName(flight.getAirline());
+		returnRes.setReservedId(null);
+		returnRes.setStarttime(vac.getStartTime());
+		returnRes.setCost(flight.getTicketPrice());
+		returnRes.setVacationId(vac.getId());
+		returnRes.setDuration(-1);
+		returnRes.setUsername(user.getUsername());
+		returnRes.setType(ReservationType.HOTEL);
+
+		Mono<ResponseEntity<Reservation>> monoRes = controller.rescheduleReservation(returnRes, res.getId().toString(),
+				session);
+		
+		StepVerifier.create(monoRes).expectNext(ResponseEntity.badRequest().build()).verifyComplete();
+	
+		Mockito.verifyNoInteractions(resService);
+	}
+	
+	@Test
+	void testRescheduleReservationInvalidNotFound() {
+		Mockito.when(session.getAttribute(UserController.LOGGED_USER)).thenReturn(user);
+
+		Reservation res = new Reservation();
+		res.setId(UUID.randomUUID());
+		res.setReservedId(flight.getId());
+		res.setReservedName(flight.getAirline());
+		res.setStarttime(vac.getStartTime());
+		res.setCost(flight.getTicketPrice());
+		res.setVacationId(vac.getId());
+		res.setDuration(vac.getDuration());
+		res.setUsername(user.getUsername());
+		res.setType(ReservationType.HOTEL);
+
+		Reservation returnRes = new Reservation();
+		returnRes.setId(res.getId());
+		returnRes.setReservedName(flight.getAirline());
+		returnRes.setReservedId(null);
+		returnRes.setStarttime(vac.getStartTime().plus(Period.of(0, 0, 5)));
+		returnRes.setCost(flight.getTicketPrice());
+		returnRes.setVacationId(vac.getId());
+		returnRes.setDuration(vac.getDuration() + 1);
+		returnRes.setUsername(user.getUsername());
+		returnRes.setType(ReservationType.HOTEL);
+
+		Mockito.when(resService.getReservation(res.getId())).thenReturn(Mono.just(new Reservation()));
+
+		Mono<ResponseEntity<Reservation>> monoRes = controller.rescheduleReservation(returnRes, res.getId().toString(),
+				session);
+		
+		StepVerifier.create(monoRes).expectNext(ResponseEntity.notFound().build()).verifyComplete();
+	}
+	
+	@Test
+	void testRescheduleReservationInvalidBadUUID() {
+		Mockito.when(session.getAttribute(UserController.LOGGED_USER)).thenReturn(user);
+		
+		String badId = "Bad ID";
+		Reservation returnRes = new Reservation();
+		returnRes.setId(UUID.randomUUID());
+		returnRes.setReservedName(flight.getAirline());
+		returnRes.setReservedId(null);
+		returnRes.setStarttime(vac.getStartTime().plus(Period.of(0, 0, 5)));
+		returnRes.setCost(flight.getTicketPrice());
+		returnRes.setVacationId(vac.getId());
+		returnRes.setDuration(vac.getDuration() + 1);
+		returnRes.setUsername(user.getUsername());
+		returnRes.setType(ReservationType.HOTEL);
+
+		Mono<ResponseEntity<Reservation>> monoRes = controller.rescheduleReservation(returnRes, badId,
+				session);
+		
+		StepVerifier.create(monoRes).expectNext(ResponseEntity.badRequest().build()).verifyComplete();
+		
+		Mockito.verifyNoInteractions(resService);
 	}
 }
