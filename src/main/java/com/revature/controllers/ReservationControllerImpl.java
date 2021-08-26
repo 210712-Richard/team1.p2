@@ -204,12 +204,16 @@ class ReservationControllerImpl implements ReservationController {
 	public Mono<ResponseEntity<Reservation>> rescheduleReservation(@RequestBody Reservation res, @PathVariable("resId") String resId,
 			WebSession session) {
 		
-		//Make sure nothing is null
-		if (res.getReservedId() == null || (res.getStarttime() == null && res.getDuration() == null)) {
-			return Mono.just(ResponseEntity.badRequest().build());
+		//Make sure the start time, duration, and the reserved id is not null
+		if (res.getStarttime() == null && res.getDuration() == null) {
+			if (res.getReservedId() == null) {
+				return Mono.just(ResponseEntity.badRequest().build());
+			}
+			
 		}
 		//Check to see if the duration is negative or if the 
-		if (LocalDateTime.now().isAfter(res.getStarttime()) || res.getDuration() < 0) {
+		if (res.getReservedId() == null && 
+				(LocalDateTime.now().isAfter(res.getStarttime()) || res.getDuration() < 0)) {
 			log.debug("Invalid time");
 			log.debug("Start time: {}", res.getStarttime());
 			log.debug("Duration: {}", res.getDuration());
