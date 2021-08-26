@@ -5,8 +5,9 @@ Scenario: As a logged in vacationer, send a patch request to "cancel" -> (close)
 a reservation
 
 Background:
-* def resId = 'c350668f-ebae-4dbf-b517-a17d75c0fb3a'
-* def statusUrl = homeUrl + '/reservations/' + resId + '/' + 'cancel'
+* def vac = call read('createReservation.feature')
+* def res = vac.resObj
+* def statusUrl = homeUrl + '/reservations/' + res.id + '/' + 'cancel'
 
 Given url statusUrl
 And def loggedIn = call read('loginUser.feature')

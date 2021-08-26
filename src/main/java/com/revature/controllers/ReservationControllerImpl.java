@@ -206,8 +206,14 @@ public class ReservationControllerImpl implements ReservationController {
 					return resService.updateReservation(resId, status)
 							.flatMap(res -> {	
 								if(res.getId() == null) {
+									
 									// Problem with input parameters
-									return Mono.just(ResponseEntity.badRequest().build());
+									if(ReservationStatus.getStatus(status) == null)
+										// Invalid status parameter
+										return Mono.just(ResponseEntity.badRequest().build());
+									
+									// Invalid resId
+									return Mono.just(ResponseEntity.notFound().build());
 								}
 								log.debug("Reservation matching ID: " + resId +
 										" updated\n" + r);
@@ -234,8 +240,14 @@ public class ReservationControllerImpl implements ReservationController {
 					return resService.updateReservation(resId, status)
 							.flatMap(res -> {
 								if(res.getId() == null) {
+									
 									// Problem with input parameters
-									return Mono.just(ResponseEntity.badRequest().build());
+									if(ReservationStatus.getStatus(status) == null)
+										// Invalid status parameter
+										return Mono.just(ResponseEntity.badRequest().build());
+									
+									// Invalid resId
+									return Mono.just(ResponseEntity.notFound().build());								
 								}
 								log.debug("Reservation matching ID: " + resId +
 										" updated\n" + r);
@@ -261,8 +273,14 @@ public class ReservationControllerImpl implements ReservationController {
 					return resService.updateReservation(resId, status)
 							.flatMap(res -> {
 								if(res.getId() == null) {
+									
 									// Problem with input parameters
-									return Mono.just(ResponseEntity.badRequest().build());
+									if(ReservationStatus.getStatus(status) == null)
+										// Invalid status parameter
+										return Mono.just(ResponseEntity.badRequest().build());
+									
+									// Invalid resId
+									return Mono.just(ResponseEntity.notFound().build());								
 								}
 								log.debug("Reservation matching ID: " + resId +
 										" updated\n" + r);
