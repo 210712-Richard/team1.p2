@@ -20,6 +20,7 @@ import com.revature.beans.Car;
 import com.revature.beans.Flight;
 import com.revature.beans.Hotel;
 import com.revature.beans.Reservation;
+import com.revature.beans.ReservationStatus;
 import com.revature.beans.ReservationType;
 import com.revature.beans.User;
 import com.revature.beans.UserType;
@@ -198,7 +199,7 @@ public class ReservationControllerImpl implements ReservationController {
 	}
 	
 	@LoggedInMono
-	@PutMapping("{resId}/startTime/duration")
+	@PatchMapping("{resId}")
 	public Mono<ResponseEntity<Reservation>> rescheduleReservation(@RequestBody Reservation res, @PathVariable("resId") String resId,
 			WebSession session) {
 		User loggedUser = session.getAttribute(UserController.LOGGED_USER);
@@ -223,11 +224,11 @@ public class ReservationControllerImpl implements ReservationController {
 			}
 			
 			//If the user is allowed to change the reservation, change the reservation and send back the reservation
-			else if ((r.getUsername().equals(loggedUser.getUsername())
-					&& !r.getType().equals(ReservationType.FLIGHT)) 
+			else if (ReservationStatus.AWAITING.equals(r.getStatus()) && (r.getUsername().equals(loggedUser.getUsername())
+					&& (r.getType().equals(ReservationType.FLIGHT) || res.getId() != null)) 
 					|| r.getType().toString().equals(loggedUser.getType().toString().split("_")[0])) {
 				log.debug("Reservation has been found and user can change startTime and duration");
-				return resService.rescheduleReservation(r, res.getStarttime(), res.getDuration())
+				return resService.rescheduleReservation(r, res.getReservedId(), res.getStarttime(), res.getDuration())
 						.map(re -> ResponseEntity.ok(re))
 						//If an empty mono was returned, that means there is a scheduling conflict
 						.switchIfEmpty(Mono.just(ResponseEntity.status(409).build()));
