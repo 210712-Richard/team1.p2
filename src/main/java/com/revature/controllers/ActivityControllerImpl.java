@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.WebSession;
 
 import com.revature.beans.Activity;
-import com.revature.beans.User;
 import com.revature.services.ActivityService;
 
 import reactor.core.publisher.Flux;
@@ -27,10 +26,6 @@ public class ActivityControllerImpl implements ActivityController {
 	@Override
 	@GetMapping("/{location}")
 	public ResponseEntity<Flux<Activity>> viewAllActivities(@PathVariable("location") String location, WebSession session) {
-		User loggedUser = (User) session.getAttribute("loggedUser");
-		if (loggedUser == null) {
-			return ResponseEntity.status(401).body(Flux.empty());
-		}
 		return ResponseEntity.ok(actService.getAllActivities(location));
 	}
 
