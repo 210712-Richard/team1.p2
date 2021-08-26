@@ -19,7 +19,7 @@ import com.revature.services.CarService;
 import reactor.core.publisher.Flux;
 import reactor.test.StepVerifier;
 
-public class CarControllerTest {
+class CarControllerTest {
 	@InjectMocks
 	private CarControllerImpl controller;
 	

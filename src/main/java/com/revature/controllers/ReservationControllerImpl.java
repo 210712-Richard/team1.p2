@@ -35,7 +35,7 @@ import reactor.core.publisher.Mono;
 
 @RestController
 @RequestMapping("/reservations")
-public class ReservationControllerImpl implements ReservationController {
+class ReservationControllerImpl implements ReservationController {
 	private static Logger log = LogManager.getLogger(ReservationControllerImpl.class);
 
 	private ReservationService resService;

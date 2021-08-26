@@ -20,7 +20,7 @@ import com.revature.services.FlightService;
 import reactor.core.publisher.Flux;
 import reactor.test.StepVerifier;
 
-public class FlightControllerTest {
+class FlightControllerTest {
 	@InjectMocks
 	private FlightControllerImpl controller;
 	

@@ -22,7 +22,7 @@ import com.revature.services.ActivityService;
 import reactor.core.publisher.Flux;
 import reactor.test.StepVerifier;
 
-public class ActivityControllerTest {
+class ActivityControllerTest {
 	
 	@InjectMocks
 	private ActivityControllerImpl controller;

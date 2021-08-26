@@ -19,7 +19,7 @@ import com.revature.services.HotelService;
 import reactor.core.publisher.Flux;
 import reactor.test.StepVerifier;
 
-public class HotelControllerTest {
+class HotelControllerTest {
 	@InjectMocks
 	private HotelControllerImpl controller;
 	
