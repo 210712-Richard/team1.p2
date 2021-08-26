@@ -37,7 +37,7 @@ public class LoggingAspect {
 
 	private void logError(Logger log, Throwable t) {
 		//Log the error
-		log.error("Method threw exception: {}", t);
+		log.error("Method threw exception: {0}", t);
 		//Loop through and log the stack trace
 		for (StackTraceElement s : t.getStackTrace()) {
 			log.warn(s);

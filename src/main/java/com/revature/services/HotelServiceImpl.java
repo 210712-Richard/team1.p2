@@ -7,10 +7,8 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.revature.beans.Flight;
 import com.revature.beans.Hotel;
 import com.revature.data.HotelDao;
-import com.revature.dto.HotelDto;
 
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
