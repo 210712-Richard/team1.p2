@@ -1072,6 +1072,15 @@ class ReservationServiceTest {
 	@Test
 	void testChangeReservationVacationerFlightValid() {
 
+		Flight flight2 = new Flight();
+		flight2.setId(UUID.randomUUID());
+		flight2.setAirline("Test Airline");
+		flight2.setDestination("Test City, Test State");
+		flight2.setOpenSeats(3);
+		flight2.setTicketPrice(150.00);
+		flight2.setDepartingDate(LocalDateTime.now().minus(Period.of(0, 0, 1)));
+		flight2.setStartingLocation("Test City1, Test State1");
+		
 		Reservation res = new Reservation();
 		res.setUsername(vac.getUsername());
 		res.setVacationId(vac.getId());
@@ -1081,46 +1090,45 @@ class ReservationServiceTest {
 		res.setDuration(0);
 		res.setCost(flight.getTicketPrice());
 		res.setType(ReservationType.FLIGHT);
-		res.setStarttime(vac.getStartTime());
+		res.setStarttime(flight.getDepartingDate());
 
 		Reservation setRes1 = new Reservation();
 		setRes1.setUsername("otherTest1");
 		setRes1.setVacationId(UUID.randomUUID());
 		setRes1.setId(UUID.randomUUID());
-		setRes1.setReservedId(flight.getId());
+		setRes1.setReservedId(flight2.getId());
 		setRes1.setReservedName(flight.getAirline());
-		setRes1.setDuration(vac.getDuration());
+		setRes1.setDuration(0);
 		setRes1.setCost(19.99);
 		setRes1.setType(ReservationType.FLIGHT);
-		setRes1.setStarttime(vac.getStartTime().minus(Period.of(0, 0, 1)));
+		setRes1.setStarttime(flight2.getDepartingDate());
 		setRes1.setStatus(ReservationStatus.AWAITING);
 
 		Reservation setRes2 = new Reservation();
 		setRes2.setUsername("otherTest2");
 		setRes2.setVacationId(UUID.randomUUID());
 		setRes2.setId(UUID.randomUUID());
-		setRes2.setReservedId(flight.getId());
+		setRes2.setReservedId(flight2.getId());
 		setRes2.setReservedName(flight.getAirline());
-		setRes2.setDuration(1);
+		setRes2.setDuration(0);
 		setRes2.setCost(19.99);
 		setRes2.setType(ReservationType.FLIGHT);
-		setRes2.setStarttime(vac.getStartTime().plus(Period.of(0, 0, 1)));
+		setRes2.setStarttime(flight2.getDepartingDate());
 		setRes2.setStatus(ReservationStatus.AWAITING);
 
-		ReservationDto[] resArray = { new ReservationDto(setRes1), new ReservationDto(setRes2),
-				new ReservationDto(res) };
+		ReservationDto[] resArray = { new ReservationDto(setRes1), new ReservationDto(setRes2), new ReservationDto(res) };
 
 		// The changed reservation
 		Reservation changedRes = new Reservation();
 		changedRes.setUsername(vac.getUsername());
 		changedRes.setVacationId(vac.getId());
-		changedRes.setId(UUID.randomUUID());
-		changedRes.setReservedId(flight.getId());
-		changedRes.setReservedName(flight.getAirline());
+		changedRes.setId(res.getId());
+		changedRes.setReservedId(flight2.getId());
+		changedRes.setReservedName(flight2.getAirline());
 		changedRes.setType(ReservationType.FLIGHT);
 		changedRes.setDuration(0);
-		changedRes.setCost(flight.getTicketPrice());
-		changedRes.setStarttime(vac.getStartTime().plus(Period.of(0, 0, 5)));
+		changedRes.setCost(flight2.getTicketPrice());
+		changedRes.setStarttime(flight2.getDepartingDate());
 
 		// Set up the returns
 		when(resDao.save(Mockito.any())).thenReturn(Mono.just(new ReservationDto(res)));
@@ -1129,16 +1137,18 @@ class ReservationServiceTest {
 		when(resDao.save(Mockito.any())).thenReturn(Mono.just(new ReservationDto(changedRes)));
 		when(flightDao.findByDestinationAndId(vac.getDestination(), flight.getId()))
 				.thenReturn(Mono.just(new FlightDto(flight)));
+		when(flightDao.findByDestinationAndId(vac.getDestination(), flight2.getId()))
+				.thenReturn(Mono.just(new FlightDto(flight2)));
 
 		when(resDao.findAll()).thenReturn(Flux.fromArray(resArray));
 
-		Mono<Reservation> resMono = service.rescheduleReservation(res, null, changedRes.getStarttime(),
-				changedRes.getDuration());
+		Mono<Reservation> resMono = service.rescheduleReservation(res, flight2.getId(), null,
+				null);
 
 		// Check to make sure the reservation was set correctly
 		StepVerifier.create(resMono).expectNextMatches(r -> r.getId() != null && r.getCost() == changedRes.getCost()
-				&& flight.getId().equals(r.getReservedId()) && changedRes.getDuration().equals(r.getDuration())
-				&& flight.getAirline().equals(r.getReservedName()) && changedRes.getStarttime().equals(r.getStarttime())
+				&& flight2.getId().equals(r.getReservedId()) && changedRes.getDuration().equals(r.getDuration())
+				&& flight2.getAirline().equals(r.getReservedName()) && changedRes.getStarttime().equals(r.getStarttime())
 				&& ReservationStatus.AWAITING.equals(r.getStatus()) && ReservationType.FLIGHT.equals(r.getType()))
 				.verifyComplete();
 
