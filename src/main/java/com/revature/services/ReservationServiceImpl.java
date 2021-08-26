@@ -223,7 +223,11 @@ public class ReservationServiceImpl implements ReservationService {
 
 	private Mono<Reservation> rescheduleHotel(Reservation res, VacationDto vac, LocalDateTime startTime,
 			Integer duration) {
+		log.trace("Rescheduling hotel");
+		log.trace("Arguments: res" + res + ", vac: " + vac + ", startTime:" + startTime + ", duration: " + duration);
+		//Get the hotel
 		return hotelDao.findByLocationAndId(vac.getDestination(), res.getReservedId())
+				//Make sure there are no reservation conflicts
 				.flatMap(h -> isAvailable(res.getId(), h.getId(), h.getRoomsAvailable(), ReservationType.HOTEL,
 						startTime, duration).flatMap(b -> {
 							// If there are rooms available
@@ -236,7 +240,11 @@ public class ReservationServiceImpl implements ReservationService {
 
 	private Mono<Reservation> rescheduleCar(Reservation res, VacationDto vac, LocalDateTime startTime,
 			Integer duration) {
+		log.trace("Rescheduling car");
+		log.trace("Arguments: res" + res + ", vac: " + vac + ", startTime:" + startTime + ", duration: " + duration);
+		//Get the car
 		return carDao.findByLocationAndId(vac.getDestination(), res.getReservedId()).flatMap(
+				//Make sure the reservation does not have any conflicts
 				c -> isAvailable(res.getId(), c.getId(), 1, ReservationType.CAR, startTime, duration).flatMap(b -> {
 					// If there are spots available
 					if (Boolean.TRUE.equals(b)) {
@@ -251,7 +259,10 @@ public class ReservationServiceImpl implements ReservationService {
 		log.trace("Rescheduling flight");
 		log.trace("Arguments: res" + res + ", vac: " + vac + ", newReservedId," + newReservedId.toString()
 				+ ", startTime:" + startTime + ", duration: " + duration);
+		
+		//Get the new flight
 		return flightDao.findByDestinationAndId(vac.getDestination(), newReservedId)
+				//Need to make sure the flight has seats available
 				.flatMap(f -> isAvailable(res.getId(), f.getId(), f.getOpenSeats(), ReservationType.FLIGHT,
 						LocalDateTime.ofInstant(f.getDepartingDate(), ZoneOffset.UTC), duration).flatMap(b -> {
 							log.debug("Checked if flights were available");
