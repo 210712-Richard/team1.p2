@@ -18,7 +18,7 @@ public interface ReservationService {
 	public Mono<Reservation> reserveCar(Car car, Vacation vacation)	;
 	public Mono<Reservation> getReservation(UUID resId);
 	public Mono<Reservation> findReservation(String resId);
-	public Mono<Reservation> updateReservation(String resId, String status);
+	public Mono<Reservation> updateReservation(Reservation res, String status);
 	public Flux<Reservation> getReservations(String username, String vacId);
 	public Mono<Reservation> rescheduleReservation(Reservation res, UUID newReservedId, LocalDateTime startTime, Integer duration);
 }

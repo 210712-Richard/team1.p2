@@ -7,12 +7,13 @@ Background:
 * def vacObj = vac.vacObj
 * def res = vac.resObj
 * def loggedIn = vac.loggedIn
-* def statusUrl = reservationUrl + '/' + res.id + '/' + 'confirm'
+* def statusUrl = reservationUrl + '/' + res.id + '/status'
 
 Given url statusUrl
+And request { status: 'CONFIRMED' }
 And cookie SESSION = loggedIn.sessionCookie
 And match loggedIn.response contains { type: 'VACATIONER' }
-When method patch
+When method put
 Then status 200
 And match response contains { status: 'CONFIRMED' }
 And def resObj = response

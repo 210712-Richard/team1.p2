@@ -14,13 +14,13 @@ public class UpdateReservationStatusFeature {
 	}
 	
 	
-	@Karate.Test
-	Karate testUpdateReservationInvalidStatus() {
-		return Karate.run("updateReservationInvalidStatus").relativeTo(getClass());
-	}
-	
-	@Karate.Test
-	Karate testUpdateReservationInvalidUser() {
-		return Karate.run("updateReservationInvalidStaff").relativeTo(getClass());
-	}
+//	@Karate.Test
+//	Karate testUpdateReservationInvalidStatus() {
+//		return Karate.run("updateReservationInvalidStatus").relativeTo(getClass());
+//	}
+//	
+//	@Karate.Test
+//	Karate testUpdateReservationInvalidUser() {
+//		return Karate.run("updateReservationInvalidStaff").relativeTo(getClass());
+//	}
 }

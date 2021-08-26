@@ -607,7 +607,7 @@ class ReservationServiceTest {
 		when(resDao.save(Mockito.any())).thenReturn(Mono.just(new ReservationDto(res)));	
 		when(vacDao.findByUsernameAndId(Mockito.any(), Mockito.any())).thenReturn(Mono.just(new VacationDto(vac)));	
 		
-		Mono<Reservation> resMono = service.updateReservation(res.getId().toString(), newStatus);
+		Mono<Reservation> resMono = service.updateReservation(res, newStatus);
 
 		StepVerifier.create(resMono).expectNextMatches(r -> r.getStatus().equals(ReservationStatus.getStatus(newStatus)));
 		assertEquals(res.getStatus(), ReservationStatus.getStatus(newStatus), 
@@ -636,7 +636,7 @@ class ReservationServiceTest {
 		when(resDao.save(Mockito.any())).thenReturn(Mono.just(new ReservationDto()));	
 		when(vacDao.findByUsernameAndId(Mockito.any(), Mockito.any())).thenReturn(Mono.just(new VacationDto()));	
 		
-		Mono<Reservation> resMono = service.updateReservation(UUID.randomUUID().toString(), newStatus);
+		Mono<Reservation> resMono = service.updateReservation(res, newStatus);
 
 		StepVerifier.create(resMono).expectError().verify();
 	}
@@ -663,7 +663,7 @@ class ReservationServiceTest {
 		when(resDao.save(Mockito.any())).thenReturn(Mono.just(new ReservationDto()));	
 		when(vacDao.findByUsernameAndId(Mockito.any(), Mockito.any())).thenReturn(Mono.just(new VacationDto()));	
 		
-		Mono<Reservation> resMono = service.updateReservation(res.getId().toString(), newStatus);
+		Mono<Reservation> resMono = service.updateReservation(res, newStatus);
 
 		StepVerifier.create(resMono).expectError().verify();
 	}

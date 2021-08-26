@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -146,15 +147,17 @@ public class ReservationControllerImpl implements ReservationController {
 			return Mono.just(ResponseEntity.status(400).build());
 		}
 	}
-	
+
 	@Override
 	@LoggedInMono
-	@PatchMapping("{resId}/{status}")
-	public Mono<ResponseEntity<Reservation>> updateReservationStatus(@PathVariable("resId") String resId,
-			@PathVariable("status") String status, WebSession session) {
+	@PutMapping("{resId}/status")
+	public Mono<ResponseEntity<Reservation>> updateReservationStatus(@RequestBody Reservation resStatus,
+			@PathVariable("resId") String resId, WebSession session) {
 
-		if (resId == null || resId.equals("") || status == null || status.equals(""))
+		if (resId == null || resId.equals("") || resStatus.getStatus() == null)
 			return Mono.just(ResponseEntity.badRequest().build());
+
+		String status = resStatus.getStatus().toString();
 
 		User loggedUser = session.getAttribute(UserController.LOGGED_USER);
 		if (loggedUser == null)
@@ -165,15 +168,11 @@ public class ReservationControllerImpl implements ReservationController {
 			return Mono.just(ResponseEntity.status(403).build());
 
 		log.debug("calling find reservation");
-		Mono<Reservation> monoRes = resService.findReservation(resId).flatMap(res -> Mono.just(res))
-				.switchIfEmpty(Mono.just(new Reservation()));
+		Mono<Reservation> monoRes = resService.findReservation(resId);
 
 		return monoRes.single().flatMap(r -> {
 			if (r.getId() == null)
 				return Mono.just(ResponseEntity.notFound().build());
-
-			if (!loggedUser.getUsername().equals(r.getUsername()) && loggedUser.getType() == UserType.VACATIONER)
-				return Mono.just(ResponseEntity.status(403).build());
 
 			ReservationType type = r.getType();
 
@@ -185,109 +184,33 @@ public class ReservationControllerImpl implements ReservationController {
 			log.debug("Reservation Type: " + type);
 			log.debug("Logged Username: " + loggedUser.getUsername());
 			log.debug("Logged user type: " + loggedUser.getType());
-			switch (type) {
-			case CAR:
-				log.debug("Updating car reservation");
-				return updateCarReservation(loggedUser, status, r);
 
-			case FLIGHT:
-				log.debug("Updating flight reservation");
-				return updateFlightReservation(loggedUser, status, r);
+			// If logged in user didn't create reservation and is not staff
+			if (!loggedUser.getUsername().equals(r.getUsername())
+					&& !loggedUser.getType().toString().split("_")[0].equals(r.getType().toString()))
+				return Mono.just(ResponseEntity.status(403).build());
 
-			case HOTEL:
-				log.debug("Updating hotel reservation");
-				return updateHotelReservation(loggedUser, status, r);
-
-			default:
-				log.debug("Default case reached");
+			// If reservation start time already passed
+			if (r.getStarttime().isBefore(LocalDateTime.now())
+					&& !loggedUser.getType().toString().split("_")[0].equals(r.getType().toString()))
+				
 				return Mono.just(ResponseEntity.badRequest().build());
-			}
-		});
-	}
 
-	private Mono<ResponseEntity<Reservation>> updateCarReservation(User loggedUser, String status, Reservation res) {
-
-		// If logged in user didn't create reservation and is not staff
-		if (!loggedUser.getUsername().equals(res.getUsername()) && loggedUser.getType() != UserType.CAR_STAFF)
-			return Mono.just(ResponseEntity.status(403).build());
-
-		// If reservation start time already passed
-		if (res.getStarttime().isBefore(LocalDateTime.now()) && loggedUser.getType() != UserType.CAR_STAFF)
-			return Mono.just(ResponseEntity.badRequest().build());
-
-		return resService.updateReservation(res.getId().toString(), status).flatMap(r -> {
-			if (r.getId() == null) {
-
-				// Problem with input parameters
-				if (ReservationStatus.getStatus(status) == null)
-					// Invalid status parameter
-					return Mono.just(ResponseEntity.badRequest().build());
-
-				// Invalid resId
-				return Mono.just(ResponseEntity.notFound().build());
-			}
-			log.debug("Reservation matching ID: " + r.getId() + " updated\n" + r);
-			return Mono.just(ResponseEntity.ok(r));
-		});
-	}
-
-	private Mono<ResponseEntity<Reservation>> updateHotelReservation(User loggedUser, String status, Reservation res) {
-
-		// If logged in user didn't create reservation and is not staff
-		if (!loggedUser.getUsername().equals(res.getUsername()) && loggedUser.getType() != UserType.HOTEL_STAFF)
-			return Mono.just(ResponseEntity.status(403).build());
-
-		// If reservation start time already passed
-		if (res.getStarttime().isBefore(LocalDateTime.now()) && loggedUser.getType() != UserType.HOTEL_STAFF)
-			return Mono.just(ResponseEntity.badRequest().build());
-
-		return resService.updateReservation(res.getId().toString(), status).flatMap(r -> {
-			if (r.getId() == null) {
-
-				// Problem with input parameters
-				if (ReservationStatus.getStatus(status) == null)
-					// Invalid status parameter
-					return Mono.just(ResponseEntity.badRequest().build());
-
-				// Invalid resId
-				return Mono.just(ResponseEntity.notFound().build());
-			}
-			log.debug("Reservation matching ID: " + r.getId() + " updated\n" + r);
-			return Mono.just(ResponseEntity.ok(r));
-		});
-
-	}
-
-	private Mono<ResponseEntity<Reservation>> updateFlightReservation(User loggedUser, String status, Reservation res) {
-
-		// If logged in user didn't create reservation and is not staff
-		if (!loggedUser.getUsername().equals(res.getUsername()) && loggedUser.getType() != UserType.FLIGHT_STAFF)
-			return Mono.just(ResponseEntity.status(403).build());
-
-		// If reservation start time already passed
-		if (res.getStarttime().isBefore(LocalDateTime.now()) && loggedUser.getType() != UserType.FLIGHT_STAFF)
-			return Mono.just(ResponseEntity.badRequest().build());
-
-		return resService.updateReservation(res.getId().toString(), status).flatMap(r -> {
-			if (r.getId() == null) {
-
-				// Problem with input parameters
-				if (ReservationStatus.getStatus(status) == null)
-					// Invalid status parameter
-					return Mono.just(ResponseEntity.badRequest().build());
-
-				// Invalid resId
-				return Mono.just(ResponseEntity.notFound().build());
-			}
-			log.debug("Reservation matching ID: " + r.getId() + " updated\n" + r);
-			return Mono.just(ResponseEntity.ok(r));
+			return resService.updateReservation(r, status).flatMap(res -> {
+				if (res.getId() == null) {
+					// Invalid resId
+					return Mono.just(ResponseEntity.notFound().build());
+				}
+				log.debug("Reservation matching ID: " + r.getId() + " updated\n" + r);
+				return Mono.just(ResponseEntity.ok(r));
+			});
 		});
 	}
 
 	@LoggedInMono
 	@PatchMapping("{resId}")
-	public Mono<ResponseEntity<Reservation>> rescheduleReservation(@RequestBody Reservation res, @PathVariable("resId") String resId,
-			WebSession session) {
+	public Mono<ResponseEntity<Reservation>> rescheduleReservation(@RequestBody Reservation res,
+			@PathVariable("resId") String resId, WebSession session) {
 
 		User loggedUser = session.getAttribute(UserController.LOGGED_USER);
 		UUID id = null;
@@ -309,10 +232,12 @@ public class ReservationControllerImpl implements ReservationController {
 				log.debug("No reservation found");
 				return Mono.just(ResponseEntity.notFound().build());
 			}
-			
-			//If the user is allowed to change the reservation, change the reservation and send back the reservation
-			else if (ReservationStatus.AWAITING.equals(r.getStatus()) && (r.getUsername().equals(loggedUser.getUsername())
-					&& (r.getType().equals(ReservationType.FLIGHT) || res.getId() != null)) 
+
+			// If the user is allowed to change the reservation, change the reservation and
+			// send back the reservation
+			else if (ReservationStatus.AWAITING.equals(r.getStatus())
+					&& (r.getUsername().equals(loggedUser.getUsername())
+							&& (r.getType().equals(ReservationType.FLIGHT) || res.getId() != null))
 					|| r.getType().toString().equals(loggedUser.getType().toString().split("_")[0])) {
 				log.debug("Reservation has been found and user can change startTime and duration");
 				return resService.rescheduleReservation(r, res.getReservedId(), res.getStarttime(), res.getDuration())
@@ -327,5 +252,3 @@ public class ReservationControllerImpl implements ReservationController {
 		});
 	}
 }
-
-

@@ -7,11 +7,12 @@ Background:
 * def vac = call read('updateReservationUser.feature')
 * def res = vac.resObj
 * def loggedIn = call read('loginStaff.feature')
-* def statusUrl = reservationUrl + '/' + res.id + '/' + 'awaiting'
+* def statusUrl = reservationUrl + '/' + res.id + '/status'
 
 Given url statusUrl
+And request { status: 'AWAITING' }
 And cookie SESSION = loggedIn.sessionCookie
 And match loggedIn.response contains { type: 'FLIGHT_STAFF' }
-When method patch
+When method put
 Then status 200
 And match response contains { status: 'AWAITING' }
