@@ -1,5 +1,6 @@
 package com.revature.controllers;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 import org.apache.logging.log4j.LogManager;
@@ -64,7 +65,7 @@ class ReservationControllerImpl implements ReservationController {
 
 		// Make sure the required fields are not null
 		if (res == null || res.getReservedId() == null || res.getVacationId() == null || res.getType() == null) {
-			return Mono.just(ResponseEntity.status(400).build());
+			return Mono.just(ResponseEntity.badRequest().build());
 		}
 		// Get the vacation and make sure the id is correct
 		Mono<Vacation> monoVac = userService.getVacation(username, res.getVacationId());
@@ -202,20 +203,32 @@ class ReservationControllerImpl implements ReservationController {
 	@PatchMapping("{resId}")
 	public Mono<ResponseEntity<Reservation>> rescheduleReservation(@RequestBody Reservation res, @PathVariable("resId") String resId,
 			WebSession session) {
+		
+		//Make sure nothing is null
+		if (res.getReservedId() == null || (res.getStarttime() == null && res.getDuration() == null)) {
+			return Mono.just(ResponseEntity.badRequest().build());
+		}
+		//Check to see if the duration is negative or if the 
+		if (LocalDateTime.now().isAfter(res.getStarttime()) || res.getDuration() < 0) {
+			log.debug("Invalid time");
+			log.debug("Start time: {}", res.getStarttime());
+			log.debug("Duration: {}", res.getDuration());
+			return Mono.just(ResponseEntity.badRequest().build());
+		}
 		User loggedUser = session.getAttribute(UserController.LOGGED_USER);
 		UUID id = null;
 		
 		//Make sure the res id is a uuid
 		try {
 			id = UUID.fromString(resId);
-			log.debug("Reservation ID: %s", resId);
+			log.debug("Reservation ID: {}", resId);
 		} catch (Exception e) {
 			return Mono.just(ResponseEntity.badRequest().build());
 		}
 		
 		//Need to first get the reservation
 		return resService.getReservation(id).flatMap(r ->{
-			log.debug("Reservation received: %s", r);
+			log.debug("Reservation received: {}", r);
 			
 			//If no reservation was found, return a 404
 			if (r.getId() == null) {
@@ -224,9 +237,12 @@ class ReservationControllerImpl implements ReservationController {
 			}
 			
 			//If the user is allowed to change the reservation, change the reservation and send back the reservation
-			else if (ReservationStatus.AWAITING.equals(r.getStatus()) && (r.getUsername().equals(loggedUser.getUsername())
-					&& (r.getType().equals(ReservationType.FLIGHT) || res.getId() != null)) 
-					|| r.getType().toString().equals(loggedUser.getType().toString().split("_")[0])) {
+			else if (ReservationStatus.AWAITING.equals(r.getStatus()) 
+					&& (r.getUsername().equals(loggedUser.getUsername())
+							|| r.getType().toString()
+							.equals(loggedUser.getType().toString().split("_")[0]))
+					&& (!r.getType().equals(ReservationType.FLIGHT) || res.getReservedId() != null)) {
+				log.debug("UserType: {}, ReservationType: {}, Username: {}", loggedUser.getType(), r.getType(), loggedUser.getUsername());
 				log.debug("Reservation has been found and user can change startTime and duration");
 				return resService.rescheduleReservation(r, res.getReservedId(), res.getStarttime(), res.getDuration())
 						.map(re -> ResponseEntity.ok(re))
