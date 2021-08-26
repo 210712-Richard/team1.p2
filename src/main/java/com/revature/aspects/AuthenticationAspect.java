@@ -59,7 +59,7 @@ public class AuthenticationAspect {
 		}
 
 		User loggedUser = session.getAttribute(UserController.LOGGED_USER);
-		log.debug("Logged In User: " + loggedUser);
+		log.debug("Logged In User: {}", loggedUser);
 		String username = null;
 
 		// Get the method signature
@@ -87,7 +87,7 @@ public class AuthenticationAspect {
 				if ("username".equals(pathVariable.value())) {
 					// Set the username to the parameter location
 					username = (String) pjp.getArgs()[i];
-					log.debug("Username found: " + username);
+					log.debug("Username found: {}", username);
 				}
 
 			}
@@ -114,7 +114,7 @@ public class AuthenticationAspect {
 		}
 
 		User loggedUser = session.getAttribute(UserController.LOGGED_USER);
-		log.debug("Logged In User: " + loggedUser);
+		log.debug("Logged In User: {}", loggedUser);
 
 		// If the logged in user is not the same user specified or is not a vacationer
 		if (loggedUser == null || UserType.VACATIONER.equals(loggedUser.getType())) {
@@ -131,7 +131,7 @@ public class AuthenticationAspect {
 			return false;
 		}
 		User loggedUser = (User) session.getAttribute(UserController.LOGGED_USER);
-		log.debug("Logged In user: " + loggedUser);
+		log.debug("Logged In User: {}", loggedUser);
 
 		return loggedUser != null;
 	}

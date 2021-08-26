@@ -7,6 +7,7 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.revature.beans.Flight;
 import com.revature.beans.Hotel;
 import com.revature.data.HotelDao;
 import com.revature.dto.HotelDto;
@@ -29,13 +30,21 @@ public class HotelServiceImpl implements HotelService{
 	@Override
 	public Mono<Hotel> getHotel(String location, UUID id) {
 		return hotelDao.findByLocationAndId(location, id)
-				.map(HotelDto::getHotel)
+				.map(hDto -> {
+					Hotel hotel = hDto.getHotel();
+					log.debug("Hotel found: {}", hotel);
+					return hotel;
+				})
 				.switchIfEmpty(Mono.just(new Hotel()));
 	}
 
 	@Override
 	public Flux<Hotel> getHotelsByLocation(String location) {
-		return hotelDao.findByLocation(location).map(HotelDto::getHotel);
+		return hotelDao.findByLocation(location).map(hDto -> {
+			Hotel hotel = hDto.getHotel();
+			log.debug("Hotel found: {}", hotel);
+			return hotel;
+		});
 	}
 
 }

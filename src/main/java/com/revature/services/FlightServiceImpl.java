@@ -27,13 +27,20 @@ public class FlightServiceImpl implements FlightService {
 
 	@Override
 	public Mono<Flight> getFlight(String destination, UUID id) {
-		return flightDao.findByDestinationAndId(destination, id).map(FlightDto::getFlight)
-				.switchIfEmpty(Mono.just(new Flight()));
+		return flightDao.findByDestinationAndId(destination, id).map(fDto -> {
+			Flight flight = fDto.getFlight();
+			log.debug("Flight found: {}", flight);
+			return flight;
+		}).switchIfEmpty(Mono.just(new Flight()));
 	}
 	
 	@Override
 	public Flux<Flight> getFlightsByDestination(String destination) {
-		return flightDao.findByDestination(destination).map(FlightDto::getFlight);
+		return flightDao.findByDestination(destination).map(fDto -> {
+			Flight flight = fDto.getFlight();
+			log.debug("Flight found: {}", flight);
+			return flight;
+		});
 	}
 
 }
