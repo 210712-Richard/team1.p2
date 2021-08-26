@@ -693,7 +693,7 @@ class ReservationServiceTest {
 		Reservation changedRes = new Reservation();
 		changedRes.setUsername(vac.getUsername());
 		changedRes.setVacationId(vac.getId());
-		changedRes.setId(UUID.randomUUID());
+		changedRes.setId(res.getId());
 		changedRes.setReservedId(hotel.getId());
 		changedRes.setReservedName(hotel.getName());
 		changedRes.setType(ReservationType.HOTEL);
@@ -711,7 +711,7 @@ class ReservationServiceTest {
 
 		when(resDao.findAll()).thenReturn(Flux.fromArray(resArray));
 
-		Mono<Reservation> resMono = service.rescheduleReservation(res, changedRes.getStarttime(),
+		Mono<Reservation> resMono = service.rescheduleReservation(res, null, changedRes.getStarttime(),
 				changedRes.getDuration());
 
 		// Check to make sure the reservation was set correctly
@@ -798,7 +798,7 @@ class ReservationServiceTest {
 
 		when(resDao.findAll()).thenReturn(Flux.fromArray(resArray));
 
-		Mono<Reservation> resMono = service.rescheduleReservation(res, changedRes.getStarttime(),
+		Mono<Reservation> resMono = service.rescheduleReservation(res, null, changedRes.getStarttime(),
 				changedRes.getDuration());
 
 		// Check to make sure that an empty mono was sent back
@@ -843,7 +843,7 @@ class ReservationServiceTest {
 
 		when(resDao.findAll()).thenReturn(Flux.fromArray(resArray));
 
-		Mono<Reservation> resMono = service.rescheduleReservation(res, changedRes.getStarttime(),
+		Mono<Reservation> resMono = service.rescheduleReservation(res, null, changedRes.getStarttime(),
 				changedRes.getDuration());
 
 		// Check to make sure the reservation was set correctly
@@ -857,7 +857,6 @@ class ReservationServiceTest {
 
 	@Test
 	void testChangeReservationCarInvalid() {
-
 		Reservation res = new Reservation();
 		res.setUsername(vac.getUsername());
 		res.setVacationId(vac.getId());
@@ -906,7 +905,7 @@ class ReservationServiceTest {
 
 		when(resDao.findAll()).thenReturn(Flux.fromArray(resArray));
 
-		Mono<Reservation> resMono = service.rescheduleReservation(res, changedRes.getStarttime(),
+		Mono<Reservation> resMono = service.rescheduleReservation(res, null, changedRes.getStarttime(),
 				changedRes.getDuration());
 
 		// Check to make sure that an empty mono was sent back
@@ -914,8 +913,8 @@ class ReservationServiceTest {
 	}
 	
 	@Test
-	void testChangeReservationFlightValid() {
-
+	void testChangeReservationStaffFlightValid() {
+		
 		Reservation res = new Reservation();
 		res.setUsername(vac.getUsername());
 		res.setVacationId(vac.getId());
@@ -925,7 +924,7 @@ class ReservationServiceTest {
 		res.setDuration(0);
 		res.setCost(flight.getTicketPrice());
 		res.setType(ReservationType.FLIGHT);
-		res.setStarttime(vac.getStartTime());
+		res.setStarttime(flight.getDepartingDate());
 
 		Reservation setRes1 = new Reservation();
 		setRes1.setUsername("otherTest1");
@@ -936,7 +935,7 @@ class ReservationServiceTest {
 		setRes1.setDuration(vac.getDuration());
 		setRes1.setCost(19.99);
 		setRes1.setType(ReservationType.FLIGHT);
-		setRes1.setStarttime(vac.getStartTime().minus(Period.of(0, 0, 1)));
+		setRes1.setStarttime(flight.getDepartingDate());
 		setRes1.setStatus(ReservationStatus.AWAITING);
 
 		Reservation setRes2 = new Reservation();
@@ -948,7 +947,7 @@ class ReservationServiceTest {
 		setRes2.setDuration(1);
 		setRes2.setCost(19.99);
 		setRes2.setType(ReservationType.FLIGHT);
-		setRes2.setStarttime(vac.getStartTime().plus(Period.of(0, 0, 1)));
+		setRes2.setStarttime(flight.getDepartingDate());
 		setRes2.setStatus(ReservationStatus.AWAITING);
 
 		ReservationDto[] resArray = { new ReservationDto(setRes1), new ReservationDto(setRes2),
@@ -964,7 +963,7 @@ class ReservationServiceTest {
 		changedRes.setType(ReservationType.FLIGHT);
 		changedRes.setDuration(0);
 		changedRes.setCost(flight.getTicketPrice());
-		changedRes.setStarttime(vac.getStartTime().plus(Period.of(0, 0, 5)));
+		changedRes.setStarttime(flight.getDepartingDate());
 
 		// Set up the returns
 		when(resDao.save(Mockito.any())).thenReturn(Mono.just(new ReservationDto(res)));
@@ -976,7 +975,7 @@ class ReservationServiceTest {
 
 		when(resDao.findAll()).thenReturn(Flux.fromArray(resArray));
 
-		Mono<Reservation> resMono = service.rescheduleReservation(res, changedRes.getStarttime(),
+		Mono<Reservation> resMono = service.rescheduleReservation(res, null, changedRes.getStarttime(),
 				changedRes.getDuration());
 
 		// Check to make sure the reservation was set correctly
@@ -989,7 +988,7 @@ class ReservationServiceTest {
 	}
 
 	@Test
-	void testChangeReservationFlightInvalid() {
+	void testChangeReservationStaffFlightInvalid() {
 
 		Reservation res = new Reservation();
 		res.setUsername(vac.getUsername());
@@ -1063,8 +1062,186 @@ class ReservationServiceTest {
 
 		when(resDao.findAll()).thenReturn(Flux.fromArray(resArray));
 
-		Mono<Reservation> resMono = service.rescheduleReservation(res, changedRes.getStarttime(),
+		Mono<Reservation> resMono = service.rescheduleReservation(res, null, changedRes.getStarttime(),
 				changedRes.getDuration());
+
+		// Check to make sure that an empty mono was sent back
+		StepVerifier.create(resMono).expectComplete().verify();
+	}
+	
+	@Test
+	void testChangeReservationVacationerFlightValid() {
+
+		Flight flight2 = new Flight();
+		flight2.setId(UUID.randomUUID());
+		flight2.setAirline("Test Airline");
+		flight2.setDestination("Test City, Test State");
+		flight2.setOpenSeats(3);
+		flight2.setTicketPrice(150.00);
+		flight2.setDepartingDate(LocalDateTime.now().minus(Period.of(0, 0, 1)));
+		flight2.setStartingLocation("Test City1, Test State1");
+		
+		Reservation res = new Reservation();
+		res.setUsername(vac.getUsername());
+		res.setVacationId(vac.getId());
+		res.setId(UUID.randomUUID());
+		res.setReservedId(flight.getId());
+		res.setReservedName(flight.getAirline());
+		res.setDuration(0);
+		res.setCost(flight.getTicketPrice());
+		res.setType(ReservationType.FLIGHT);
+		res.setStarttime(flight.getDepartingDate());
+
+		Reservation setRes1 = new Reservation();
+		setRes1.setUsername("otherTest1");
+		setRes1.setVacationId(UUID.randomUUID());
+		setRes1.setId(UUID.randomUUID());
+		setRes1.setReservedId(flight2.getId());
+		setRes1.setReservedName(flight.getAirline());
+		setRes1.setDuration(0);
+		setRes1.setCost(19.99);
+		setRes1.setType(ReservationType.FLIGHT);
+		setRes1.setStarttime(flight2.getDepartingDate());
+		setRes1.setStatus(ReservationStatus.AWAITING);
+
+		Reservation setRes2 = new Reservation();
+		setRes2.setUsername("otherTest2");
+		setRes2.setVacationId(UUID.randomUUID());
+		setRes2.setId(UUID.randomUUID());
+		setRes2.setReservedId(flight2.getId());
+		setRes2.setReservedName(flight.getAirline());
+		setRes2.setDuration(0);
+		setRes2.setCost(19.99);
+		setRes2.setType(ReservationType.FLIGHT);
+		setRes2.setStarttime(flight2.getDepartingDate());
+		setRes2.setStatus(ReservationStatus.AWAITING);
+
+		ReservationDto[] resArray = { new ReservationDto(setRes1), new ReservationDto(setRes2), new ReservationDto(res) };
+
+		// The changed reservation
+		Reservation changedRes = new Reservation();
+		changedRes.setUsername(vac.getUsername());
+		changedRes.setVacationId(vac.getId());
+		changedRes.setId(res.getId());
+		changedRes.setReservedId(flight2.getId());
+		changedRes.setReservedName(flight2.getAirline());
+		changedRes.setType(ReservationType.FLIGHT);
+		changedRes.setDuration(0);
+		changedRes.setCost(flight2.getTicketPrice());
+		changedRes.setStarttime(flight2.getDepartingDate());
+
+		// Set up the returns
+		when(resDao.save(Mockito.any())).thenReturn(Mono.just(new ReservationDto(res)));
+		when(vacDao.findByUsernameAndId(vac.getUsername(), vac.getId())).thenReturn(Mono.just(new VacationDto(vac)));
+		when(vacDao.save(Mockito.any())).thenReturn(Mono.just(new VacationDto(vac)));
+		when(resDao.save(Mockito.any())).thenReturn(Mono.just(new ReservationDto(changedRes)));
+		when(flightDao.findByDestinationAndId(vac.getDestination(), flight.getId()))
+				.thenReturn(Mono.just(new FlightDto(flight)));
+		when(flightDao.findByDestinationAndId(vac.getDestination(), flight2.getId()))
+				.thenReturn(Mono.just(new FlightDto(flight2)));
+
+		when(resDao.findAll()).thenReturn(Flux.fromArray(resArray));
+
+		Mono<Reservation> resMono = service.rescheduleReservation(res, flight2.getId(), null,
+				null);
+
+		// Check to make sure the reservation was set correctly
+		StepVerifier.create(resMono).expectNextMatches(r -> r.getId() != null && r.getCost() == changedRes.getCost()
+				&& flight2.getId().equals(r.getReservedId()) && changedRes.getDuration().equals(r.getDuration())
+				&& flight2.getAirline().equals(r.getReservedName()) && changedRes.getStarttime().equals(r.getStarttime())
+				&& ReservationStatus.AWAITING.equals(r.getStatus()) && ReservationType.FLIGHT.equals(r.getType()))
+				.verifyComplete();
+
+	}
+
+	@Test
+	void testChangeReservationVacationerFlightInvalid() {
+		Flight flight2 = new Flight();
+		flight2.setId(UUID.randomUUID());
+		flight2.setAirline("Test Airline");
+		flight2.setDestination("Test City, Test State");
+		flight2.setOpenSeats(3);
+		flight2.setTicketPrice(150.00);
+		flight2.setDepartingDate(LocalDateTime.now().minus(Period.of(0, 0, 1)));
+		flight2.setStartingLocation("Test City1, Test State1");
+		
+		Reservation res = new Reservation();
+		res.setUsername(vac.getUsername());
+		res.setVacationId(vac.getId());
+		res.setId(UUID.randomUUID());
+		res.setReservedId(flight.getId());
+		res.setReservedName(flight.getAirline());
+		res.setDuration(0);
+		res.setCost(flight.getTicketPrice());
+		res.setType(ReservationType.FLIGHT);
+		res.setStarttime(flight.getDepartingDate());
+
+		Reservation setRes1 = new Reservation();
+		setRes1.setUsername("otherTest1");
+		setRes1.setVacationId(UUID.randomUUID());
+		setRes1.setId(UUID.randomUUID());
+		setRes1.setReservedId(flight2.getId());
+		setRes1.setReservedName(flight.getAirline());
+		setRes1.setDuration(0);
+		setRes1.setCost(19.99);
+		setRes1.setType(ReservationType.FLIGHT);
+		setRes1.setStarttime(flight2.getDepartingDate());
+		setRes1.setStatus(ReservationStatus.AWAITING);
+
+		Reservation setRes2 = new Reservation();
+		setRes2.setUsername("otherTest2");
+		setRes2.setVacationId(UUID.randomUUID());
+		setRes2.setId(UUID.randomUUID());
+		setRes2.setReservedId(flight2.getId());
+		setRes2.setReservedName(flight.getAirline());
+		setRes2.setDuration(0);
+		setRes2.setCost(19.99);
+		setRes2.setType(ReservationType.FLIGHT);
+		setRes2.setStarttime(flight2.getDepartingDate());
+		setRes2.setStatus(ReservationStatus.AWAITING);
+
+		Reservation setRes3 = new Reservation();
+		setRes3.setUsername("otherTest3");
+		setRes3.setVacationId(UUID.randomUUID());
+		setRes3.setId(UUID.randomUUID());
+		setRes3.setReservedId(flight2.getId());
+		setRes3.setReservedName(flight.getAirline());
+		setRes3.setDuration(0);
+		setRes3.setCost(19.99);
+		setRes3.setType(ReservationType.FLIGHT);
+		setRes3.setStarttime(flight2.getDepartingDate());
+		setRes3.setStatus(ReservationStatus.AWAITING);
+
+		ReservationDto[] resArray = { new ReservationDto(setRes1), new ReservationDto(setRes2),
+				new ReservationDto(setRes3), new ReservationDto(res) };
+
+		// The changed reservation
+		Reservation changedRes = new Reservation();
+		changedRes.setUsername(vac.getUsername());
+		changedRes.setVacationId(vac.getId());
+		changedRes.setId(res.getId());
+		changedRes.setReservedId(flight2.getId());
+		changedRes.setReservedName(flight2.getAirline());
+		changedRes.setType(ReservationType.FLIGHT);
+		changedRes.setDuration(0);
+		changedRes.setCost(flight2.getTicketPrice());
+		changedRes.setStarttime(flight2.getDepartingDate());
+
+		// Set up the returns
+		when(resDao.save(Mockito.any())).thenReturn(Mono.just(new ReservationDto(res)));
+		when(vacDao.findByUsernameAndId(vac.getUsername(), vac.getId())).thenReturn(Mono.just(new VacationDto(vac)));
+		when(vacDao.save(Mockito.any())).thenReturn(Mono.just(new VacationDto(vac)));
+		when(resDao.save(Mockito.any())).thenReturn(Mono.just(new ReservationDto(changedRes)));
+		when(flightDao.findByDestinationAndId(vac.getDestination(), flight.getId()))
+				.thenReturn(Mono.just(new FlightDto(flight)));
+		when(flightDao.findByDestinationAndId(vac.getDestination(), flight2.getId()))
+				.thenReturn(Mono.just(new FlightDto(flight2)));
+
+
+		when(resDao.findAll()).thenReturn(Flux.fromArray(resArray));
+
+		Mono<Reservation> resMono = service.rescheduleReservation(res, changedRes.getReservedId(), flight2.getDepartingDate(),
+				0);
 
 		// Check to make sure that an empty mono was sent back
 		StepVerifier.create(resMono).expectComplete().verify();
