@@ -3,6 +3,7 @@ package com.revature.controllers;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.server.WebSession;
 
+import com.revature.beans.Activity;
 import com.revature.beans.User;
 import com.revature.beans.Vacation;
 
@@ -23,5 +24,7 @@ public interface UserController {
 	public Mono<ResponseEntity<Vacation>> getVacation(String username, String id, WebSession session);
 	
 	public Mono<ResponseEntity<Void>> deleteUser(String username, WebSession session);
+
+	public  Mono<ResponseEntity<Activity>> chooseActivities(Activity activity, String username, String vacId, WebSession session);
 
 }
