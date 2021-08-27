@@ -162,4 +162,25 @@ public class UserControllerImpl implements UserController {
 				.map(v -> ResponseEntity.status(204).build());
 	}
 
+	@Override
+	@PostMapping("{username}/vacations/{vacationid}/activities")
+	public Mono<ResponseEntity<Activity>> chooseActivities(@RequestBody Activity activity,
+			@PathVariable("username") String username, @PathVariable("vacationid") String id, WebSession session) {
+		UUID vacId = null;
+		try {
+			vacId = UUID.fromString(id);
+		} catch (Exception e) {
+			return Mono.just(ResponseEntity.badRequest().build());
+		}
+
+		return userService.chooseActivities(username, vacId, activity).flatMap(a -> {
+			if (a.getId() == null) {
+				return Mono.just(ResponseEntity.status(409).build());
+			} else {
+				return Mono.just(ResponseEntity.status(200).body(a));
+			}
+		});
+
+	}
+
 }

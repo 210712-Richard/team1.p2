@@ -134,57 +134,57 @@ class UserControllerTest {
 		StepVerifier.create(monoUser).expectNext(ResponseEntity.status(409).build()).verifyComplete();
 
 	}
-	
+
 	@Test
 	void testRegisterInvalidNullPassword() {
 		user.setPassword(null);
-		
+
 		Mono<ResponseEntity<User>> monoUser = controller.register(user, user.getUsername());
 
 		StepVerifier.create(monoUser).expectNext(ResponseEntity.badRequest().build()).verifyComplete();
 
 	}
-	
+
 	@Test
 	void testRegisterInvalidNullEmail() {
 		user.setEmail(null);
-		
+
 		Mono<ResponseEntity<User>> monoUser = controller.register(user, user.getUsername());
 
 		StepVerifier.create(monoUser).expectNext(ResponseEntity.badRequest().build()).verifyComplete();
 	}
-	
+
 	@Test
 	void testRegisterInvalidNullFirstName() {
 		user.setFirstName(null);
-		
+
 		Mono<ResponseEntity<User>> monoUser = controller.register(user, user.getUsername());
 
 		StepVerifier.create(monoUser).expectNext(ResponseEntity.badRequest().build()).verifyComplete();
 	}
-	
+
 	@Test
 	void testRegisterInvalidNullLastName() {
 		user.setLastName(null);
-		
+
 		Mono<ResponseEntity<User>> monoUser = controller.register(user, user.getUsername());
 
 		StepVerifier.create(monoUser).expectNext(ResponseEntity.badRequest().build()).verifyComplete();
 	}
-	
+
 	@Test
 	void testRegisterInvalidNullBirthday() {
 		user.setBirthday(null);
-		
+
 		Mono<ResponseEntity<User>> monoUser = controller.register(user, user.getUsername());
 
 		StepVerifier.create(monoUser).expectNext(ResponseEntity.badRequest().build()).verifyComplete();
 	}
-	
+
 	@Test
 	void testRegisterInvalidNullType() {
 		user.setType(null);
-		
+
 		Mono<ResponseEntity<User>> monoUser = controller.register(user, user.getUsername());
 
 		StepVerifier.create(monoUser).expectNext(ResponseEntity.badRequest().build()).verifyComplete();
@@ -210,8 +210,8 @@ class UserControllerTest {
 
 	@Test
 	void testCreateVacationValid() {
-		Mockito.when(userService.createVacation(Mockito.anyString(), Mockito.anyString(), Mockito.any(),
-				Mockito.any(), Mockito.any(), Mockito.any())).thenReturn(Mono.just(vac));
+		Mockito.when(userService.createVacation(Mockito.anyString(), Mockito.anyString(), Mockito.any(), Mockito.any(),
+				Mockito.any(), Mockito.any())).thenReturn(Mono.just(vac));
 
 		Mono<ResponseEntity<Vacation>> monoVac = controller.createVacation(vac, user.getUsername(), session);
 
@@ -220,9 +220,9 @@ class UserControllerTest {
 
 	@Test
 	void testCreateVacationInvalid() {
-		Mockito.when(userService.createVacation(Mockito.anyString(), Mockito.anyString(), Mockito.any(),
-				Mockito.any(), Mockito.any(), Mockito.any())).thenReturn(Mono.just(new Vacation()));
-		
+		Mockito.when(userService.createVacation(Mockito.anyString(), Mockito.anyString(), Mockito.any(), Mockito.any(),
+				Mockito.any(), Mockito.any())).thenReturn(Mono.just(new Vacation()));
+
 		Mono<ResponseEntity<Vacation>> monoVac = controller.createVacation(vac, user.getUsername(), session);
 
 		StepVerifier.create(monoVac).expectNext(ResponseEntity.badRequest().build()).verifyComplete();
@@ -234,29 +234,28 @@ class UserControllerTest {
 
 		Mono<ResponseEntity<Vacation>> monoVac = controller.getVacation(user.getUsername(), vac.getId().toString(),
 				session);
-		
+
 		StepVerifier.create(monoVac).expectNext(ResponseEntity.ok(vac)).verifyComplete();
 	}
-	
+
 	@Test
 	void testGetVacationInvalidNotFound() {
 		Mockito.when(userService.getVacation(user.getUsername(), vac.getId())).thenReturn(Mono.just(new Vacation()));
 
 		Mono<ResponseEntity<Vacation>> monoVac = controller.getVacation(user.getUsername(), vac.getId().toString(),
 				session);
-		
+
 		StepVerifier.create(monoVac).expectNext(ResponseEntity.notFound().build()).verifyComplete();
 	}
-	
+
 	@Test
 	void testGetVacationInvalidBadRequest() {
 		String badId = "Bad ID";
-		Mono<ResponseEntity<Vacation>> monoVac = controller.getVacation(user.getUsername(), badId,
-				session);
-		
+		Mono<ResponseEntity<Vacation>> monoVac = controller.getVacation(user.getUsername(), badId, session);
+
 		StepVerifier.create(monoVac).expectNext(ResponseEntity.badRequest().build()).verifyComplete();
 	}
-	
+
 	@Test
 	void testGetActivitiesValid() {
 		Activity act1 = new Activity();
@@ -267,7 +266,7 @@ class UserControllerTest {
 		act1.setMaxParticipants(100);
 		act1.setDate(LocalDateTime.now());
 		act1.setCost(19.99);
-		
+
 		Activity act2 = new Activity();
 		act2.setId(UUID.randomUUID());
 		act2.setName("Activity2");
@@ -276,29 +275,89 @@ class UserControllerTest {
 		act2.setMaxParticipants(50);
 		act2.setDate(LocalDateTime.now());
 		act2.setCost(79.99);
-		
+
 		vac.getActivities().add(act1);
 		vac.getActivities().add(act2);
-		
-		Mockito.when(userService.getActivities(vac.getId(), user.getUsername())).thenReturn(Flux.fromIterable(vac.getActivities()));
-		
-		ResponseEntity<Flux<Activity>> fluxActEntity = controller.getActivities(user.getUsername(), vac.getId().toString(), session);
-		
+
+		Mockito.when(userService.getActivities(vac.getId(), user.getUsername()))
+				.thenReturn(Flux.fromIterable(vac.getActivities()));
+
+		ResponseEntity<Flux<Activity>> fluxActEntity = controller.getActivities(user.getUsername(),
+				vac.getId().toString(), session);
+
 		assertEquals(200, fluxActEntity.getStatusCodeValue(), "Assert that the status code is 200");
-		
+
 		Flux<Activity> fluxAct = fluxActEntity.getBody();
-		
+
 		StepVerifier.create(fluxAct).expectNext(act1).expectNext(act2).verifyComplete();
 	}
-	
+
 	@Test
 	void testGetActivitiesInvalid() {
 		String wrongId = "Wrong ID";
 		ResponseEntity<Flux<Activity>> fluxActEntity = controller.getActivities(user.getUsername(), wrongId, session);
-		
+
 		assertEquals(400, fluxActEntity.getStatusCodeValue(), "Assert that a 400 is the status code");
-		
+
 	}
 
+	@Test
+	void testChooseActivityValid() {
+		Activity act = new Activity();
+		act.setId(UUID.randomUUID());
+		act.setName("Activity1");
+		act.setDescription("Description");
+		act.setLocation("Los Angeles, CA");
+		act.setMaxParticipants(100);
+		act.setDate(LocalDateTime.now());
+		act.setCost(19.99);
+
+		Mockito.when(userService.chooseActivities(user.getUsername(), vac.getId(), act))
+		.thenReturn(Mono.just(act));
+		
+		Mono<ResponseEntity<Activity>> monoAct = controller.chooseActivities(act, user.getUsername(), vac.getId().toString(), session);
+		
+		StepVerifier.create(monoAct).expectNext(ResponseEntity.ok(act));
+	
+	}
+	
+	@Test
+	void testChooseActivityInvalidConflict() {
+		Activity act = new Activity();
+		act.setId(UUID.randomUUID());
+		act.setName("Activity1");
+		act.setDescription("Description");
+		act.setLocation("Los Angeles, CA");
+		act.setMaxParticipants(100);
+		act.setDate(LocalDateTime.now());
+		act.setCost(19.99);
+
+		Mockito.when(userService.chooseActivities(user.getUsername(), vac.getId(), act))
+		.thenReturn(Mono.just(new Activity()));
+		
+		Mono<ResponseEntity<Activity>> monoAct = controller.chooseActivities(act, user.getUsername(), vac.getId().toString(), session);
+		
+		StepVerifier.create(monoAct).expectNext(ResponseEntity.status(409).build());
+	
+	}
+	
+	@Test
+	void testChooseActivityInvalidBadRequest() {
+		Activity act = new Activity();
+		act.setId(UUID.randomUUID());
+		act.setName("Activity1");
+		act.setDescription("Description");
+		act.setLocation("Los Angeles, CA");
+		act.setMaxParticipants(100);
+		act.setDate(LocalDateTime.now());
+		act.setCost(19.99);
+
+		String badId = "Bad ID";
+		
+		Mono<ResponseEntity<Activity>> monoAct = controller.chooseActivities(act, user.getUsername(), badId, session);
+		
+		StepVerifier.create(monoAct).expectNext(ResponseEntity.badRequest().build());
+	
+	}
 
 }

@@ -44,7 +44,7 @@ class HotelServiceTest {
 	}
 	
 	@Test
-	void testGetHotelValid() {
+	void testGethotelValid() {
 		Mockito.when(hotelDao.findByLocationAndId(hotel.getLocation(), hotel.getId())).thenReturn(Mono.just(new HotelDto(hotel)));
 		
 		Mono<Hotel> monohotel = service.getHotel(hotel.getLocation(), hotel.getId());
@@ -54,7 +54,7 @@ class HotelServiceTest {
 	}
 	
 	@Test
-	void testGetHotelInvalidLocation() {
+	void testGethotelInvalidLocation() {
 		String invalidLocation = "San Diego, CA";
 		
 		ArgumentCaptor<String> stringCaptor = ArgumentCaptor.forClass(String.class);

@@ -80,4 +80,15 @@ public interface UserService {
 	 * @return A void Mono
 	 */
 	public Mono<Void> deleteUser(String username, List<Vacation> vacList);
+	
+	/**
+	 * Add an activity to a vacation
+	 * @param username The username of the user adding the activity
+	 * @param id The id of the vacation
+	 * @param activity The activity being added.
+	 * @return The activity
+	 */
+	public Mono<Activity> chooseActivities(String username, UUID id, Activity activity);
+
+	
 }

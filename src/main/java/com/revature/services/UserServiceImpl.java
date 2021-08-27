@@ -207,5 +207,35 @@ public class UserServiceImpl implements UserService {
 				.collectList().subscribe();
 				userDao.deleteByUsername(username).subscribe();
 				return Mono.empty();
+	
+	
+   }
+
+	@Override
+	public Mono<Activity> chooseActivities(String username, UUID id, Activity activity){
+		return vacDao.findByUsernameAndId(username, id).flatMap(v -> {
+			
+			// Make sure the activities array exists
+			if (v.getActivities() == null) {
+				v.setActivities(new ArrayList<>());
+			}
+			
+			//Make sure the activity hasn't been added already.
+			if (v.getActivities().contains(activity.getId())) {
+				return Mono.just(new Activity());
+			}
+			//Add the activity to the vacation and change the total
+			v.getActivities().add(id);
+			v.setTotal(v.getTotal() + activity.getCost());
+			
+			//Save the vacation and the activity
+			return vacDao.save(v).map(l->l.getVacation());
+		}).zipWith(actDao.save(new ActivityDto(activity)))
+				.flatMap(t -> Mono.just(t.getT2().getActivity()))
+				.switchIfEmpty(Mono.just(new Activity()));
+		
 	}
+	
+	
 }
+	
