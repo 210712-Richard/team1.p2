@@ -1,5 +1,6 @@
 package com.revature.controllers;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 import org.apache.logging.log4j.LogManager;
@@ -150,79 +151,87 @@ public class ReservationControllerImpl implements ReservationController {
 	@Override
 	@LoggedInMono
 	@PutMapping("{resId}/status")
-	public Mono<ResponseEntity<Reservation>> confirmReservation(@PathVariable("resId") String resId,
-			WebSession session) {
+	public Mono<ResponseEntity<Reservation>> updateReservationStatus(@RequestBody Reservation resStatus,
+			@PathVariable("resId") String resId, WebSession session) {
+
+		if (resId == null || resId.equals("") || resStatus.getStatus() == null)
+			return Mono.just(ResponseEntity.badRequest().build());
+
+		String status = resStatus.getStatus().toString();
+
 		User loggedUser = session.getAttribute(UserController.LOGGED_USER);
 		if (loggedUser == null)
 			return Mono.just(ResponseEntity.status(401).build());
 
-		if (loggedUser.getType() == UserType.VACATIONER)
+		if (loggedUser.getType() == UserType.VACATIONER
+				&& status.equalsIgnoreCase(ReservationStatus.AWAITING.toString()))
 			return Mono.just(ResponseEntity.status(403).build());
 
-		if (resId == null || resId.equals(""))
-			return Mono.just(ResponseEntity.badRequest().build());
+		log.debug("calling find reservation");
+		Mono<Reservation> monoRes = resService.findReservation(resId);
 
-		return resService.confirmReservation(resId).map(res -> {
-			if (res.getReservedId() == null) {
-				log.debug("No results found with reservation ID: " + resId);
-				return ResponseEntity.notFound().build();
+		return monoRes.single().flatMap(r -> {
+			if (r.getId() == null)
+				return Mono.just(ResponseEntity.notFound().build());
+
+			ReservationType type = r.getType();
+
+			// If reservation status is already closed, do not allow users confirm
+			if (r.getStatus() == ReservationStatus.CLOSED && loggedUser.getType() == UserType.VACATIONER) {
+				return Mono.just(ResponseEntity.status(403).build());
 			}
 
-			log.debug("Confirmed resevation for " + res.getReservedName());
-			return ResponseEntity.ok(res);
+			log.debug("Reservation Type: " + type);
+			log.debug("Logged Username: " + loggedUser.getUsername());
+			log.debug("Logged user type: " + loggedUser.getType());
+
+			// If logged in user didn't create reservation and is not staff
+			if (!loggedUser.getUsername().equals(r.getUsername())
+					&& !loggedUser.getType().toString().split("_")[0].equals(r.getType().toString()))
+				return Mono.just(ResponseEntity.status(403).build());
+
+			// If reservation start time already passed
+			if (r.getStarttime().isBefore(LocalDateTime.now())
+					&& !loggedUser.getType().toString().split("_")[0].equals(r.getType().toString()))
+				
+				return Mono.just(ResponseEntity.badRequest().build());
+
+			return resService.updateReservation(r, status).flatMap(res -> {
+				if (res.getId() == null) {
+					// Invalid resId
+					return Mono.just(ResponseEntity.notFound().build());
+				}
+				log.debug("Reservation matching ID: " + r.getId() + " updated\n" + r);
+				return Mono.just(ResponseEntity.ok(r));
+			});
 		});
 	}
 
-	// Implemented to reset effects of Karate tests
-	@LoggedInMono
-	@PatchMapping("{resId}/status")
-	public Mono<ResponseEntity<Reservation>> resetReservationStatus(@PathVariable("resId") String resId,
-			WebSession session) {
-		User loggedUser = session.getAttribute(UserController.LOGGED_USER);
-		if (loggedUser == null)
-			return Mono.just(ResponseEntity.status(401).build());
-
-		if (loggedUser.getType() == UserType.VACATIONER)
-			return Mono.just(ResponseEntity.status(403).build());
-
-		if (resId == null || resId.equals(""))
-			return Mono.just(ResponseEntity.badRequest().build());
-
-		return resService.resetReservationStatus(resId).map(res -> {
-			log.debug("Resevation result from DB: " + res.toString());
-			if (res.getReservedId() == null)
-				return ResponseEntity.notFound().build();
-
-			log.debug("Resevation status for " + res.getReservedName() + " has been reset");
-			return ResponseEntity.ok(res);
-		});
-	}
-	
 	@LoggedInMono
 	@PatchMapping("{resId}")
-	public Mono<ResponseEntity<Reservation>> rescheduleReservation(@RequestBody Reservation res, @PathVariable("resId") String resId,
-			WebSession session) {
+	public Mono<ResponseEntity<Reservation>> rescheduleReservation(@RequestBody Reservation res,
+			@PathVariable("resId") String resId, WebSession session) {
+
 		User loggedUser = session.getAttribute(UserController.LOGGED_USER);
 		UUID id = null;
-		
-		//Make sure the res id is a uuid
+
+		// Make sure the res id is a uuid
 		try {
 			id = UUID.fromString(resId);
 			log.debug("Reservation ID: %s", resId);
 		} catch (Exception e) {
 			return Mono.just(ResponseEntity.badRequest().build());
 		}
-		
-		//Need to first get the reservation
-		return resService.getReservation(id).flatMap(r ->{
+
+		// Need to first get the reservation
+		return resService.getReservation(id).flatMap(r -> {
 			log.debug("Reservation received: %s", r);
-			
-			//If no reservation was found, return a 404
+
+			// If no reservation was found, return a 404
 			if (r.getId() == null) {
 				log.debug("No reservation found");
 				return Mono.just(ResponseEntity.notFound().build());
 			}
-			
 			//If the user is allowed to change the reservation, change the reservation and send back the reservation
 			else if (ReservationStatus.AWAITING.equals(r.getStatus()) && (r.getUsername().equals(loggedUser.getUsername())
 					&& (!r.getType().equals(ReservationType.FLIGHT) || res.getReservedId() != null)) 
@@ -230,11 +239,11 @@ public class ReservationControllerImpl implements ReservationController {
 				log.debug("Reservation has been found and user can change startTime and duration");
 				return resService.rescheduleReservation(r, res.getReservedId(), res.getStarttime(), res.getDuration())
 						.map(re -> ResponseEntity.ok(re))
-						//If an empty mono was returned, that means there is a scheduling conflict
+						// If an empty mono was returned, that means there is a scheduling conflict
 						.switchIfEmpty(Mono.just(ResponseEntity.status(409).build()));
 			}
-			
-			//The user cannot change this reservation
+
+			// The user cannot change this reservation
 			log.debug("User cannot change startTime and duration for this reservation");
 			return Mono.just(ResponseEntity.status(403).build());
 		});
