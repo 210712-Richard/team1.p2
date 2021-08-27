@@ -99,9 +99,9 @@ class ReservationControllerImpl implements ReservationController {
 		// Zip the two monos together and return the response entity needed
 		return monoVac.zipWith(monoHotel).flatMap(t -> {
 			Hotel hotel = t.getT2();
-			log.debug("Hotel returned: " + hotel);
+			log.debug("Hotel returned: {}", hotel);
 			Vacation vac = t.getT1();
-			log.debug("Vacation obtained: " + vac);
+			log.debug("Vacation obtained: {}", vac);
 			// If the vacation id is null, it means no valid vacation was found.
 			if (vac.getId() == null || hotel.getId() == null) {
 				return Mono.just(ResponseEntity.notFound().build());
