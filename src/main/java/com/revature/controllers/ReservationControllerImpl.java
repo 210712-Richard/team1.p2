@@ -232,12 +232,9 @@ public class ReservationControllerImpl implements ReservationController {
 				log.debug("No reservation found");
 				return Mono.just(ResponseEntity.notFound().build());
 			}
-
-			// If the user is allowed to change the reservation, change the reservation and
-			// send back the reservation
-			else if (ReservationStatus.AWAITING.equals(r.getStatus())
-					&& (r.getUsername().equals(loggedUser.getUsername())
-							&& (r.getType().equals(ReservationType.FLIGHT) || res.getId() != null))
+			//If the user is allowed to change the reservation, change the reservation and send back the reservation
+			else if (ReservationStatus.AWAITING.equals(r.getStatus()) && (r.getUsername().equals(loggedUser.getUsername())
+					&& (!r.getType().equals(ReservationType.FLIGHT) || res.getReservedId() != null)) 
 					|| r.getType().toString().equals(loggedUser.getType().toString().split("_")[0])) {
 				log.debug("Reservation has been found and user can change startTime and duration");
 				return resService.rescheduleReservation(r, res.getReservedId(), res.getStarttime(), res.getDuration())

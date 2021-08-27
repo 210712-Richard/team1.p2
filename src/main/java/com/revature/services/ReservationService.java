@@ -22,4 +22,3 @@ public interface ReservationService {
 	public Flux<Reservation> getReservations(String username, String vacId);
 	public Mono<Reservation> rescheduleReservation(Reservation res, UUID newReservedId, LocalDateTime startTime, Integer duration);
 }
-

@@ -122,10 +122,10 @@ public class UserControllerImpl implements UserController {
 			}
 		});
 	}
-	
+
 	@LoggedInFlux
 	@GetMapping("{username}/vacations/{vacationid}/activities")
-	public ResponseEntity<Flux<Activity>> getActivities(@PathVariable("username") String username, 
+	public ResponseEntity<Flux<Activity>> getActivities(@PathVariable("username") String username,
 			@PathVariable("vacationid") String id, WebSession session) {
 		log.trace("running getactivities");
 		User loggedUser = (User) session.getAttribute(LOGGED_USER);
@@ -152,6 +152,27 @@ public class UserControllerImpl implements UserController {
 				.flatMap(l -> Flux.fromIterable(l)).flatMap(uuid -> userService.getVacation(username, uuid))
 				.collectList().map(list -> userService.deleteUser(username, list))
 				.map(v -> ResponseEntity.status(204).build());
+	}
+
+	@Override
+	@PostMapping("{username}/vacations/{vacationid}/activities")
+	public Mono<ResponseEntity<Activity>> chooseActivities(@RequestBody Activity activity,
+			@PathVariable("username") String username, @PathVariable("vacationid") String id, WebSession session) {
+		UUID vacId = null;
+		try {
+			vacId = UUID.fromString(id);
+		} catch (Exception e) {
+			return Mono.just(ResponseEntity.badRequest().build());
+		}
+
+		return userService.chooseActivities(username, vacId, activity).flatMap(a -> {
+			if (a.getId() == null) {
+				return Mono.just(ResponseEntity.status(409).build());
+			} else {
+				return Mono.just(ResponseEntity.status(200).body(a));
+			}
+		});
+
 	}
 
 }

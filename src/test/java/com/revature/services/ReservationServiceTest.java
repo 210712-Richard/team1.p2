@@ -2,7 +2,6 @@ package com.revature.services;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.mockito.Mockito.when;
 
 import java.time.LocalDateTime;
@@ -483,7 +482,7 @@ class ReservationServiceTest {
 		setRes1.setDuration(0);
 		setRes1.setCost(150.00);
 		setRes1.setType(ReservationType.FLIGHT);
-		setRes1.setStarttime(flight.getDepartingDate());
+		setRes1.setStarttime(flight.getDepartingDate().minus(Period.of(0, 0, 1)));
 		setRes1.setStatus(ReservationStatus.AWAITING);
 
 		Reservation setRes2 = new Reservation();
@@ -495,11 +494,25 @@ class ReservationServiceTest {
 		setRes2.setDuration(0);
 		setRes2.setCost(150.00);
 		setRes2.setType(ReservationType.FLIGHT);
-		setRes2.setStarttime(flight.getDepartingDate());
+		setRes2.setStarttime(flight.getDepartingDate().plus(Period.of(0, 0, 1)));
 		setRes2.setStatus(ReservationStatus.AWAITING);
 
+		// This reservation is after the end time of the current reservation, so the
+		// reservation should go through
+		Reservation setRes3 = new Reservation();
+		setRes3.setUsername("otherTest3");
+		setRes3.setVacationId(UUID.randomUUID());
+		setRes3.setId(UUID.randomUUID());
+		setRes3.setReservedId(flight.getId());
+		setRes3.setReservedName(flight.getAirline());
+		setRes3.setDuration(0);
+		setRes3.setCost(150.00);
+		setRes3.setType(ReservationType.FLIGHT);
+		setRes3.setStarttime(flight.getDepartingDate().plus(Period.of(0, 0, res.getDuration() + 1)));
+		setRes3.setStatus(ReservationStatus.AWAITING);
 
-		ReservationDto[] resArray = { new ReservationDto(setRes1), new ReservationDto(setRes2) };
+		ReservationDto[] resArray = { new ReservationDto(setRes1), new ReservationDto(setRes2),
+				new ReservationDto(setRes3) };
 
 		// Set up the returns
 		when(resDao.save(Mockito.any())).thenReturn(Mono.just(new ReservationDto(res)));
@@ -1307,3 +1320,4 @@ class ReservationServiceTest {
 		StepVerifier.create(resMono).expectComplete().verify();
 	}
 }
+
