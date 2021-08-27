@@ -18,3 +18,4 @@ And cookie SESSION = loggedIn.sessionCookie
 When method post
 Then status 200
 And match response contains { id: '#notnull' }
+And def resObj = response
