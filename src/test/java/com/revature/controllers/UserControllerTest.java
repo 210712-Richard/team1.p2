@@ -221,7 +221,7 @@ class UserControllerTest {
 	@Test
 	void testCreateVacationInvalid() {
 		Mockito.when(userService.createVacation(Mockito.anyString(), Mockito.anyString(), Mockito.any(),
-				Mockito.any(), Mockito.any(), Mockito.any())).thenReturn(Mono.just(vac));
+				Mockito.any(), Mockito.any(), Mockito.any())).thenReturn(Mono.just(new Vacation()));
 		
 		Mono<ResponseEntity<Vacation>> monoVac = controller.createVacation(vac, user.getUsername(), session);
 
