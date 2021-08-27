@@ -166,8 +166,8 @@ public class UserControllerImpl implements UserController {
 		}
 
 		return userService.chooseActivities(username, vacId, activity).flatMap(a -> {
-			if (a == null) {
-				return Mono.just(ResponseEntity.status(400).build());
+			if (a.getId() == null) {
+				return Mono.just(ResponseEntity.status(409).build());
 			} else {
 				return Mono.just(ResponseEntity.status(200).body(a));
 			}
