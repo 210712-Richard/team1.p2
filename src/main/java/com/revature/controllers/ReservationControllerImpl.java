@@ -189,9 +189,10 @@ class ReservationControllerImpl implements ReservationController {
 			return Mono.just(ResponseEntity.status(403).build());
 
 		log.debug("calling find reservation");
+		
 		Mono<Reservation> monoRes = resService.getReservation(UUID.fromString(resId));
 
-		return monoRes.single().flatMap(r -> {
+		return monoRes.flatMap(r -> {
 			if (r.getId() == null)
 				return Mono.just(ResponseEntity.notFound().build());
 

@@ -18,6 +18,22 @@ public interface ReservationController {
 	 * @return A Mono containing the new reservation
 	 */
 	public Mono<ResponseEntity<Reservation>> createReservation(Reservation res, WebSession session);
+	
+	/**
+	 * Update the reservation status
+	 * @param resStatus The status being updated
+	 * @param resId The id of the reservation being updated
+	 * @param session The WebSession
+	 * @return The reservation
+	 */
 	public Mono<ResponseEntity<Reservation>> updateReservationStatus(Reservation resStatus, String resId, WebSession session);
+	
+	/**
+	 * Reschedule a reservation
+	 * @param res The reservation with the new details
+	 * @param resId The id of the reservation being updated
+	 * @param session The WebSession
+	 * @return The reservation
+	 */
 	public Mono<ResponseEntity<Reservation>> rescheduleReservation(Reservation res, String resId, WebSession session);
 }

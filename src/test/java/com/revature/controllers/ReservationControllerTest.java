@@ -839,4 +839,211 @@ class ReservationControllerTest {
 		
 		Mockito.verifyNoInteractions(resService);
 	}
+	
+	@Test
+	void testUpdateReservationStatusValidCar() {
+		Mockito.when(session.getAttribute(UserController.LOGGED_USER)).thenReturn(user);
+
+		Reservation res = new Reservation();
+		res.setId(UUID.randomUUID());
+		res.setReservedId(car.getId());
+		res.setReservedName(car.getMake());
+		res.setStarttime(vac.getStartTime());
+		res.setCost(car.getCostPerDay());
+		res.setVacationId(vac.getId());
+		res.setDuration(vac.getDuration());
+		res.setUsername(user.getUsername());
+		res.setType(ReservationType.CAR);
+		res.setStatus(ReservationStatus.AWAITING);	
+		
+		Reservation updatedRes = new Reservation();
+		updatedRes.setId(res.getId());
+		updatedRes.setReservedId(car.getId());
+		updatedRes.setReservedName(car.getMake());
+		updatedRes.setStarttime(vac.getStartTime());
+		updatedRes.setCost(car.getCostPerDay());
+		updatedRes.setVacationId(vac.getId());
+		updatedRes.setDuration(vac.getDuration());
+		updatedRes.setUsername(user.getUsername());
+		updatedRes.setType(ReservationType.CAR);		
+		updatedRes.setStatus(ReservationStatus.CONFIRMED);		
+		
+		Mockito.when(resService.getReservation(res.getId()))
+		.thenReturn(Mono.just(res));
+		
+		Mockito.when(resService.updateReservation(res, "CONFIRMED"))
+		.thenReturn(Mono.just(updatedRes));
+
+		Mono<ResponseEntity<Reservation>> monoRes = controller.
+				updateReservationStatus(res, res.getId().toString(), session);
+		
+		StepVerifier.create(monoRes).expectNext(ResponseEntity.ok(updatedRes)).expectComplete();
+	}
+	
+	@Test
+	void testUpdateReservationStatusValidHotel() {
+		Mockito.when(session.getAttribute(UserController.LOGGED_USER)).thenReturn(user);
+
+		Reservation res = new Reservation();
+		res.setId(UUID.randomUUID());
+		res.setReservedId(hotel.getId());
+		res.setReservedName(hotel.getName());
+		res.setStarttime(vac.getStartTime());
+		res.setCost(hotel.getCostPerNight());
+		res.setVacationId(vac.getId());
+		res.setDuration(vac.getDuration());
+		res.setUsername(user.getUsername());
+		res.setType(ReservationType.HOTEL);
+		res.setStatus(ReservationStatus.AWAITING);	
+		
+		Reservation updatedRes = new Reservation();
+		updatedRes.setId(res.getId());
+		updatedRes.setReservedId(hotel.getId());
+		updatedRes.setReservedName(hotel.getName());
+		updatedRes.setStarttime(vac.getStartTime());
+		updatedRes.setCost(hotel.getCostPerNight());
+		updatedRes.setVacationId(vac.getId());
+		updatedRes.setDuration(vac.getDuration());
+		updatedRes.setUsername(user.getUsername());
+		updatedRes.setType(ReservationType.HOTEL);		
+		updatedRes.setStatus(ReservationStatus.CONFIRMED);		
+		
+		Mockito.when(resService.getReservation(res.getId()))
+		.thenReturn(Mono.just(res));
+		
+		Mockito.when(resService.updateReservation(res, "CONFIRMED"))
+		.thenReturn(Mono.just(updatedRes));
+
+		Mono<ResponseEntity<Reservation>> monoRes = controller.
+				updateReservationStatus(res, res.getId().toString(), session);
+		
+		StepVerifier.create(monoRes).expectNext(ResponseEntity.ok(updatedRes)).expectComplete();
+	}
+		
+	@Test
+	void testUpdateReservationStatusValidFlight() {
+		Mockito.when(session.getAttribute(UserController.LOGGED_USER)).thenReturn(user);
+
+		Reservation res = new Reservation();
+		res.setId(UUID.randomUUID());
+		res.setReservedId(flight.getId());
+		res.setReservedName(flight.getAirline());
+		res.setStarttime(vac.getStartTime());
+		res.setCost(flight.getTicketPrice());
+		res.setVacationId(vac.getId());
+		res.setDuration(vac.getDuration());
+		res.setUsername(user.getUsername());
+		res.setType(ReservationType.FLIGHT);
+		res.setStatus(ReservationStatus.AWAITING);	
+		
+		Reservation updatedRes = new Reservation();
+		updatedRes.setId(res.getId());
+		updatedRes.setReservedId(flight.getId());
+		updatedRes.setReservedName(flight.getAirline());
+		updatedRes.setStarttime(vac.getStartTime());
+		updatedRes.setCost(flight.getTicketPrice());
+		updatedRes.setVacationId(vac.getId());
+		updatedRes.setDuration(vac.getDuration());
+		updatedRes.setUsername(user.getUsername());
+		updatedRes.setType(ReservationType.FLIGHT);		
+		updatedRes.setStatus(ReservationStatus.CONFIRMED);		
+		
+		Mockito.when(resService.getReservation(res.getId()))
+		.thenReturn(Mono.just(res));
+		
+		Mockito.when(resService.updateReservation(res, "CONFIRMED"))
+		.thenReturn(Mono.just(updatedRes));
+
+		Mono<ResponseEntity<Reservation>> monoRes = controller.
+				updateReservationStatus(res, res.getId().toString(), session);
+		
+		StepVerifier.create(monoRes).expectNext(ResponseEntity.ok(updatedRes)).expectComplete();
+	}
+	
+	@Test
+	void testUpdateReservationStatusValidStaff() {
+		User staff = new User();
+		staff.setUsername("carTest");
+		staff.setPassword("password");
+		staff.setFirstName("Car");
+		staff.setLastName("User");
+		staff.setEmail("cartest@email.com");
+		staff.setBirthday(LocalDate.now());
+		staff.setType(UserType.CAR_STAFF);
+		
+		Mockito.when(session.getAttribute(UserController.LOGGED_USER)).thenReturn(staff);
+
+		Reservation res = new Reservation();
+		res.setId(UUID.randomUUID());
+		res.setReservedId(car.getId());
+		res.setReservedName(car.getMake());
+		res.setStarttime(vac.getStartTime());
+		res.setCost(car.getCostPerDay());
+		res.setVacationId(vac.getId());
+		res.setDuration(vac.getDuration());
+		res.setUsername(user.getUsername());
+		res.setType(ReservationType.CAR);
+		res.setStatus(ReservationStatus.CONFIRMED);	
+
+		
+		Reservation updatedRes = new Reservation();
+		updatedRes.setId(res.getId());
+		updatedRes.setReservedId(car.getId());
+		updatedRes.setReservedName(car.getMake());
+		updatedRes.setStarttime(vac.getStartTime());
+		updatedRes.setCost(car.getCostPerDay());
+		updatedRes.setVacationId(vac.getId());
+		updatedRes.setDuration(vac.getDuration());
+		updatedRes.setUsername(user.getUsername());
+		updatedRes.setType(ReservationType.CAR);		
+		updatedRes.setStatus(ReservationStatus.CLOSED);	
+		
+		Mockito.when(resService.getReservation(res.getId()))
+		.thenReturn(Mono.just(res));
+		
+		Mockito.when(resService.updateReservation(res, "CLOSED"))
+		.thenReturn(Mono.just(updatedRes));
+
+		Mono<ResponseEntity<Reservation>> monoRes = controller.
+				updateReservationStatus(res, res.getId().toString(), session);
+		
+		StepVerifier.create(monoRes).expectNext(ResponseEntity.ok(updatedRes)).expectComplete();
+	}
+	
+	@Test
+	void testUpdateReservationStatusInvalidStaff() {
+		User staff = new User();
+		staff.setUsername("carTest");
+		staff.setPassword("password");
+		staff.setFirstName("Car");
+		staff.setLastName("User");
+		staff.setEmail("cartest@email.com");
+		staff.setBirthday(LocalDate.now());
+		staff.setType(UserType.CAR_STAFF);
+		
+		Mockito.when(session.getAttribute(UserController.LOGGED_USER)).thenReturn(staff);
+		
+		Reservation res = new Reservation();
+		res.setId(UUID.randomUUID());
+		res.setReservedId(flight.getId());
+		res.setReservedName(flight.getAirline());
+		res.setStarttime(vac.getStartTime());
+		res.setCost(flight.getTicketPrice());
+		res.setVacationId(vac.getId());
+		res.setDuration(vac.getDuration());
+		res.setUsername(user.getUsername());
+		res.setType(ReservationType.FLIGHT);
+		res.setStatus(ReservationStatus.AWAITING);	
+		
+		
+		Mockito.when(resService.getReservation(res.getId()))
+		.thenReturn(Mono.just(res));
+		
+		Mono<ResponseEntity<Reservation>> monoRes = controller.
+				updateReservationStatus(res, res.getId().toString(), session);
+		
+		StepVerifier.create(monoRes).expectNext(ResponseEntity.status(403).build()).expectComplete();
+
+	}
+	
 }
