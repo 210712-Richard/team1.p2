@@ -9,6 +9,7 @@ import com.revature.beans.Hotel;
 import com.revature.beans.Reservation;
 import com.revature.beans.Vacation;
 
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 public interface ReservationService {
@@ -35,8 +36,37 @@ public interface ReservationService {
 	 * @return The new reservation
 	 */
 	public Mono<Reservation> reserveCar(Car car, Vacation vacation);
-	public Mono<Reservation> confirmReservation(String resId);
-	public Mono<Reservation> resetReservationStatus(String resId);
+
+	/**
+	 * Get a reservation
+	 * @param resId The id of the reservation
+	 * @return The reservation
+	 */
 	public Mono<Reservation> getReservation(UUID resId);
+	
+	/**
+	 * Update a reservation status
+	 * @param res The reservation being updated
+	 * @param status The new status of the reservation
+	 * @return The updated reservation
+	 */
+	public Mono<Reservation> updateReservation(Reservation res, String status);
+	
+	/**
+	 * Get all the reservations in a vacation
+	 * @param username The username of the user
+	 * @param vacId The id of the vacation
+	 * @return
+	 */
+	public Flux<Reservation> getReservations(String username, String vacId);
+	
+	/**
+	 * Reschedule a reservation
+	 * @param res The reservation being changed
+	 * @param newReservedId The new reserved id. Used for vacationers to reschedule flights.
+	 * @param startTime The new start time. If reserved id is set and it is a flight, will not be used
+	 * @param duration The new duration. If reserved id is set and it is a flight, will not be used
+	 * @return The rescheduled reservation
+	 */
 	public Mono<Reservation> rescheduleReservation(Reservation res, UUID newReservedId, LocalDateTime startTime, Integer duration);
 }

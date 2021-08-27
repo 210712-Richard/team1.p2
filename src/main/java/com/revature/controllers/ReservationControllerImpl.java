@@ -172,51 +172,59 @@ class ReservationControllerImpl implements ReservationController {
 	@Override
 	@LoggedInMono
 	@PutMapping("{resId}/status")
-	public Mono<ResponseEntity<Reservation>> confirmReservation(@PathVariable("resId") String resId,
-			WebSession session) {
+	public Mono<ResponseEntity<Reservation>> updateReservationStatus(@RequestBody Reservation resStatus,
+			@PathVariable("resId") String resId, WebSession session) {
+
+		if (resId == null || resId.equals("") || resStatus.getStatus() == null)
+			return Mono.just(ResponseEntity.badRequest().build());
+
+		String status = resStatus.getStatus().toString();
+
 		User loggedUser = session.getAttribute(UserController.LOGGED_USER);
 		if (loggedUser == null)
 			return Mono.just(ResponseEntity.status(401).build());
 
-		if (loggedUser.getType() == UserType.VACATIONER)
+		if (loggedUser.getType() == UserType.VACATIONER
+				&& status.equalsIgnoreCase(ReservationStatus.AWAITING.toString()))
 			return Mono.just(ResponseEntity.status(403).build());
 
-		if (resId == null || resId.equals(""))
-			return Mono.just(ResponseEntity.badRequest().build());
+		log.debug("calling find reservation");
+		Mono<Reservation> monoRes = resService.getReservation(UUID.fromString(resId));
 
-		return resService.confirmReservation(resId).map(res -> {
-			if (res.getReservedId() == null) {
-				log.debug("No results found with reservation ID: " + resId);
-				return ResponseEntity.notFound().build();
+		return monoRes.single().flatMap(r -> {
+			if (r.getId() == null)
+				return Mono.just(ResponseEntity.notFound().build());
+
+			ReservationType type = r.getType();
+
+			// If reservation status is already closed, do not allow users confirm
+			if (r.getStatus() == ReservationStatus.CLOSED && loggedUser.getType() == UserType.VACATIONER) {
+				return Mono.just(ResponseEntity.status(403).build());
 			}
 
-			log.debug("Confirmed resevation for " + res.getReservedName());
-			return ResponseEntity.ok(res);
-		});
-	}
+			log.debug("Reservation Type: {}", type);
+			log.debug("Logged Username: {}", loggedUser.getUsername());
+			log.debug("Logged user type: {}", loggedUser.getType());
 
-	// Implemented to reset effects of Karate tests
-	@LoggedInMono
-	@PatchMapping("{resId}/status")
-	public Mono<ResponseEntity<Reservation>> resetReservationStatus(@PathVariable("resId") String resId,
-			WebSession session) {
-		User loggedUser = session.getAttribute(UserController.LOGGED_USER);
-		if (loggedUser == null)
-			return Mono.just(ResponseEntity.status(401).build());
+			// If logged in user didn't create reservation and is not staff
+			if (!loggedUser.getUsername().equals(r.getUsername())
+					&& !loggedUser.getType().toString().split("_")[0].equals(r.getType().toString()))
+				return Mono.just(ResponseEntity.status(403).build());
 
-		if (loggedUser.getType() == UserType.VACATIONER)
-			return Mono.just(ResponseEntity.status(403).build());
+			// If reservation start time already passed
+			if (r.getStarttime().isBefore(LocalDateTime.now())
+					&& !loggedUser.getType().toString().split("_")[0].equals(r.getType().toString()))
+				
+				return Mono.just(ResponseEntity.badRequest().build());
 
-		if (resId == null || resId.equals(""))
-			return Mono.just(ResponseEntity.badRequest().build());
-
-		return resService.resetReservationStatus(resId).map(res -> {
-			log.debug("Resevation result from DB: " + res.toString());
-			if (res.getReservedId() == null)
-				return ResponseEntity.notFound().build();
-
-			log.debug("Resevation status for " + res.getReservedName() + " has been reset");
-			return ResponseEntity.ok(res);
+			return resService.updateReservation(r, status).flatMap(res -> {
+				if (res.getId() == null) {
+					// Invalid resId
+					return Mono.just(ResponseEntity.notFound().build());
+				}
+				log.debug("Updated Reservation: {}", r);
+				return Mono.just(ResponseEntity.ok(r));
+			});
 		});
 	}
 
@@ -234,6 +242,7 @@ class ReservationControllerImpl implements ReservationController {
 			log.debug("Invalid time");
 			return Mono.just(ResponseEntity.badRequest().build());
 		}
+
 		User loggedUser = session.getAttribute(UserController.LOGGED_USER);
 		UUID id = null;
 
@@ -248,6 +257,7 @@ class ReservationControllerImpl implements ReservationController {
 		// Need to first get the reservation
 		return resService.getReservation(id).flatMap(r -> {
 			log.debug("Reservation received: {}", r);
+
 
 			// If no reservation was found, return a 404
 			if (r.getId() == null) {
@@ -264,6 +274,7 @@ class ReservationControllerImpl implements ReservationController {
 							|| (!r.getType().equals(ReservationType.FLIGHT) || res.getReservedId() != null))) {
 				log.debug("UserType: {}, ReservationType: {}, Username: {}", loggedUser.getType(), r.getType(),
 						loggedUser.getUsername());
+
 				log.debug("Reservation has been found and user can change startTime and duration");
 				
 				//Call the reschedule reservation service to change the reservation
