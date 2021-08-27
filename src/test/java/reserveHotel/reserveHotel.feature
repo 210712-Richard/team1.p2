@@ -6,6 +6,7 @@ Background:
 	* def vac = call read('classpath:createVacation/createVacation.feature')
 	* def vacObj = vac.vacObj
 	* def sessionCookie = vac.loggedIn.sessionCookie
+	* def loggedIn = vac.loggedIn
 
 Given url 'http://localhost:8080/hotels/Los%20Angeles,%20CA'
 When method get

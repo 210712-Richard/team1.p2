@@ -1,10 +1,10 @@
 Feature: Update reservation status as staff for reservation type 
 
-Scenario: As a logged in flight staff, send a patch request to set reservation 
+Scenario: As a logged in flight staff, send a put request to set reservation 
 status to awaiting
 
 Background:
-* def vac = call read('updateReservationUser.feature')
+* def vac = call read('updateFlightReservation.feature')
 * def res = vac.resObj
 * def loggedIn = call read('loginStaff.feature')
 * def statusUrl = reservationUrl + '/' + res.id + '/status'

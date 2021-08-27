@@ -9,18 +9,27 @@ public class UpdateReservationStatusFeature {
 	}
 	
 	@Karate.Test
-	Karate testUpdateReservationUser() {
-		return Karate.run("updateReservationUser").relativeTo(getClass());
+	Karate testUpdateFlightReservation() {
+		return Karate.run("updateFlightReservation").relativeTo(getClass());
 	}
 	
+	@Karate.Test
+	Karate testUpdateHotelReservation() {
+		return Karate.run("updateHotelReservation").relativeTo(getClass());
+	}
 	
-//	@Karate.Test
-//	Karate testUpdateReservationInvalidStatus() {
-//		return Karate.run("updateReservationInvalidStatus").relativeTo(getClass());
-//	}
-//	
-//	@Karate.Test
-//	Karate testUpdateReservationInvalidUser() {
-//		return Karate.run("updateReservationInvalidStaff").relativeTo(getClass());
-//	}
+	@Karate.Test
+	Karate testUpdateCarReservation() {
+		return Karate.run("updateCarReservation").relativeTo(getClass());
+	}
+	
+	@Karate.Test
+	Karate testUpdateReservationInvalidStatus() {
+		return Karate.run("updateReservationInvalidStatus").relativeTo(getClass());
+	}
+	
+	@Karate.Test
+	Karate testUpdateReservationInvalidUser() {
+		return Karate.run("updateReservationInvalidStaff").relativeTo(getClass());
+	}
 }

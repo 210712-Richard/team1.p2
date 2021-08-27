@@ -16,6 +16,9 @@ public enum ReservationStatus {
 		if(value.equalsIgnoreCase("confirmed") || value.equalsIgnoreCase("confirm"))
 			return CONFIRMED;
 		
+		if(value.equalsIgnoreCase("cancelled") || value.equalsIgnoreCase("cancel"))
+			return CANCELLED;
+		
 		if(value.equalsIgnoreCase("closed") || value.equalsIgnoreCase("close"))
 			return CLOSED;
 		

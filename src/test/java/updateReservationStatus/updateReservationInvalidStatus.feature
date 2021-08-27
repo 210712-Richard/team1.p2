@@ -1,17 +1,16 @@
-Feature: Attempt to update reservation status for a reservation with invalid
-status input
+Feature: Attempt to update reservation status with invalid status input
 
-Scenario: As a logged in vacationer, send a patch request to "cancel" -> (close)
-a reservation
+Scenario: As a logged in staff, send a put request to "OPEN" -> (AWAITING) a reservation
 
 Background:
-* def vac = call read('createReservation.feature')
+* def vac = call read('updateFlightReservation.feature')
 * def res = vac.resObj
-* def statusUrl = homeUrl + '/reservations/' + res.id + '/' + 'cancel'
+* def loggedIn = call read('loginStaff.feature')
+* def statusUrl = reservationUrl + '/' + res.id + '/status'
 
 Given url statusUrl
-And def loggedIn = call read('loginUser.feature')
+And request { status: 'OPEN' }
 And cookie SESSION = loggedIn.sessionCookie
-And match loggedIn.response contains { type: 'VACATIONER' }
-When method patch
+And match loggedIn.response contains { type: 'FLIGHT_STAFF' }
+When method put
 Then status 400
