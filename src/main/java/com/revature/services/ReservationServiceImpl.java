@@ -63,17 +63,23 @@ public class ReservationServiceImpl implements ReservationService {
 		res.setCost(hotel.getCostPerNight() * res.getDuration());
 		res.setType(ReservationType.HOTEL);
 		res.setStarttime(vacation.getStartTime());
+		
+		log.debug("The new hotel reservation: {}", res);
 
 		// Add the reservation to the vacation
 		vacation.getReservations().add(res);
 		vacation.setTotal(vacation.getTotal() + res.getCost());
+		
+		log.debug("The vacation now: {}", vacation);
 
 		// Save the reservation and the vacation and return the reservation
 		return isAvailable(res.getId(), hotel.getId(), hotel.getRoomsAvailable(), ReservationType.HOTEL,
 				res.getStarttime(), res.getDuration()).flatMap(b -> {
 					// If there are rooms available
 					if (Boolean.TRUE.equals(b)) {
-						return vacDao.save(new VacationDto(vacation)).flatMap(v -> resDao.save(new ReservationDto(res)))
+						log.debug("Saving the vacation");
+						return vacDao.save(new VacationDto(vacation))
+								.flatMap(v -> resDao.save(new ReservationDto(res)))
 								.map(rDto -> rDto.getReservation());
 					}
 					return Mono.empty();
@@ -96,16 +102,22 @@ public class ReservationServiceImpl implements ReservationService {
 		res.setType(ReservationType.FLIGHT);
 		res.setUsername(vacation.getUsername());
 		res.setVacationId(vacation.getId());
+		
+		log.debug("The new flight reservation: {}", res);
 
 		// add reservation
 		vacation.getReservations().add(res);
 		vacation.setTotal(vacation.getTotal() + res.getCost());
+		
+		log.debug("The modified vacation: {}", vacation);
 
 		return isAvailable(res.getId(), flight.getId(), flight.getOpenSeats(), ReservationType.FLIGHT,
 				res.getStarttime(), res.getDuration()).flatMap(b -> {
 					// If flight is available
 					if (Boolean.TRUE.equals(b)) {
-						return vacDao.save(new VacationDto(vacation)).flatMap(v -> resDao.save(new ReservationDto(res)))
+						log.debug("Saving the vacation");
+						return vacDao.save(new VacationDto(vacation))
+								.flatMap(v -> resDao.save(new ReservationDto(res)))
 								.map(rDto -> rDto.getReservation());
 					}
 					return Mono.empty();
@@ -127,13 +139,17 @@ public class ReservationServiceImpl implements ReservationService {
 		res.setCost(car.getCostPerDay() * res.getDuration());
 		res.setType(ReservationType.CAR);
 		res.setStarttime(vacation.getStartTime());
+		
+		log.debug("The new car reservation: {}", res);
 
 		// Save the reservation and the vacation and return the reservation
 		if (Boolean.FALSE.equals(car.getInUse())) {
 			// Add the reservation to the vacation
 			vacation.getReservations().add(res);
 			vacation.setTotal(vacation.getTotal() + res.getCost());
-			return vacDao.save(new VacationDto(vacation)).flatMap(v -> resDao.save(new ReservationDto(res)))
+			log.debug("The changed vacation: {}", vacation);
+			return vacDao.save(new VacationDto(vacation))
+					.flatMap(v -> resDao.save(new ReservationDto(res)))
 					.map(ReservationDto::getReservation);
 		}
 		return Mono.empty();
@@ -144,14 +160,14 @@ public class ReservationServiceImpl implements ReservationService {
 		UUID id = UUID.fromString(resId);
 		return resDao.findByUuid(id).map(res -> {
 			Reservation r = res.getReservation();
-
+			
 			if (ReservationStatus.CLOSED != r.getStatus()) {
 				r.setStatus(ReservationStatus.CONFIRMED);
 				ReservationDto rdto = new ReservationDto(r);
 				resDao.save(rdto);
 				return r;
 			}
-
+			
 			return null;
 
 		}).switchIfEmpty(Mono.just(new Reservation()));
@@ -171,6 +187,17 @@ public class ReservationServiceImpl implements ReservationService {
 		}).switchIfEmpty(Mono.just(new Reservation()));
 	}
 
+	/**
+	 * Checks to see if a reservation is available for a specific time and duration
+	 * @param resId The id of the reservation that needs verifying.<br>
+	 * Used to make sure it does not get added if a modification is being made
+	 * @param id The id of the reserveable
+	 * @param available How many spots are available
+	 * @param type The type of the reservation
+	 * @param startTime The start time of the reservation
+	 * @param duration How many days the reservation is for
+	 * @return True if there are enough spots available, false otherwise
+	 */
 	private Mono<Boolean> isAvailable(UUID resId, UUID id, Integer available, ReservationType type,
 			LocalDateTime startTime, Integer duration) {
 		log.trace("Checking if reservations are available");
@@ -221,6 +248,14 @@ public class ReservationServiceImpl implements ReservationService {
 		});
 	}
 
+	/**
+	 * Reschedule a hotel reservation
+	 * @param res The reservation being modified
+	 * @param vac The vacation the reservation is a part of
+	 * @param startTime The new start time
+	 * @param duration The new duration
+	 * @return The modified reservation
+	 */
 	private Mono<Reservation> rescheduleHotel(Reservation res, VacationDto vac, LocalDateTime startTime,
 			Integer duration) {
 		log.trace("Rescheduling hotel");
@@ -238,6 +273,14 @@ public class ReservationServiceImpl implements ReservationService {
 						}));
 	}
 
+	/**
+	 * Reschedule a car reservation
+	 * @param res The reservation being modified
+	 * @param vac The vacation the reservation is a part of
+	 * @param startTime The new start time
+	 * @param duration The new duration
+	 * @return The modified reservation
+	 */
 	private Mono<Reservation> rescheduleCar(Reservation res, VacationDto vac, LocalDateTime startTime,
 			Integer duration) {
 		log.trace("Rescheduling car");
@@ -254,6 +297,15 @@ public class ReservationServiceImpl implements ReservationService {
 				}));
 	}
 
+	/**
+	 * Reschedule a flight reservation
+	 * @param res The reservation being modified
+	 * @param vac The vacation the reservation is a part of
+	 * @param newReservedId The new reserved Id. Used to change what flight is reserved.
+	 * @param startTime The new start time. Can be null if reserved id is set.
+	 * @param duration The new duration. Can be null if reserved id is set.
+	 * @return The modified reservation
+	 */
 	private Mono<Reservation> rescheduleFlight(Reservation res, VacationDto vac, UUID newReservedId,
 			LocalDateTime startTime, Integer duration) {
 		log.trace("Rescheduling flight");

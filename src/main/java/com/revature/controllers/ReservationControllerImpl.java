@@ -63,89 +63,110 @@ class ReservationControllerImpl implements ReservationController {
 		User loggedUser = (User) session.getAttribute(UserController.LOGGED_USER);
 		String username = loggedUser != null ? loggedUser.getUsername() : "";
 
+		log.debug("User creating vacation: {}", username);
 		// Make sure the required fields are not null
 		if (res == null || res.getReservedId() == null || res.getVacationId() == null || res.getType() == null) {
+			log.debug("Reservation contains null value: {}", res);
 			return Mono.just(ResponseEntity.badRequest().build());
 		}
-		// Get the vacation and make sure the id is correct
-		Mono<Vacation> monoVac = userService.getVacation(username, res.getVacationId());
 
 		// Need to do different operations based on what is being reserved
 		switch (res.getType()) {
 		// Used to see if we are reserving a hotel
 		case HOTEL:
-			// Check to make sure the vacation and hotel exist before making the reservation
-			Mono<Hotel> monoHotel = userService.getVacation(username, res.getVacationId())
-					// If the vacation wasn't found, just return an empty Hotel object
-					.flatMap(v -> v.getId() != null ? hotelService.getHotel(v.getDestination(), res.getReservedId())
-							: Mono.just(new Hotel()));
-
-			// Zip the two monos together and return the response entity needed
-			return monoVac.zipWith(monoHotel).flatMap(t -> {
-				Hotel hotel = t.getT2();
-				log.debug("Hotel returned: " + hotel);
-				Vacation vac = t.getT1();
-				log.debug("Vacation obtained: " + vac);
-				// If the vacation id is null, it means no valid vacation was found.
-				if (vac.getId() == null || hotel.getId() == null) {
-					return Mono.just(ResponseEntity.notFound().build());
-					// A vacation was found, so a reservation can be made.
-				} else {
-					return resService.reserveHotel(hotel, vac).map(ResponseEntity::ok)
-							.switchIfEmpty(Mono.just(ResponseEntity.status(409).build()));
-				}
-			});
+			return createHotelReservation(username, res);
 		// Used to see if we're reserving a flight
 		case FLIGHT:
-			// Check to make sure the vacation and flight exist before making the
-			// reservation
-			Mono<Flight> monoFlight = userService.getVacation(username, res.getVacationId())
-					// If the vacation wasn't found, just return an empty Flight object
-					.flatMap(v -> v.getId() != null ? flightService.getFlight(v.getDestination(), res.getReservedId())
-							: Mono.just(new Flight()));
-
-			// Zip the two monos together and return the response entity needed
-			return monoVac.zipWith(monoFlight).flatMap(t -> {
-				Flight flight = t.getT2();
-				log.debug("Flight returned: " + flight);
-				Vacation vac = t.getT1();
-				log.debug("Vacation returned: " + vac);
-				// If the vacation id is null, it means no valid vacation was found.
-				if (vac.getId() == null || flight.getId() == null) {
-					return Mono.just(ResponseEntity.notFound().build());
-					// A vacation was found, so a reservation can be made.
-				} else {
-					return resService.reserveFlight(flight, vac).map(ResponseEntity::ok)
-							.switchIfEmpty(Mono.just(ResponseEntity.status(409).build()));
-				}
-			});
+			return createFlightReservation(username, res);
 		// Used to see if we're reserving a car
 		case CAR:
-			// Check to make sure the vacation and flight exist before making the
-			// reservation
-			Mono<Car> monoCar = userService.getVacation(username, res.getVacationId())
-					// If the vacation wasn't found, just return an empty Car object
-					.flatMap(v -> v.getId() != null ? carService.getCar(v.getDestination(), res.getReservedId())
-							: Mono.just(new Car()));
-
-			// Zip the two monos together and return the response entity needed
-			return monoVac.zipWith(monoCar).flatMap(t -> {
-				Car car = t.getT2();
-				log.debug("Car returned: " + car);
-				Vacation vac = t.getT1();
-				log.debug("Vacation received: " + vac);
-				// If the vacation id is null, it means no valid vacation was found.
-				if (vac.getId() == null || car.getId() == null) {
-					return Mono.just(ResponseEntity.notFound().build());
-					// A vacation was found, so a reservation can be made.
-				} else {
-					return resService.reserveCar(car, vac).map(ResponseEntity::ok)
-							.switchIfEmpty(Mono.just(ResponseEntity.status(409).build()));
-				}
-			});
+			return createCarReservation(username, res);
 		default:
 			return Mono.just(ResponseEntity.status(400).build());
 		}
+	}
+
+	private Mono<ResponseEntity<Reservation>> createHotelReservation(String username, Reservation res) {
+		// Get the vacation and make sure the id is correct
+		Mono<Vacation> monoVac = userService.getVacation(username, res.getVacationId());
+
+		// Check to make sure the vacation and hotel exist before making the reservation
+		Mono<Hotel> monoHotel = userService.getVacation(username, res.getVacationId())
+				// If the vacation wasn't found, just return an empty Hotel object
+				.flatMap(v -> v.getId() != null ? hotelService.getHotel(v.getDestination(), res.getReservedId())
+						: Mono.just(new Hotel()));
+
+		// Zip the two monos together and return the response entity needed
+		return monoVac.zipWith(monoHotel).flatMap(t -> {
+			Hotel hotel = t.getT2();
+			log.debug("Hotel returned: " + hotel);
+			Vacation vac = t.getT1();
+			log.debug("Vacation obtained: " + vac);
+			// If the vacation id is null, it means no valid vacation was found.
+			if (vac.getId() == null || hotel.getId() == null) {
+				return Mono.just(ResponseEntity.notFound().build());
+				// A vacation was found, so a reservation can be made.
+			} else {
+				return resService.reserveHotel(hotel, vac).map(ResponseEntity::ok)
+						.switchIfEmpty(Mono.just(ResponseEntity.status(409).build()));
+			}
+		});
+	}
+
+	private Mono<ResponseEntity<Reservation>> createFlightReservation(String username, Reservation res) {
+
+		// Get the vacation and make sure the id is correct
+		Mono<Vacation> monoVac = userService.getVacation(username, res.getVacationId());
+		// Check to make sure the vacation and flight exist before making the
+		// reservation
+		Mono<Flight> monoFlight = userService.getVacation(username, res.getVacationId())
+				// If the vacation wasn't found, just return an empty Flight object
+				.flatMap(v -> v.getId() != null ? flightService.getFlight(v.getDestination(), res.getReservedId())
+						: Mono.just(new Flight()));
+
+		// Zip the two monos together and return the response entity needed
+		return monoVac.zipWith(monoFlight).flatMap(t -> {
+			Flight flight = t.getT2();
+			log.debug("Flight returned: {}", flight);
+			Vacation vac = t.getT1();
+			log.debug("Vacation returned: {}", vac);
+			// If the vacation id is null, it means no valid vacation was found.
+			if (vac.getId() == null || flight.getId() == null) {
+				return Mono.just(ResponseEntity.notFound().build());
+				// A vacation was found, so a reservation can be made.
+			} else {
+				return resService.reserveFlight(flight, vac).map(ResponseEntity::ok)
+						.switchIfEmpty(Mono.just(ResponseEntity.status(409).build()));
+			}
+		});
+	}
+
+	private Mono<ResponseEntity<Reservation>> createCarReservation(String username, Reservation res) {
+		// Get the vacation and make sure the id is correct
+		Mono<Vacation> monoVac = userService.getVacation(username, res.getVacationId());
+
+		// Check to make sure the vacation and flight exist before making the
+		// reservation
+		Mono<Car> monoCar = userService.getVacation(username, res.getVacationId())
+				// If the vacation wasn't found, just return an empty Car object
+				.flatMap(v -> v.getId() != null ? carService.getCar(v.getDestination(), res.getReservedId())
+						: Mono.just(new Car()));
+
+		// Zip the two monos together and return the response entity needed
+		return monoVac.zipWith(monoCar).flatMap(t -> {
+			Car car = t.getT2();
+			log.debug("Car returned: {}", car);
+			Vacation vac = t.getT1();
+			log.debug("Vacation received: {}", vac);
+			// If the vacation id is null, it means no valid vacation was found.
+			if (vac.getId() == null || car.getId() == null) {
+				return Mono.just(ResponseEntity.notFound().build());
+				// A vacation was found, so a reservation can be made.
+			} else {
+				return resService.reserveCar(car, vac).map(ResponseEntity::ok)
+						.switchIfEmpty(Mono.just(ResponseEntity.status(409).build()));
+			}
+		});
 	}
 
 	@Override
@@ -239,12 +260,13 @@ class ReservationControllerImpl implements ReservationController {
 			else if (ReservationStatus.AWAITING.equals(r.getStatus())
 					&& (r.getUsername().equals(loggedUser.getUsername())
 							|| r.getType().toString().equals(loggedUser.getType().toString().split("_")[0]))
-					&& (!loggedUser.getType().equals(UserType.VACATIONER) || 
-							(!r.getType().equals(ReservationType.FLIGHT)
-							|| res.getReservedId() != null))) {
+					&& (!loggedUser.getType().equals(UserType.VACATIONER)
+							|| (!r.getType().equals(ReservationType.FLIGHT) || res.getReservedId() != null))) {
 				log.debug("UserType: {}, ReservationType: {}, Username: {}", loggedUser.getType(), r.getType(),
 						loggedUser.getUsername());
 				log.debug("Reservation has been found and user can change startTime and duration");
+				
+				//Call the reschedule reservation service to change the reservation
 				return resService.rescheduleReservation(r, res.getReservedId(), res.getStarttime(), res.getDuration())
 						.map(re -> ResponseEntity.ok(re))
 						// If an empty mono was returned, that means there is a scheduling conflict

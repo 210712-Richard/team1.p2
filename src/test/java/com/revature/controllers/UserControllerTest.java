@@ -134,6 +134,61 @@ class UserControllerTest {
 		StepVerifier.create(monoUser).expectNext(ResponseEntity.status(409).build()).verifyComplete();
 
 	}
+	
+	@Test
+	void testRegisterInvalidNullPassword() {
+		user.setPassword(null);
+		
+		Mono<ResponseEntity<User>> monoUser = controller.register(user, user.getUsername());
+
+		StepVerifier.create(monoUser).expectNext(ResponseEntity.badRequest().build()).verifyComplete();
+
+	}
+	
+	@Test
+	void testRegisterInvalidNullEmail() {
+		user.setEmail(null);
+		
+		Mono<ResponseEntity<User>> monoUser = controller.register(user, user.getUsername());
+
+		StepVerifier.create(monoUser).expectNext(ResponseEntity.badRequest().build()).verifyComplete();
+	}
+	
+	@Test
+	void testRegisterInvalidNullFirstName() {
+		user.setFirstName(null);
+		
+		Mono<ResponseEntity<User>> monoUser = controller.register(user, user.getUsername());
+
+		StepVerifier.create(monoUser).expectNext(ResponseEntity.badRequest().build()).verifyComplete();
+	}
+	
+	@Test
+	void testRegisterInvalidNullLastName() {
+		user.setLastName(null);
+		
+		Mono<ResponseEntity<User>> monoUser = controller.register(user, user.getUsername());
+
+		StepVerifier.create(monoUser).expectNext(ResponseEntity.badRequest().build()).verifyComplete();
+	}
+	
+	@Test
+	void testRegisterInvalidNullBirthday() {
+		user.setBirthday(null);
+		
+		Mono<ResponseEntity<User>> monoUser = controller.register(user, user.getUsername());
+
+		StepVerifier.create(monoUser).expectNext(ResponseEntity.badRequest().build()).verifyComplete();
+	}
+	
+	@Test
+	void testRegisterInvalidNullType() {
+		user.setType(null);
+		
+		Mono<ResponseEntity<User>> monoUser = controller.register(user, user.getUsername());
+
+		StepVerifier.create(monoUser).expectNext(ResponseEntity.badRequest().build()).verifyComplete();
+	}
 
 	@Test
 	void testDeleteUser() {

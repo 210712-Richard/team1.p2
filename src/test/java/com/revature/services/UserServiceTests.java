@@ -171,7 +171,7 @@ class UserServiceTests {
 				"Assert that the user and capUser have the same last name.");
 
 	}
-
+	
 	@Test
 	void testCreateVacationValid() {
 

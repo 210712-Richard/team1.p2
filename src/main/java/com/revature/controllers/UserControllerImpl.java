@@ -1,5 +1,7 @@
 package com.revature.controllers;
 
+import java.time.LocalDateTime;
+import java.time.Period;
 import java.util.UUID;
 
 import org.apache.logging.log4j.LogManager;
@@ -44,11 +46,13 @@ public class UserControllerImpl implements UserController {
 
 	@PostMapping
 	public Mono<ResponseEntity<User>> login(@RequestBody User user, WebSession session) {
-		if (user == null) {
+		if (user == null || user.getUsername() == null || user.getPassword() == null) {
+			log.debug("Username and/or password were not found");
 			return Mono.just(ResponseEntity.badRequest().build());
 		}
 
 		return userService.login(user.getUsername(), user.getPassword()).single().map(u -> {
+			log.debug("User found: {}", u);
 			if (u.getUsername() == null) {
 				return ResponseEntity.notFound().build();
 			}
@@ -64,15 +68,23 @@ public class UserControllerImpl implements UserController {
 	@DeleteMapping
 	public Mono<ResponseEntity<Void>> logout(WebSession session) {
 		session.invalidate();
-
 		return Mono.just(ResponseEntity.noContent().build());
 	}
 
 	@PutMapping("{username}")
 	public Mono<ResponseEntity<User>> register(@RequestBody User u, @PathVariable("username") String username) {
+		
+		//Check to make sure none of the fields are null
+		if (u.getPassword() == null || u.getEmail() == null || u.getFirstName() == null 
+				|| u.getLastName() == null
+				|| u.getBirthday() == null || u.getType() == null) {
+			log.debug("One of the user fields are null");
+			return Mono.just(ResponseEntity.badRequest().build());
+		}
 		// check to see if that username is available
 		return userService.checkAvailability(username).flatMap(b -> {
 			if (Boolean.FALSE.equals(b)) {
+				log.debug("User is being registered");
 				return userService.register(username, u.getPassword(), u.getEmail(), u.getFirstName(), u.getLastName(),
 						u.getBirthday(), u.getType()).map(user -> ResponseEntity.status(201).body(user));
 			} else {
@@ -87,9 +99,12 @@ public class UserControllerImpl implements UserController {
 	@PostMapping("{username}/vacations")
 	public Mono<ResponseEntity<Vacation>> createVacation(@RequestBody Vacation vacation,
 			@PathVariable("username") String username, WebSession session) {
-
+		
+		LocalDateTime endTime = vacation.getStartTime().plus(Period.of(0, 0, vacation.getDuration()));
+		
 		return userService.createVacation(username, vacation.getDestination(), vacation.getStartTime(),
-				vacation.getEndTime(), vacation.getPartySize(), vacation.getDuration()).flatMap(v -> {
+				endTime, vacation.getPartySize(), vacation.getDuration()).flatMap(v -> {
+					log.debug("Vacation created: {}", v);
 					if (v.getId() == null) {
 						return Mono.just(ResponseEntity.badRequest().build());
 					} else {
@@ -98,24 +113,20 @@ public class UserControllerImpl implements UserController {
 				});
 	}
 
-	@LoggedInMono
+	@VacationerCheck
 	@Override
 	@GetMapping("{username}/vacations/{vacationid}")
 	public Mono<ResponseEntity<Vacation>> getVacation(@PathVariable("username") String username,
 			@PathVariable("vacationid") String id, WebSession session) {
-		User loggedUser = (User) session.getAttribute(LOGGED_USER);
-
-		if (loggedUser == null || !username.equals(loggedUser.getUsername())) {
-			return Mono.just(ResponseEntity.status(403).build());
-		}
 		UUID vacId = null;
 		try {
 			vacId = UUID.fromString(id);
 		} catch (Exception e) {
+			log.debug("ID wasn't a UUID");
 			return Mono.just(ResponseEntity.badRequest().build());
 		}
 		return userService.getVacation(username, vacId).map(v -> {
-			log.debug("Vacation received: " + v);
+			log.debug("Vacation received: {}", v);
 			if (v.getId() == null) {
 				return ResponseEntity.notFound().build();
 			} else {
@@ -123,15 +134,16 @@ public class UserControllerImpl implements UserController {
 			}
 		});
 	}
-	
+
 	@LoggedInFlux
 	@GetMapping("{username}/vacations/{vacationid}/activities")
-	public ResponseEntity<Flux<Activity>> getActivities(@PathVariable("username") String username, 
+	public ResponseEntity<Flux<Activity>> getActivities(@PathVariable("username") String username,
 			@PathVariable("vacationid") String id, WebSession session) {
 		UUID vacId = null;
 		try {
 			vacId = UUID.fromString(id);
 		} catch (Exception e) {
+			log.debug("ID wasn't a UUID");
 			return ResponseEntity.badRequest().build();
 		}
 		return ResponseEntity.ok(userService.getActivities(vacId, username));
@@ -143,8 +155,10 @@ public class UserControllerImpl implements UserController {
 		User loggedUser = (User) session.getAttribute(LOGGED_USER);
 		loggedUser = loggedUser == null ? new User() : loggedUser;
 		session.invalidate();
-		return Flux.from(userService.login(username, loggedUser.getPassword())).map(u -> u.getVacations())
-				.flatMap(l -> Flux.fromIterable(l)).flatMap(uuid -> userService.getVacation(username, uuid))
+		return Flux.from(userService.login(username, loggedUser.getPassword()))
+				.map(u -> u.getVacations())
+				.flatMap(l -> Flux.fromIterable(l))
+				.flatMap(uuid -> userService.getVacation(username, uuid))
 				.collectList().map(list -> userService.deleteUser(username, list))
 				.map(v -> ResponseEntity.status(204).build());
 	}

@@ -8,6 +8,18 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 public interface FlightService {
-	public Mono<Flight> getFlight(String location, UUID id);
+	/**
+	 * Get a specific flight
+	 * @param destination The destination of the flight
+	 * @param id The id of the flight
+	 * @return The flight
+	 */
+	public Mono<Flight> getFlight(String destination, UUID id);
+	
+	/**
+	 * Get all the flights for a destination
+	 * @param destination The destination of the flights
+	 * @return The flights in the destination
+	 */
 	public Flux<Flight> getFlightsByDestination(String destination);
 }
