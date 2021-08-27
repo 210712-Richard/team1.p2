@@ -183,7 +183,7 @@ class ReservationControllerImpl implements ReservationController {
 			return Mono.just(ResponseEntity.status(401).build());
 
 		if (loggedUser.getType() == UserType.VACATIONER
-				&& !ReservationStatus.AWAITING.toString().equals(status)) {
+				&& ReservationStatus.AWAITING.toString().equals(status)) {
 			return Mono.just(ResponseEntity.status(403).build());
 		}
 			
