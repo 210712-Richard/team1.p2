@@ -23,7 +23,7 @@ public class LoggingAspect {
 		//Get the log for the class
 		Logger log = LogManager.getLogger(pjp.getTarget().getClass()); 
 		log.trace("Method with signature: {}", pjp.getSignature());
-		log.trace("With arguments: {}", Arrays.toString(pjp.getArgs()));
+		log.trace("With arguments: {0}", Arrays.toString(pjp.getArgs()));
 		try {
 			result = pjp.proceed();
 		} catch (Throwable t) {
