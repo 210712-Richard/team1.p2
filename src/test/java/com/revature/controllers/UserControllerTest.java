@@ -210,9 +210,8 @@ class UserControllerTest {
 
 	@Test
 	void testCreateVacationValid() {
-		System.out.println("HERE");
-		Mockito.when(userService.createVacation(user.getUsername(), vac.getDestination(), vac.getStartTime(),
-				vac.getEndTime(), vac.getPartySize(), vac.getDuration())).thenReturn(Mono.just(vac));
+		Mockito.when(userService.createVacation(Mockito.anyString(), Mockito.anyString(), Mockito.any(),
+				Mockito.any(), Mockito.any(), Mockito.any())).thenReturn(Mono.just(vac));
 
 		Mono<ResponseEntity<Vacation>> monoVac = controller.createVacation(vac, user.getUsername(), session);
 
@@ -221,10 +220,9 @@ class UserControllerTest {
 
 	@Test
 	void testCreateVacationInvalid() {
-		System.out.println("HERE@");
-		Mockito.when(userService.createVacation(user.getUsername(), vac.getDestination(), vac.getStartTime(),
-				vac.getEndTime(), vac.getPartySize(), vac.getDuration())).thenReturn(Mono.just(new Vacation()));
-
+		Mockito.when(userService.createVacation(Mockito.anyString(), Mockito.anyString(), Mockito.any(),
+				Mockito.any(), Mockito.any(), Mockito.any())).thenReturn(Mono.just(vac));
+		
 		Mono<ResponseEntity<Vacation>> monoVac = controller.createVacation(vac, user.getUsername(), session);
 
 		StepVerifier.create(monoVac).expectNext(ResponseEntity.badRequest().build()).verifyComplete();
