@@ -389,7 +389,7 @@ class UserServiceTests {
 	  Mono<Activity> monoAct = service.chooseActivities(user.getUsername(), vac.getId(), act);
     
 	  StepVerifier.create(monoAct).expectNextMatches(aDto -> aDto.equals(act)).verifyComplete();
-}
+	}
 }
 	   
 		

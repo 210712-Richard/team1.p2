@@ -12,14 +12,13 @@ public class Flight {
 	private String startingLocation;
 	private Double ticketPrice;
 	private Integer openSeats;
-	private Integer duration;
 
 	public Flight() {
 		super();
 	}
 
 	public Flight(String destination, UUID id, String airline, LocalDateTime departingDate, String startingLocation,
-			Double ticketPrice, Integer openSeats, Integer duration) {
+			Double ticketPrice, Integer openSeats) {
 		super();
 		this.setDestination(destination);
 		this.setId(id);
@@ -28,7 +27,6 @@ public class Flight {
 		this.setStartingLocation(startingLocation);
 		this.setTicketPrice(ticketPrice);
 		this.setOpenSeats(openSeats);
-		this.setDuration(duration);
 	}
 
 	public String getDestination() {
@@ -86,18 +84,10 @@ public class Flight {
 	public void setOpenSeats(Integer openSeats) {
 		this.openSeats = openSeats;
 	}
-	
-	public Integer getDuration() {
-		return duration;
-	}
-
-	public void setDuration(Integer duration) {
-		this.duration = duration;
-	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(airline, departingDate, destination, id, openSeats, startingLocation, ticketPrice, duration);
+		return Objects.hash(airline, departingDate, destination, id, openSeats, startingLocation, ticketPrice);
 	}
 
 	@Override
@@ -113,16 +103,14 @@ public class Flight {
 				&& Objects.equals(destination, other.destination) && Objects.equals(id, other.id)
 				&& Objects.equals(openSeats, other.openSeats)
 				&& Objects.equals(startingLocation, other.startingLocation)
-				&& Objects.equals(ticketPrice, other.ticketPrice)
-		        && Objects.equals(duration, other.duration);
-		
+				&& Objects.equals(ticketPrice, other.ticketPrice);
 	}
 
 	@Override
 	public String toString() {
 		return "Flight [destination=" + destination + ", id=" + id + ", airline=" + airline + ", departingDate="
 				+ departingDate + ", startingLocation=" + startingLocation + ", ticketPrice=" + ticketPrice
-				+ ", openSeats=" + openSeats + ",duration=" + duration + "]";
+				+ ", openSeats=" + openSeats + "]";
 	}
 
 }

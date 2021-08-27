@@ -218,13 +218,17 @@ public class UserServiceImpl implements UserService {
 	public Mono<Activity> chooseActivities(String username, UUID id, Activity activity){
 		return vacDao.findByUsernameAndId(username, id).flatMap(v -> {
 			
+			// Make sure the activities array exists
 			if (v.getActivities() == null) {
 				v.setActivities(new ArrayList<>());
 			}
+			//Add the activity to the vacation and change the total
 			v.getActivities().add(id);
 			v.setTotal(v.getTotal() + activity.getCost());
+			//Save the vacation and the activity
 			return vacDao.save(v).map(l->l.getVacation());
-		}).zipWith(actDao.save(new ActivityDto(activity))).flatMap(t -> Mono.just(t.getT2().getActivity()));
+		}).zipWith(actDao.save(new ActivityDto(activity)))
+				.flatMap(t -> Mono.just(t.getT2().getActivity()));
 		
 	}
 	
