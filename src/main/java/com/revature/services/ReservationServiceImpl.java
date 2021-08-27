@@ -145,7 +145,7 @@ public class ReservationServiceImpl implements ReservationService {
 	public Mono<Reservation> findReservation(String resId) {
 		UUID id = UUID.fromString(resId);
 		log.debug("called findReservation with ID: " + resId);
-		return resDao.findByUuid(id).map(res -> res.getReservation())
+		return resDao.findByUuid(id).map(rdto -> rdto.getReservation())
 				.switchIfEmpty(Mono.just(new Reservation()));
 	}
 
