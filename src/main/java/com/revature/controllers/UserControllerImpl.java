@@ -99,7 +99,7 @@ public class UserControllerImpl implements UserController {
 	@PostMapping("{username}/vacations")
 	public Mono<ResponseEntity<Vacation>> createVacation(@RequestBody Vacation vacation,
 			@PathVariable("username") String username, WebSession session) {
-		
+		log.debug("Arguments: " + vacation + username);
 		LocalDateTime endTime = vacation.getStartTime().plus(Period.of(0, 0, vacation.getDuration()));
 		
 		return userService.createVacation(username, vacation.getDestination(), vacation.getStartTime(),

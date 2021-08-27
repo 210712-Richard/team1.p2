@@ -210,6 +210,7 @@ class UserControllerTest {
 
 	@Test
 	void testCreateVacationValid() {
+		System.out.println("HERE");
 		Mockito.when(userService.createVacation(user.getUsername(), vac.getDestination(), vac.getStartTime(),
 				vac.getEndTime(), vac.getPartySize(), vac.getDuration())).thenReturn(Mono.just(vac));
 
@@ -220,6 +221,7 @@ class UserControllerTest {
 
 	@Test
 	void testCreateVacationInvalid() {
+		System.out.println("HERE@");
 		Mockito.when(userService.createVacation(user.getUsername(), vac.getDestination(), vac.getStartTime(),
 				vac.getEndTime(), vac.getPartySize(), vac.getDuration())).thenReturn(Mono.just(new Vacation()));
 
