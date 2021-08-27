@@ -93,7 +93,6 @@ public class UserServiceImpl implements UserService {
 		vac.setPartySize(partySize);
 		vac.setDuration(duration);
 		
-		log.debug("The new vacation: {}", vac);
 
 		// Save the vacation id to the user and save the vacation to the database
 		return userDao.findByUsername(username).flatMap(u -> {
@@ -128,7 +127,7 @@ public class UserServiceImpl implements UserService {
 			}
 			return vac.getActivities();
 		}).flatMap(l -> {
-			log.debug("The list from the vacation: {}", l);
+			log.debug("The list of activities: {}", l);
 			if (l.isEmpty()) {
 				return Flux.fromIterable(new ArrayList<Activity>());
 			} else {
@@ -150,7 +149,7 @@ public class UserServiceImpl implements UserService {
 			}
 			return vac.getReservations();
 		}).flatMap(l -> {
-			log.debug("The list from the vacation: {}", l);
+			log.debug("The list of reservations from the vacation: {}", l);
 			if (l.isEmpty()) {
 				return Flux.fromIterable(new ArrayList<Reservation>());
 			} else {

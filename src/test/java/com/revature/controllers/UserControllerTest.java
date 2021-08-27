@@ -208,7 +208,25 @@ class UserControllerTest {
 
 	}
 
+	@Test
+	void testCreateVacationValid() {
+		Mockito.when(userService.createVacation(user.getUsername(), vac.getDestination(), vac.getStartTime(),
+				vac.getEndTime(), vac.getPartySize(), vac.getDuration())).thenReturn(Mono.just(vac));
 
+		Mono<ResponseEntity<Vacation>> monoVac = controller.createVacation(vac, user.getUsername(), session);
+
+		StepVerifier.create(monoVac).expectNext(ResponseEntity.status(201).body(vac)).verifyComplete();
+	}
+
+	@Test
+	void testCreateVacationInvalid() {
+		Mockito.when(userService.createVacation(user.getUsername(), vac.getDestination(), vac.getStartTime(),
+				vac.getEndTime(), vac.getPartySize(), vac.getDuration())).thenReturn(Mono.just(new Vacation()));
+
+		Mono<ResponseEntity<Vacation>> monoVac = controller.createVacation(vac, user.getUsername(), session);
+
+		StepVerifier.create(monoVac).expectNext(ResponseEntity.badRequest().build()).verifyComplete();
+	}
 
 	@Test
 	void testGetVacationValid() {
