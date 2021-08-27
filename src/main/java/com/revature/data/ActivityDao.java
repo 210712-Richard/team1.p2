@@ -14,6 +14,6 @@ import reactor.core.publisher.Mono;
 public interface ActivityDao extends ReactiveCassandraRepository<ActivityDto, String> {
 	Flux<ActivityDto> findByLocation(String location);
 	Mono<ActivityDto> findByLocationAndId(String location, UUID id);
-	//Mono<ActivityDto> findByActivityId(UUID activityId);
+	
 
 }

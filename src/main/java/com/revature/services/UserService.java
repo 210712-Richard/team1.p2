@@ -30,8 +30,7 @@ public interface UserService {
 
 	public Mono<Void> deleteUser(String username, List<Vacation> vacList);
 	
-	public  Mono<Activity> chooseActivities(String username, String location, UUID id, String name,
-			String description, Double cost, LocalDateTime date, Integer maxParticipants);
+	public Mono<Activity> chooseActivities(String username, UUID id, Activity activity);
 
-	//Mono<Activity> chooseActivities(Vacation vac, UUID ActivityId);
+	
 }

@@ -157,21 +157,27 @@ public class UserControllerImpl implements UserController {
 	
 	@Override
 	@PostMapping("{username}/vacations/{vacationid}/activities")
-	public Mono<ResponseEntity<Activity>> chooseActivities(@RequestBody Activity activity, 
-			@PathVariable("username") String username, WebSession session) {
-		User loggedUser = (User) session.getAttribute(LOGGED_USER);
-		return userService.chooseActivities(username, activity.getLocation(), activity.getId(), activity.getName(),
-				activity.getDescription(), activity.getCost(), activity.getDate(), activity.getMaxParticipants()).flatMap(a-> {
-					if (a == null) {
-						return Mono.just(ResponseEntity.status(400).build());
-					} else {
-						return Mono.just(ResponseEntity.status(201).body(a));
-					}
-				});
-		
+	public Mono<ResponseEntity<Activity>> chooseActivities(@RequestBody Activity activity,
+			@PathVariable("username") String username, @PathVariable("vacationid") String id, WebSession session) {
+		UUID vacId = null;
+		try {
+			vacId = UUID.fromString(id);
+		} catch (Exception e) {
+			return Mono.just(ResponseEntity.badRequest().build());
+		}
+
+		return userService.chooseActivities(username, vacId, activity).flatMap(a -> {
+			if (a == null) {
+				return Mono.just(ResponseEntity.status(400).build());
+			} else {
+				return Mono.just(ResponseEntity.status(200).body(a));
+			}
+		});
+
 	}
+}
 
 	
 	
 	
-}
+

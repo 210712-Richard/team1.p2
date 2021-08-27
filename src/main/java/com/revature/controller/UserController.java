@@ -30,7 +30,7 @@ public interface UserController {
 	
 	public Mono<ResponseEntity<Void>> deleteUser(String username, WebSession session);
 	
-	public  Mono<ResponseEntity<Activity>> chooseActivities(Activity activity, String username, WebSession session);
+	public  Mono<ResponseEntity<Activity>> chooseActivities(Activity activity, String username, String vacId, WebSession session);
 
 
 }
