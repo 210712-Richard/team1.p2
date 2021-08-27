@@ -9,7 +9,6 @@ import org.springframework.stereotype.Service;
 
 import com.revature.beans.Flight;
 import com.revature.data.FlightDao;
-import com.revature.dto.FlightDto;
 
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -27,13 +26,20 @@ public class FlightServiceImpl implements FlightService {
 
 	@Override
 	public Mono<Flight> getFlight(String destination, UUID id) {
-		return flightDao.findByDestinationAndId(destination, id).map(FlightDto::getFlight)
-				.switchIfEmpty(Mono.just(new Flight()));
+		return flightDao.findByDestinationAndId(destination, id).map(fDto -> {
+			Flight flight = fDto.getFlight();
+			log.debug("Flight found: {}", flight);
+			return flight;
+		}).switchIfEmpty(Mono.just(new Flight()));
 	}
 	
 	@Override
 	public Flux<Flight> getFlightsByDestination(String destination) {
-		return flightDao.findByDestination(destination).map(FlightDto::getFlight);
+		return flightDao.findByDestination(destination).map(fDto -> {
+			Flight flight = fDto.getFlight();
+			log.debug("Flight found: {}", flight);
+			return flight;
+		});
 	}
 
 }

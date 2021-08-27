@@ -22,8 +22,8 @@ public class LoggingAspect {
 		
 		//Get the log for the class
 		Logger log = LogManager.getLogger(pjp.getTarget().getClass()); 
-		log.trace(String.format("Method with signature: %s", pjp.getSignature()));
-		log.trace(String.format("With arguments: %s", Arrays.toString(pjp.getArgs())));
+		log.trace("Method with signature: {}", pjp.getSignature());
+		log.trace("With arguments: {}", Arrays.toString(pjp.getArgs()));
 		try {
 			result = pjp.proceed();
 		} catch (Throwable t) {
@@ -31,13 +31,13 @@ public class LoggingAspect {
 			logError(log, t);
 			throw t; 
 		}
-		log.trace(String.format("Method returning with: %s", result));
+		log.trace("Method returning with: {}", result);
 		return result;
 	}
 
 	private void logError(Logger log, Throwable t) {
 		//Log the error
-		log.error(String.format("Method threw exception: %s", t));
+		log.error("Method threw exception: {0}", t);
 		//Loop through and log the stack trace
 		for (StackTraceElement s : t.getStackTrace()) {
 			log.warn(s);

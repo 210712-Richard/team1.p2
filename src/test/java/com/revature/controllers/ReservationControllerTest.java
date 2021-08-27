@@ -334,7 +334,7 @@ class ReservationControllerTest {
 		Mockito.verifyNoInteractions(resService);
 	}
 
-//	@Test
+	@Test
 	void testCreateReservationInvalidBadRequest() {
 		Mockito.when(session.getAttribute(UserController.LOGGED_USER)).thenReturn(user);
 
@@ -499,7 +499,7 @@ class ReservationControllerTest {
 		StepVerifier.create(monoRes).expectNext(ResponseEntity.status(403).build()).verifyComplete();
 	}
 	
-//	@Test
+	@Test
 	void testRescheduleReservationInvalidVacationerFlightDurationStartTime() {
 		Mockito.when(session.getAttribute(UserController.LOGGED_USER)).thenReturn(user);
 
@@ -608,7 +608,7 @@ class ReservationControllerTest {
 		StepVerifier.create(monoRes).expectNext(ResponseEntity.status(409).build()).verifyComplete();
 	}
 	
-//	@Test
+	@Test
 	void testRescheduleReservationInvalidStartTimeNull() {
 		Mockito.when(session.getAttribute(UserController.LOGGED_USER)).thenReturn(user);
 
@@ -642,7 +642,7 @@ class ReservationControllerTest {
 		Mockito.verifyNoInteractions(resService);
 	}
 	
-//	@Test
+	@Test
 	void testRescheduleReservationInvalidDurationNull() {
 		Mockito.when(session.getAttribute(UserController.LOGGED_USER)).thenReturn(user);
 
@@ -677,7 +677,7 @@ class ReservationControllerTest {
 		Mockito.verifyNoInteractions(resService);
 	}
 	
-//	@Test
+	@Test
 	void testRescheduleReservationInvalidAllNull() {
 		Mockito.when(session.getAttribute(UserController.LOGGED_USER)).thenReturn(user);
 
@@ -714,7 +714,7 @@ class ReservationControllerTest {
 
 	}
 	
-//	@Test
+	@Test
 	void testRescheduleReservationInvalidStartTimeBeforeNow() {
 		Mockito.when(session.getAttribute(UserController.LOGGED_USER)).thenReturn(user);
 
@@ -748,7 +748,7 @@ class ReservationControllerTest {
 		Mockito.verifyNoInteractions(resService);
 	}
 	
-//	@Test
+	@Test
 	void testRescheduleReservationDurationNegative() {
 		Mockito.when(session.getAttribute(UserController.LOGGED_USER)).thenReturn(user);
 
@@ -868,7 +868,7 @@ class ReservationControllerTest {
 		updatedRes.setType(ReservationType.CAR);		
 		updatedRes.setStatus(ReservationStatus.CONFIRMED);		
 		
-		Mockito.when(resService.findReservation(res.getId().toString()))
+		Mockito.when(resService.getReservation(res.getId()))
 		.thenReturn(Mono.just(res));
 		
 		Mockito.when(resService.updateReservation(res, "CONFIRMED"))
@@ -908,7 +908,7 @@ class ReservationControllerTest {
 		updatedRes.setType(ReservationType.HOTEL);		
 		updatedRes.setStatus(ReservationStatus.CONFIRMED);		
 		
-		Mockito.when(resService.findReservation(res.getId().toString()))
+		Mockito.when(resService.getReservation(res.getId()))
 		.thenReturn(Mono.just(res));
 		
 		Mockito.when(resService.updateReservation(res, "CONFIRMED"))
@@ -948,7 +948,7 @@ class ReservationControllerTest {
 		updatedRes.setType(ReservationType.FLIGHT);		
 		updatedRes.setStatus(ReservationStatus.CONFIRMED);		
 		
-		Mockito.when(resService.findReservation(res.getId().toString()))
+		Mockito.when(resService.getReservation(res.getId()))
 		.thenReturn(Mono.just(res));
 		
 		Mockito.when(resService.updateReservation(res, "CONFIRMED"))
@@ -998,7 +998,7 @@ class ReservationControllerTest {
 		updatedRes.setType(ReservationType.CAR);		
 		updatedRes.setStatus(ReservationStatus.CLOSED);	
 		
-		Mockito.when(resService.findReservation(res.getId().toString()))
+		Mockito.when(resService.getReservation(res.getId()))
 		.thenReturn(Mono.just(res));
 		
 		Mockito.when(resService.updateReservation(res, "CLOSED"))
@@ -1036,7 +1036,7 @@ class ReservationControllerTest {
 		res.setStatus(ReservationStatus.AWAITING);	
 		
 		
-		Mockito.when(resService.findReservation(res.getId().toString()))
+		Mockito.when(resService.getReservation(res.getId()))
 		.thenReturn(Mono.just(res));
 		
 		Mono<ResponseEntity<Reservation>> monoRes = controller.

@@ -70,6 +70,8 @@ public class UserServiceImpl implements UserService {
 		user.setLastName(lastName);
 		user.setBirthday(birthday);
 		user.setType(type);
+		
+		log.debug("The new user: {}", user);
 		return userDao.save(new UserDto(user)).map(uDto -> uDto.getUser());
 	}
 
@@ -90,9 +92,11 @@ public class UserServiceImpl implements UserService {
 		vac.setEndTime(endTime);
 		vac.setPartySize(partySize);
 		vac.setDuration(duration);
+		
 
 		// Save the vacation id to the user and save the vacation to the database
 		return userDao.findByUsername(username).flatMap(u -> {
+			log.debug("The user found: {}", u);
 			// Make sure vacations list isn't null
 			if (u.getVacations() == null) {
 				u.setVacations(new ArrayList<>());
@@ -110,41 +114,29 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public Mono<Vacation> getVacation(String username, UUID id) {
+		
+		//Find the vacation of the user
 		Mono<Vacation> monoVac = vacDao.findByUsernameAndId(username, id).map(VacationDto::getVacation)
 				.switchIfEmpty(Mono.empty());
+		
 		// Get the list of activities in the vacation
-		Mono<List<Activity>> activities = Flux.from(vacDao.findByUsernameAndId(username, id)).map(vac -> {
-			if (vac.getActivities() == null) {
-				vac.setActivities(new ArrayList<>());
-			}
-			return vac.getActivities();
-		}).flatMap(l -> {
-			log.debug("The list from the vacation: %s", l);
-			if (l.isEmpty()) {
-				return Flux.fromIterable(new ArrayList<Activity>());
-			} else {
-				//Need to create an infinite flux to make sure all the activities are retrieved
-				Flux<Vacation> fluxVac = Flux.from(monoVac)
-						.flatMap(v -> Flux.<Vacation>generate(sink -> sink.next(v)));
-				
-				//Zip the fluxes together and iterate until all the activities have been obtained.
-				return Flux.fromIterable(l).zipWith(fluxVac)
-						.flatMap(t -> actDao.findByLocationAndId(t.getT2().getDestination(), t.getT1()))
-						.map(ActivityDto::getActivity);
-			}
-		}).collectList().switchIfEmpty(Mono.just(new ArrayList<Activity>()));
+		Mono<List<Activity>> activities = getActivities(id, username)
+				.collectList()
+				.switchIfEmpty(Mono.just(new ArrayList<Activity>()));
 
 		Mono<List<Reservation>> reserveds = Flux.from(vacDao.findByUsernameAndId(username, id)).map(vac -> {
+			//Make sure the reservations list isn't null
 			if (vac.getReservations() == null) {
 				vac.setReservations(new ArrayList<>());
 			}
 			return vac.getReservations();
 		}).flatMap(l -> {
-			log.debug("The list from the vacation: %s", l);
+			log.debug("The list of reservations from the vacation: {}", l);
 			if (l.isEmpty()) {
 				return Flux.fromIterable(new ArrayList<Reservation>());
 			} else {
-				return Flux.fromIterable(l).flatMap(uuid -> resDao.findByUuid(uuid))
+				return Flux.fromIterable(l)
+						.flatMap(uuid -> resDao.findByUuid(uuid))
 						.map(ReservationDto::getReservation);
 			}
 		}).collectList().switchIfEmpty(Mono.just(new ArrayList<Reservation>()));
@@ -158,11 +150,13 @@ public class UserServiceImpl implements UserService {
 		//Then set the reservations and return
 		Mono<Tuple2<List<Reservation>, Vacation>> zippedFinalMono = reserveds.zipWith(zippedVacMono)
 				.switchIfEmpty(Mono.empty());
+		
+		//Use the zipped mono to get the reservations into the vacation
 		return zippedFinalMono.map(t -> {
 			Vacation vac = t.getT2();
-			log.debug("Vacation received: " + vac);
+			log.debug("Vacation received: {}", vac);
 			List<Reservation> resList = t.getT1();
-			log.debug("Reservation List received: " + resList);
+			log.debug("Reservation List received: {}", resList);
 			vac.setReservations(resList);
 			return vac;
 		}).switchIfEmpty(Mono.just(new Vacation()));
@@ -170,10 +164,13 @@ public class UserServiceImpl implements UserService {
 	
 	@Override
 	public Flux<Activity> getActivities(UUID vacId, String username) {
-		Mono<VacationDto> monoVacDto = vacDao.findByUsernameAndId(username, vacId);
-		if (monoVacDto == null) {
+		
+		//Make sure none of the arguments are null
+		if (vacId == null || username == null) {
 			return Flux.empty();
 		}
+		
+		Mono<VacationDto> monoVacDto = vacDao.findByUsernameAndId(username, vacId);
         Mono<Vacation> monoVac = monoVacDto.map(VacationDto::getVacation)
                 .switchIfEmpty(Mono.empty());
         // Get the list of activities in the vacation
@@ -183,7 +180,7 @@ public class UserServiceImpl implements UserService {
             }
             return vac.getActivities();
         }).flatMap(l -> {
-            log.debug("The list from the vacation: " + l);
+            log.debug("The list from the vacation: {}", l);
             if (l.isEmpty()) {
                 return Flux.fromIterable(new ArrayList<Activity>());
             } else {
@@ -225,11 +222,12 @@ public class UserServiceImpl implements UserService {
 			
 			//Make sure the activity hasn't been added already.
 			if (v.getActivities().contains(activity.getId())) {
-				return Mono.empty();
+				return Mono.just(new Activity());
 			}
 			//Add the activity to the vacation and change the total
 			v.getActivities().add(id);
 			v.setTotal(v.getTotal() + activity.getCost());
+			
 			//Save the vacation and the activity
 			return vacDao.save(v).map(l->l.getVacation());
 		}).zipWith(actDao.save(new ActivityDto(activity)))

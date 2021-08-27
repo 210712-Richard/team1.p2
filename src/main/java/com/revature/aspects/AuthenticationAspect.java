@@ -31,6 +31,7 @@ public class AuthenticationAspect {
 	public Object checkLoggedInMono(ProceedingJoinPoint pjp) throws Throwable {
 		log.trace("Checking if user is logged in");
 
+		// If the user is not logged in, send back a 401
 		if (Boolean.FALSE.equals(isLoggedIn(pjp.getArgs()))) {
 			return Mono.just(ResponseEntity.status(401).build());
 		}
@@ -40,7 +41,8 @@ public class AuthenticationAspect {
 	@Around("loginFluxHook()")
 	public Object checkLoggedInFlux(ProceedingJoinPoint pjp) throws Throwable {
 		log.trace("Checking if user is logged in");
-
+		
+		// If the user is not logged in, send back a 401
 		if (Boolean.FALSE.equals(isLoggedIn(pjp.getArgs()))) {
 			return ResponseEntity.status(401).build();
 		}
@@ -54,12 +56,17 @@ public class AuthenticationAspect {
 		WebSession session = (WebSession) Stream.of(pjp.getArgs()).filter(WebSession.class::isInstance).findFirst()
 				.orElse(null);
 
+		// If no session was found, then there is an error with the server
 		if (session == null) {
 			return Mono.just(ResponseEntity.status(500).build());
 		}
 
+		// If the user is not logged in, return a 401
+		if (Boolean.FALSE.equals(isLoggedIn(pjp.getArgs()))) {
+			return Mono.just(ResponseEntity.status(401).build());
+		}
+
 		User loggedUser = session.getAttribute(UserController.LOGGED_USER);
-		log.debug("Logged In User: " + loggedUser);
 		String username = null;
 
 		// Get the method signature
@@ -79,15 +86,15 @@ public class AuthenticationAspect {
 				if (!(annotate instanceof PathVariable)) {
 					continue;
 				}
-				
+
 				// Set the path variable
 				PathVariable pathVariable = (PathVariable) annotate;
-				
-				// Make sure 
+
+				// Make sure
 				if ("username".equals(pathVariable.value())) {
 					// Set the username to the parameter location
 					username = (String) pjp.getArgs()[i];
-					log.debug("Username found: " + username);
+					log.debug("Username found: {}", username);
 				}
 
 			}
@@ -101,7 +108,7 @@ public class AuthenticationAspect {
 
 		return pjp.proceed();
 	}
-	
+
 	@Around("checkStaffHook()")
 	public Object checkStaff(ProceedingJoinPoint pjp) throws Throwable {
 		log.trace("Checking to see if the user is a staff member");
@@ -109,14 +116,19 @@ public class AuthenticationAspect {
 		WebSession session = (WebSession) Stream.of(pjp.getArgs()).filter(WebSession.class::isInstance).findFirst()
 				.orElse(null);
 
+		// Make sure there is actually a session
 		if (session == null) {
 			return Mono.just(ResponseEntity.status(500).build());
 		}
 
-		User loggedUser = session.getAttribute(UserController.LOGGED_USER);
-		log.debug("Logged In User: " + loggedUser);
+		// If the user is not logged in, return a 401
+		if (Boolean.FALSE.equals(isLoggedIn(pjp.getArgs()))) {
+			return Mono.just(ResponseEntity.status(401).build());
+		}
 
-		// If the logged in user is not the same user specified or is not a vacationer
+		User loggedUser = session.getAttribute(UserController.LOGGED_USER);
+
+		// Need to make sure the user is a vacationer
 		if (loggedUser == null || UserType.VACATIONER.equals(loggedUser.getType())) {
 			return Mono.just(ResponseEntity.status(403).build());
 		}
@@ -131,7 +143,7 @@ public class AuthenticationAspect {
 			return false;
 		}
 		User loggedUser = (User) session.getAttribute(UserController.LOGGED_USER);
-		log.debug("Logged In user: " + loggedUser);
+		log.debug("Logged In User: {}", loggedUser);
 
 		return loggedUser != null;
 	}
@@ -148,9 +160,10 @@ public class AuthenticationAspect {
 	private void checkVacationerHook() {
 		/* Empty */
 	}
-	
+
 	@Pointcut("@annotation(com.revature.aspects.StaffCheck)")
 	private void checkStaffHook() {
 		/* Empty */
 	}
 }
+
