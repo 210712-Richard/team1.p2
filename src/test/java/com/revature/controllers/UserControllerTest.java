@@ -239,18 +239,6 @@ class UserControllerTest {
 	}
 	
 	@Test
-	void testGetVacationInvalidForbidden() {
-		String invalidName = "Wrong";
-		
-		Mono<ResponseEntity<Vacation>> monoVac = controller.getVacation(invalidName, vac.getId().toString(),
-				session);
-		
-		StepVerifier.create(monoVac).expectNext(ResponseEntity.status(403).build()).verifyComplete();
-		
-		Mockito.verifyNoInteractions(userService);
-	}
-	
-	@Test
 	void testGetVacationInvalidNotFound() {
 		Mockito.when(userService.getVacation(user.getUsername(), vac.getId())).thenReturn(Mono.just(new Vacation()));
 
