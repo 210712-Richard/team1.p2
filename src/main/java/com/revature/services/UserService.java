@@ -30,12 +30,7 @@ public interface UserService {
 
 	public Mono<Void> deleteUser(String username, List<Vacation> vacList);
 	
-<<<<<<< HEAD
 	public Mono<Activity> chooseActivities(String username, UUID id, Activity activity);
 
 	
-=======
-	public  Mono<Activity> chooseActivities(String username, UUID id, Activity activity);
-
->>>>>>> 31c953c473bbcc54f5f48f4b5070c39c3683ccf1
 }

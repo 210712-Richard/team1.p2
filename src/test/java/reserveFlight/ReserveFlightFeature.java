@@ -6,5 +6,5 @@ public class ReserveFlightFeature {
 	Karate testReserveFlight() {
 		return Karate.run("reserveFlight").relativeTo(getClass());
 
-	}
+}
 }

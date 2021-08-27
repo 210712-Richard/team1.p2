@@ -310,9 +310,6 @@ public class ReservationServiceImpl implements ReservationService {
 							return Mono.empty();
 						}));
 
-}	
-}
-
 	}
 
 	private Mono<Reservation> changeAndSaveReservation(Reservation res, VacationDto vac, LocalDateTime startTime,
@@ -335,4 +332,3 @@ public class ReservationServiceImpl implements ReservationService {
 		return resDao.save(new ReservationDto(res)).zipWith(vacDao.save(vac)).map(t -> t.getT1().getReservation());
 	}
 }
-
