@@ -99,9 +99,9 @@ class ReservationControllerImpl implements ReservationController {
 		// Zip the two monos together and return the response entity needed
 		return monoVac.zipWith(monoHotel).flatMap(t -> {
 			Hotel hotel = t.getT2();
-			log.debug("Hotel returned: " + hotel);
+			log.debug("Hotel returned: {}", hotel);
 			Vacation vac = t.getT1();
-			log.debug("Vacation obtained: " + vac);
+			log.debug("Vacation obtained: {}", vac);
 			// If the vacation id is null, it means no valid vacation was found.
 			if (vac.getId() == null || hotel.getId() == null) {
 				return Mono.just(ResponseEntity.notFound().build());
@@ -175,9 +175,7 @@ class ReservationControllerImpl implements ReservationController {
 	public Mono<ResponseEntity<Reservation>> updateReservationStatus(@RequestBody Reservation resStatus,
 			@PathVariable("resId") String resId, WebSession session) {
 
-		if (resId == null || resId.equals("") || resStatus.getStatus() == null)
-			return Mono.just(ResponseEntity.badRequest().build());
-
+		
 		String status = resStatus.getStatus().toString();
 
 		User loggedUser = session.getAttribute(UserController.LOGGED_USER);
@@ -185,8 +183,10 @@ class ReservationControllerImpl implements ReservationController {
 			return Mono.just(ResponseEntity.status(401).build());
 
 		if (loggedUser.getType() == UserType.VACATIONER
-				&& status.equalsIgnoreCase(ReservationStatus.AWAITING.toString()))
+				&& !ReservationStatus.AWAITING.toString().equals(status)) {
 			return Mono.just(ResponseEntity.status(403).build());
+		}
+			
 
 		log.debug("calling find reservation");
 		
@@ -198,11 +198,6 @@ class ReservationControllerImpl implements ReservationController {
 
 			ReservationType type = r.getType();
 
-			// If reservation status is already closed, do not allow users confirm
-			if (r.getStatus() == ReservationStatus.CLOSED && loggedUser.getType() == UserType.VACATIONER) {
-				return Mono.just(ResponseEntity.status(403).build());
-			}
-
 			log.debug("Reservation Type: {}", type);
 			log.debug("Logged Username: {}", loggedUser.getUsername());
 			log.debug("Logged user type: {}", loggedUser.getType());
@@ -211,12 +206,6 @@ class ReservationControllerImpl implements ReservationController {
 			if (!loggedUser.getUsername().equals(r.getUsername())
 					&& !loggedUser.getType().toString().split("_")[0].equals(r.getType().toString()))
 				return Mono.just(ResponseEntity.status(403).build());
-
-			// If reservation start time already passed
-			if (r.getStarttime().isBefore(LocalDateTime.now())
-					&& !loggedUser.getType().toString().split("_")[0].equals(r.getType().toString()))
-				
-				return Mono.just(ResponseEntity.badRequest().build());
 
 			return resService.updateReservation(r, status).flatMap(res -> {
 				if (res.getId() == null) {

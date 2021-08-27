@@ -65,13 +65,13 @@ public class ReservationServiceImpl implements ReservationService {
 		res.setCost(hotel.getCostPerNight() * res.getDuration());
 		res.setType(ReservationType.HOTEL);
 		res.setStarttime(vacation.getStartTime());
-		
+
 		log.debug("The new hotel reservation: {}", res);
 
 		// Add the reservation to the vacation
 		vacation.getReservations().add(res);
 		vacation.setTotal(vacation.getTotal() + res.getCost());
-		
+
 		log.debug("The vacation now: {}", vacation);
 
 		// Save the reservation and the vacation and return the reservation
@@ -80,8 +80,7 @@ public class ReservationServiceImpl implements ReservationService {
 					// If there are rooms available
 					if (Boolean.TRUE.equals(b)) {
 						log.debug("Saving the vacation");
-						return vacDao.save(new VacationDto(vacation))
-								.flatMap(v -> resDao.save(new ReservationDto(res)))
+						return vacDao.save(new VacationDto(vacation)).flatMap(v -> resDao.save(new ReservationDto(res)))
 								.map(rDto -> rDto.getReservation());
 					}
 					return Mono.empty();
@@ -104,13 +103,13 @@ public class ReservationServiceImpl implements ReservationService {
 		res.setType(ReservationType.FLIGHT);
 		res.setUsername(vacation.getUsername());
 		res.setVacationId(vacation.getId());
-		
+
 		log.debug("The new flight reservation: {}", res);
 
 		// add reservation
 		vacation.getReservations().add(res);
 		vacation.setTotal(vacation.getTotal() + res.getCost());
-		
+
 		log.debug("The modified vacation: {}", vacation);
 
 		return isAvailable(res.getId(), flight.getId(), flight.getOpenSeats(), ReservationType.FLIGHT,
@@ -118,8 +117,7 @@ public class ReservationServiceImpl implements ReservationService {
 					// If flight is available
 					if (Boolean.TRUE.equals(b)) {
 						log.debug("Saving the vacation");
-						return vacDao.save(new VacationDto(vacation))
-								.flatMap(v -> resDao.save(new ReservationDto(res)))
+						return vacDao.save(new VacationDto(vacation)).flatMap(v -> resDao.save(new ReservationDto(res)))
 								.map(rDto -> rDto.getReservation());
 					}
 					return Mono.empty();
@@ -141,7 +139,7 @@ public class ReservationServiceImpl implements ReservationService {
 		res.setCost(car.getCostPerDay() * res.getDuration());
 		res.setType(ReservationType.CAR);
 		res.setStarttime(vacation.getStartTime());
-		
+
 		log.debug("The new car reservation: {}", res);
 
 		// Save the reservation and the vacation and return the reservation
@@ -150,27 +148,25 @@ public class ReservationServiceImpl implements ReservationService {
 			vacation.getReservations().add(res);
 			vacation.setTotal(vacation.getTotal() + res.getCost());
 			log.debug("The changed vacation: {}", vacation);
-			return vacDao.save(new VacationDto(vacation))
-					.flatMap(v -> resDao.save(new ReservationDto(res)))
+			return vacDao.save(new VacationDto(vacation)).flatMap(v -> resDao.save(new ReservationDto(res)))
 					.map(ReservationDto::getReservation);
 		}
 		return Mono.empty();
 	}
 
-
 	public Mono<Reservation> updateReservation(Reservation res, String status) {
 		// Make sure the resId is a uuid
-		
-		return vacDao.findByUsernameAndId(res.getUsername(), res.getVacationId()).flatMap(vac -> {
-					//If the reservation status is cancelled, change vacation total to reflect that
-					if (ReservationStatus.CANCELLED.toString().equals(status)) {
-						vac.setTotal(vac.getTotal() - res.getCost());
-						vacDao.save(vac).subscribe();
-					}
-					res.setStatus(ReservationStatus.valueOf(status));
-					return resDao.save(new ReservationDto(res)).map(r -> r.getReservation());
 
-				});
+		return vacDao.findByUsernameAndId(res.getUsername(), res.getVacationId()).flatMap(vac -> {
+			// If the reservation status is cancelled, change vacation total to reflect that
+			if (ReservationStatus.CANCELLED.toString().equals(status)) {
+				vac.setTotal(vac.getTotal() - res.getCost());
+				vacDao.save(vac).subscribe();
+			}
+			res.setStatus(ReservationStatus.valueOf(status));
+			return resDao.save(new ReservationDto(res)).map(r -> r.getReservation());
+
+		});
 	}
 
 	@Override
@@ -178,23 +174,25 @@ public class ReservationServiceImpl implements ReservationService {
 		UUID id = UUID.fromString(vacId);
 		return vacDao.findByUsernameAndId(username, id).map(vdto -> {
 			Vacation v = vdto == null ? new VacationDto().getVacation() : vdto.getVacation();
-			log.debug("getReservations called. Vacation Result: " + v);
+			log.debug("getReservations called. Vacation Result: {}", v);
 			return v;
 		}).flatMapMany(v -> {
-			log.debug("Reservations List: " + v.getReservations());
+			log.debug("Reservations List: {}", v.getReservations());
 			return Flux.fromIterable(v.getReservations());
 		});
 	}
 
 	/**
 	 * Checks to see if a reservation is available for a specific time and duration
-	 * @param resId The id of the reservation that needs verifying.<br>
-	 * Used to make sure it does not get added if a modification is being made
-	 * @param id The id of the reserveable
+	 * 
+	 * @param resId     The id of the reservation that needs verifying.<br>
+	 *                  Used to make sure it does not get added if a modification is
+	 *                  being made
+	 * @param id        The id of the reserveable
 	 * @param available How many spots are available
-	 * @param type The type of the reservation
+	 * @param type      The type of the reservation
 	 * @param startTime The start time of the reservation
-	 * @param duration How many days the reservation is for
+	 * @param duration  How many days the reservation is for
 	 * @return True if there are enough spots available, false otherwise
 	 */
 	private Mono<Boolean> isAvailable(UUID resId, UUID id, Integer available, ReservationType type,
@@ -215,7 +213,7 @@ public class ReservationServiceImpl implements ReservationService {
 		}).collectList().map(rDtoList -> rDtoList.size());
 
 		return intMono.map(i -> {
-			log.debug("Amount in database for " + type + ": " + i);
+			log.debug("Amount in database for {}: {}", type, i);
 			return i < available;
 		});
 	}
@@ -249,16 +247,18 @@ public class ReservationServiceImpl implements ReservationService {
 
 	/**
 	 * Reschedule a hotel reservation
-	 * @param res The reservation being modified
-	 * @param vac The vacation the reservation is a part of
+	 * 
+	 * @param res       The reservation being modified
+	 * @param vac       The vacation the reservation is a part of
 	 * @param startTime The new start time
-	 * @param duration The new duration
+	 * @param duration  The new duration
 	 * @return The modified reservation
 	 */
 	private Mono<Reservation> rescheduleHotel(Reservation res, VacationDto vac, LocalDateTime startTime,
 			Integer duration) {
 		log.trace("Rescheduling hotel");
-		log.trace("Arguments: res" + res + ", vac: " + vac + ", startTime:" + startTime + ", duration: " + duration);
+		log.trace("Arguments: res, {}, vac: {}, startTime: {}, duration: {}",
+				res, vac, startTime, duration);
 		// Get the hotel
 		return hotelDao.findByLocationAndId(vac.getDestination(), res.getReservedId())
 				// Make sure there are no reservation conflicts
@@ -274,16 +274,18 @@ public class ReservationServiceImpl implements ReservationService {
 
 	/**
 	 * Reschedule a car reservation
-	 * @param res The reservation being modified
-	 * @param vac The vacation the reservation is a part of
+	 * 
+	 * @param res       The reservation being modified
+	 * @param vac       The vacation the reservation is a part of
 	 * @param startTime The new start time
-	 * @param duration The new duration
+	 * @param duration  The new duration
 	 * @return The modified reservation
 	 */
 	private Mono<Reservation> rescheduleCar(Reservation res, VacationDto vac, LocalDateTime startTime,
 			Integer duration) {
 		log.trace("Rescheduling car");
-		log.trace("Arguments: res" + res + ", vac: " + vac + ", startTime:" + startTime + ", duration: " + duration);
+		log.trace("Arguments: res, {}, vac: {}, startTime: {}, duration: {}",
+				res, vac, startTime, duration);
 		// Get the car
 		return carDao.findByLocationAndId(vac.getDestination(), res.getReservedId()).flatMap(
 				// Make sure the reservation does not have any conflicts
@@ -298,18 +300,20 @@ public class ReservationServiceImpl implements ReservationService {
 
 	/**
 	 * Reschedule a flight reservation
-	 * @param res The reservation being modified
-	 * @param vac The vacation the reservation is a part of
-	 * @param newReservedId The new reserved Id. Used to change what flight is reserved.
-	 * @param startTime The new start time. Can be null if reserved id is set.
-	 * @param duration The new duration. Can be null if reserved id is set.
+	 * 
+	 * @param res           The reservation being modified
+	 * @param vac           The vacation the reservation is a part of
+	 * @param newReservedId The new reserved Id. Used to change what flight is
+	 *                      reserved.
+	 * @param startTime     The new start time. Can be null if reserved id is set.
+	 * @param duration      The new duration. Can be null if reserved id is set.
 	 * @return The modified reservation
 	 */
 	private Mono<Reservation> rescheduleFlight(Reservation res, VacationDto vac, UUID newReservedId,
 			LocalDateTime startTime, Integer duration) {
 		log.trace("Rescheduling flight");
-		log.trace("Arguments: res" + res + ", vac: " + vac + ", newReservedId," + newReservedId.toString()
-				+ ", startTime:" + startTime + ", duration: " + duration);
+		log.trace("Arguments: res: {}, vac: {}, newReservedId: {}, startTime: {}, duration, {}", 
+				res, vac, newReservedId, startTime, duration);
 
 		// Get the new flight
 		return flightDao.findByDestinationAndId(vac.getDestination(), newReservedId)
@@ -332,9 +336,9 @@ public class ReservationServiceImpl implements ReservationService {
 
 												// Get the old flight and new flight
 												FlightDto oldFlight = t.getT1();
-												log.debug("The old flight: " + oldFlight);
+												log.debug("The old flight: {}", oldFlight);
 												FlightDto newFlight = t.getT2();
-												log.debug("The new flight" + newFlight);
+												log.debug("The new flight: {}", newFlight);
 
 												// Subtract the old ticket price and add the new ticket price
 												// to the vacation total
@@ -349,8 +353,8 @@ public class ReservationServiceImpl implements ReservationService {
 												res.setReservedName(newFlight.getAirline());
 
 												// Save the vacation and the reservation and return
-												log.debug("New Reservation: " + res);
-												log.debug("Vacation changed to: " + vac);
+												log.debug("New Reservation: {}", res);
+												log.debug("Vacation changed to: {}", vac);
 												return resDao.save(new ReservationDto(res)).zipWith(vacDao.save(vac))
 														.map(tuple -> tuple.getT1().getReservation());
 											});
@@ -377,8 +381,8 @@ public class ReservationServiceImpl implements ReservationService {
 		vac.setTotal(vac.getTotal() - oldCost + res.getCost());
 
 		// Save both and return the reservation
-		log.debug("New Vacation: " + vac);
-		log.debug("New Reservation: " + res);
+		log.debug("New Vacation: {}", vac);
+		log.debug("New Reservation: {}", res);
 		return resDao.save(new ReservationDto(res)).zipWith(vacDao.save(vac)).map(t -> t.getT1().getReservation());
 	}
 }

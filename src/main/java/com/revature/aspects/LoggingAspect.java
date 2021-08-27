@@ -1,7 +1,5 @@
 package com.revature.aspects;
 
-import java.util.Arrays;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -23,7 +21,7 @@ public class LoggingAspect {
 		//Get the log for the class
 		Logger log = LogManager.getLogger(pjp.getTarget().getClass()); 
 		log.trace("Method with signature: {}", pjp.getSignature());
-		log.trace("With arguments: {}", Arrays.toString(pjp.getArgs()));
+		log.trace("With arguments: {}", pjp.getArgs());
 		try {
 			result = pjp.proceed();
 		} catch (Throwable t) {
