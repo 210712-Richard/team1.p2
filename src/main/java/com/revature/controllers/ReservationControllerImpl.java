@@ -175,7 +175,7 @@ class ReservationControllerImpl implements ReservationController {
 	public Mono<ResponseEntity<Reservation>> updateReservationStatus(@RequestBody Reservation resStatus,
 			@PathVariable("resId") String resId, WebSession session) {
 
-
+		
 		String status = resStatus.getStatus().toString();
 
 		User loggedUser = session.getAttribute(UserController.LOGGED_USER);
