@@ -2,7 +2,6 @@ package com.revature.services;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.mockito.Mockito.when;
 
 import java.time.LocalDateTime;
@@ -603,14 +602,14 @@ class ReservationServiceTest {
 		String newStatus = "CONFIRMED";
 
 		when(resDao.findByUuid(Mockito.any())).thenReturn(Mono.just(new ReservationDto(res)));
-		res.setStatus(ReservationStatus.getStatus(newStatus));
+		res.setStatus(ReservationStatus.CONFIRMED);
 		when(resDao.save(Mockito.any())).thenReturn(Mono.just(new ReservationDto(res)));	
 		when(vacDao.findByUsernameAndId(Mockito.any(), Mockito.any())).thenReturn(Mono.just(new VacationDto(vac)));	
 		
 		Mono<Reservation> resMono = service.updateReservation(res, newStatus);
 
-		StepVerifier.create(resMono).expectNextMatches(r -> r.getStatus().equals(ReservationStatus.getStatus(newStatus)));
-		assertEquals(res.getStatus(), ReservationStatus.getStatus(newStatus), 
+		StepVerifier.create(resMono).expectNextMatches(r -> r.getStatus().equals(ReservationStatus.CONFIRMED));
+		assertEquals(res.getStatus(), ReservationStatus.CONFIRMED, 
 				"Assert that the reservation status was updated to status defined.");
 	}
 
@@ -629,10 +628,10 @@ class ReservationServiceTest {
 		res.setStarttime(vac.getStartTime());
 		res.setStatus(ReservationStatus.AWAITING);
 
-		String newStatus = "close";
+		String newStatus = "CLOSED";
 		
 		when(resDao.findByUuid(Mockito.any())).thenReturn(Mono.just(new ReservationDto()));
-		res.setStatus(ReservationStatus.getStatus(newStatus));
+		res.setStatus(ReservationStatus.CLOSED);
 		when(resDao.save(Mockito.any())).thenReturn(Mono.just(new ReservationDto()));	
 		when(vacDao.findByUsernameAndId(Mockito.any(), Mockito.any())).thenReturn(Mono.just(new VacationDto()));	
 		
@@ -656,10 +655,10 @@ class ReservationServiceTest {
 		res.setStarttime(flight.getDepartingDate());
 		res.setStatus(ReservationStatus.AWAITING);
 
-		String newStatus = "cancel";
+		String newStatus = "CANCELLED";
 
 		when(resDao.findByUuid(Mockito.any())).thenReturn(Mono.just(new ReservationDto()));
-		res.setStatus(ReservationStatus.getStatus(newStatus));
+		res.setStatus(ReservationStatus.CANCELLED);
 		when(resDao.save(Mockito.any())).thenReturn(Mono.just(new ReservationDto()));	
 		when(vacDao.findByUsernameAndId(Mockito.any(), Mockito.any())).thenReturn(Mono.just(new VacationDto()));	
 		
