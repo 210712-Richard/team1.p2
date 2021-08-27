@@ -104,7 +104,7 @@ public class UserControllerImpl implements UserController {
 		
 		return userService.createVacation(username, vacation.getDestination(), vacation.getStartTime(),
 				endTime, vacation.getPartySize(), vacation.getDuration()).flatMap(v -> {
-					log.debug("Vacation created: {}", v);
+					
 					if (v.getId() == null) {
 						return Mono.just(ResponseEntity.badRequest().build());
 					} else {
