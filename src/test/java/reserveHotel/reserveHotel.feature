@@ -11,8 +11,9 @@ Background:
 Given url 'http://localhost:8080/hotels/Los%20Angeles,%20CA'
 When method get
 Then status 200
-And match each response contains { id: '#notnull' }
-And def hotel = response[0]
+And def hotels = JSON.parse(karate.extractAll(response, "(\\{.*?\\})", 1))
+And match each hotels contains { id: '#notnull' }
+And def hotel = hotels[0]
 
 Given url 'http://localhost:8080/reservations'
 And request { type: 'HOTEL', reservedId: '#(hotel.id)', vacationId: '#(vacObj.id)' }

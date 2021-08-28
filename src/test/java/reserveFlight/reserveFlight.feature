@@ -10,8 +10,8 @@ Background:
 Given url 'http://localhost:8080/flights/Los%20Angeles,%20CA'
 When method get
 Then status 200
-And match each response contains { id: '#notnull' }
-And def flights = response
+And def flights = JSON.parse(karate.extractAll(response, "(\\{.*?\\})", 1))
+And match each flights contains { id: '#notnull' }
 
 Given url 'http://localhost:8080/reservations'
 And request { type: 'FLIGHT', reservedId: '#(flights[0].id)', vacationId: '#(vacObj.id)' }
