@@ -1,6 +1,7 @@
 package com.revature.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -25,7 +26,7 @@ public class FlightControllerImpl implements FlightController{
 	}
 
 	@Override
-	@GetMapping("{destination}")
+	@GetMapping(value = "{destination}", produces = MediaType.APPLICATION_NDJSON_VALUE)
 	public ResponseEntity<Flux<Flight>> getFlightsByDestination(@PathVariable("destination") String destination, WebSession session) {
 		return ResponseEntity.ok(flightService.getFlightsByDestination(destination));
 	}

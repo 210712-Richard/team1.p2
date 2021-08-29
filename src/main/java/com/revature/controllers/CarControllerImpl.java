@@ -1,6 +1,7 @@
 package com.revature.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -25,7 +26,7 @@ public class CarControllerImpl implements CarController{
 	}
 
 	@Override
-	@GetMapping("{location}")
+	@GetMapping(value = "{location}", produces = MediaType.APPLICATION_NDJSON_VALUE)
 	public ResponseEntity<Flux<Car>> getCarsByLocation(@PathVariable("location") String location, WebSession session) {
 		return ResponseEntity.ok(carService.getCarsByLocation(location));
 	}

@@ -1,6 +1,7 @@
 package com.revature.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -24,7 +25,7 @@ public class ActivityControllerImpl implements ActivityController {
 	}
 
 	@Override
-	@GetMapping("/{location}")
+	@GetMapping(value="/{location}", produces = MediaType.APPLICATION_NDJSON_VALUE)
 	public ResponseEntity<Flux<Activity>> viewAllActivities(@PathVariable("location") String location, WebSession session) {
 		return ResponseEntity.ok(actService.getAllActivities(location));
 	}

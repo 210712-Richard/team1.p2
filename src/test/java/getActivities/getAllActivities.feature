@@ -5,4 +5,5 @@ Scenario: As a logged-in user, send a get request that retrieves all available a
 Given url 'http://localhost:8080/activities/Los%20Angeles,%20CA'
 When method get
 Then status 200
-And match each response contains { id: '#notnull' }
+And def acts = JSON.parse(karate.extractAll(response, "(\\{.*?\\})", 1))
+And match each acts contains {id: '#notnull' }

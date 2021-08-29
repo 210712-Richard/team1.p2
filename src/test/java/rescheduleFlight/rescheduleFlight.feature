@@ -1,6 +1,6 @@
 Feature: User can reschedule flight Successfully
 
-Scenario: Login, create vacation, reserve fligth, then reschedule flight
+Scenario: Login, create vacation, reserve flight, then reschedule flight
 
 Background:
 	* def res = call read('classpath:reserveFlight/reserveFlight.feature')

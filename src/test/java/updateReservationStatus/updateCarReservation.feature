@@ -13,8 +13,9 @@ Background:
 Given url 'http://localhost:8080/cars/Los%20Angeles,%20CA'
 When method get
 Then status 200
-And match each response contains { id: '#notnull' }
-And def car = response[0]
+And def cars = JSON.parse(karate.extractAll(response, "(\\{.*?\\})", 1))
+And match each cars contains { id: '#notnull' }
+And def car = cars[0]
 
 # Book first available car
 Given url 'http://localhost:8080/reservations'
