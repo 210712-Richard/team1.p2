@@ -179,17 +179,19 @@ class ReservationControllerImpl implements ReservationController {
 		String status = resStatus.getStatus().toString();
 
 		User loggedUser = session.getAttribute(UserController.LOGGED_USER);
+		System.out.println(loggedUser);
+		System.out.println(status);
 		if (loggedUser == null)
 			return Mono.just(ResponseEntity.status(401).build());
 
 		if (loggedUser.getType() == UserType.VACATIONER
-				&& !ReservationStatus.AWAITING.toString().equals(status)) {
+				&& ReservationStatus.AWAITING == resStatus.getStatus()) {
 			return Mono.just(ResponseEntity.status(403).build());
 		}
 			
 
 		log.debug("calling find reservation");
-		
+
 		Mono<Reservation> monoRes = resService.getReservation(UUID.fromString(resId));
 
 		return monoRes.flatMap(r -> {
@@ -201,6 +203,7 @@ class ReservationControllerImpl implements ReservationController {
 			log.debug("Reservation Type: {}", type);
 			log.debug("Logged Username: {}", loggedUser.getUsername());
 			log.debug("Logged user type: {}", loggedUser.getType());
+			log.debug("Reservation details {}", r);
 
 			// If logged in user didn't create reservation and is not staff
 			if (!loggedUser.getUsername().equals(r.getUsername())

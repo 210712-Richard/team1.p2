@@ -9,6 +9,6 @@ And request { destination: "Los Angeles, CA", startTime: "2021-10-24T10:00", end
 And cookie SESSION = loggedIn.sessionCookie
 When method post
 Then status 201
-And match response contains { username: "test", id: "#notnull", destination: "Los Angeles, CA", startTime: "2021-10-24T10:00:00", endTime: "2021-11-21T10:00:00", partySize: 4, duration: 2}
+And match response contains { username: "test", id: "#notnull", destination: "Los Angeles, CA", startTime: "2021-10-24T10:00:00", endTime: '#notnull', partySize: 4, duration: 2}
 And def vacObj = response
 
