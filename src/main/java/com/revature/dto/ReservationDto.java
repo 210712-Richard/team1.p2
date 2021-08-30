@@ -26,7 +26,7 @@ public class ReservationDto {
 	private UUID vacationId;
 	private String username;
 	private String reservedName;
-	private Instant starttime;
+	private Instant startTime;
 	private Double cost;
 	private Integer duration;
 	private String status;
@@ -42,7 +42,7 @@ public class ReservationDto {
 		this.setVacationId(r.getVacationId());
 		this.setUsername(r.getUsername());
 		this.setReservedName(r.getReservedName());
-		this.setStarttime(r.getStarttime().toInstant(ZoneOffset.UTC));
+		this.setStartTime(r.getStartTime().toInstant(ZoneOffset.UTC));
 		this.setCost(r.getCost());
 		this.setDuration(r.getDuration());
 		this.setStatus(r.getStatus().toString());
@@ -88,12 +88,12 @@ public class ReservationDto {
 		this.reservedName = reservedName;
 	}
 
-	public Instant getStarttime() {
-		return starttime;
+	public Instant getStartTime() {
+		return startTime;
 	}
 
-	public void setStarttime(Instant starttime) {
-		this.starttime = starttime;
+	public void setStartTime(Instant startTime) {
+		this.startTime = startTime;
 	}
 
 	public Double getCost() {
@@ -137,7 +137,7 @@ public class ReservationDto {
 		r.setVacationId(vacationId);
 		r.setUsername(username);
 		r.setReservedName(reservedName);
-		r.setStarttime(LocalDateTime.ofInstant(starttime, ZoneOffset.UTC));
+		r.setStartTime(LocalDateTime.ofInstant(startTime, ZoneOffset.UTC));
 		r.setCost(cost);
 		r.setDuration(duration);
 		r.setStatus(ReservationStatus.valueOf(status));
@@ -147,7 +147,7 @@ public class ReservationDto {
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(cost, duration, uuid, reservedId, reservedName, starttime, status, type, username,
+		return Objects.hash(cost, duration, uuid, reservedId, reservedName, startTime, status, type, username,
 				vacationId);
 	}
 
@@ -162,7 +162,7 @@ public class ReservationDto {
 		ReservationDto other = (ReservationDto) obj;
 		return Objects.equals(cost, other.cost) && Objects.equals(duration, other.duration)
 				&& Objects.equals(uuid, other.uuid) && Objects.equals(reservedId, other.reservedId)
-				&& Objects.equals(reservedName, other.reservedName) && Objects.equals(starttime, other.starttime)
+				&& Objects.equals(reservedName, other.reservedName) && Objects.equals(startTime, other.startTime)
 				&& Objects.equals(status, other.status) && Objects.equals(type, other.type)
 				&& Objects.equals(username, other.username) && Objects.equals(vacationId, other.vacationId);
 	}
@@ -170,7 +170,7 @@ public class ReservationDto {
 	@Override
 	public String toString() {
 		return "ReservationDto [id=" + uuid + ", type=" + type + ", reservedId=" + reservedId + ", vacationId="
-				+ vacationId + ", username=" + username + ", reservedName=" + reservedName + ", starttime=" + starttime
+				+ vacationId + ", username=" + username + ", reservedName=" + reservedName + ", starttime=" + startTime
 				+ ", cost=" + cost + ", duration=" + duration + ", status=" + status + "]";
 	}
 	

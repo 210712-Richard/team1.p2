@@ -64,7 +64,7 @@ public class ReservationServiceImpl implements ReservationService {
 		res.setDuration(vacation.getDuration());
 		res.setCost(hotel.getCostPerNight() * res.getDuration());
 		res.setType(ReservationType.HOTEL);
-		res.setStarttime(vacation.getStartTime());
+		res.setStartTime(vacation.getStartTime());
 
 		log.debug("The new hotel reservation: {}", res);
 
@@ -76,7 +76,7 @@ public class ReservationServiceImpl implements ReservationService {
 
 		// Save the reservation and the vacation and return the reservation
 		return isAvailable(res.getId(), hotel.getId(), hotel.getRoomsAvailable(), ReservationType.HOTEL,
-				res.getStarttime(), res.getDuration()).flatMap(b -> {
+				res.getStartTime(), res.getDuration()).flatMap(b -> {
 					// If there are rooms available
 					if (Boolean.TRUE.equals(b)) {
 						log.debug("Saving the vacation");
@@ -99,7 +99,7 @@ public class ReservationServiceImpl implements ReservationService {
 		res.setId(UUID.randomUUID());
 		res.setReservedId(flight.getId());
 		res.setReservedName(flight.getAirline());
-		res.setStarttime(flight.getDepartingDate());
+		res.setStartTime(flight.getDepartingDate());
 		res.setType(ReservationType.FLIGHT);
 		res.setUsername(vacation.getUsername());
 		res.setVacationId(vacation.getId());
@@ -113,7 +113,7 @@ public class ReservationServiceImpl implements ReservationService {
 		log.debug("The modified vacation: {}", vacation);
 
 		return isAvailable(res.getId(), flight.getId(), flight.getOpenSeats(), ReservationType.FLIGHT,
-				res.getStarttime(), res.getDuration()).flatMap(b -> {
+				res.getStartTime(), res.getDuration()).flatMap(b -> {
 					// If flight is available
 					if (Boolean.TRUE.equals(b)) {
 						log.debug("Saving the vacation");
@@ -138,7 +138,7 @@ public class ReservationServiceImpl implements ReservationService {
 		res.setDuration(vacation.getDuration());
 		res.setCost(car.getCostPerDay() * res.getDuration());
 		res.setType(ReservationType.CAR);
-		res.setStarttime(vacation.getStartTime());
+		res.setStartTime(vacation.getStartTime());
 
 		log.debug("The new car reservation: {}", res);
 
@@ -204,12 +204,12 @@ public class ReservationServiceImpl implements ReservationService {
 
 		// Get the number of potential reservation conflicts
 		Mono<Integer> intMono = resDao.findAll().map(rDto -> rDto.getReservation()).filter(r -> {
-			LocalDateTime rEndTime = r.getStarttime().plus(Period.of(0, 0, duration));
+			LocalDateTime rEndTime = r.getStartTime().plus(Period.of(0, 0, duration));
 			return !r.getId().equals(resId) && r.getReservedId().equals(id) && r.getType().equals(type)
 					&& !r.getStatus().equals(ReservationStatus.CLOSED)
 					&& ((!r.getType().equals(ReservationType.FLIGHT)
-							&& (!startTime.isAfter(rEndTime) && !endTime.isBefore(r.getStarttime())))
-							|| (r.getType().equals(ReservationType.FLIGHT) && startTime.equals(r.getStarttime())));
+							&& (!startTime.isAfter(rEndTime) && !endTime.isBefore(r.getStartTime())))
+							|| (r.getType().equals(ReservationType.FLIGHT) && startTime.equals(r.getStartTime())));
 		}).collectList().map(rDtoList -> rDtoList.size());
 
 		return intMono.map(i -> {
@@ -236,7 +236,7 @@ public class ReservationServiceImpl implements ReservationService {
 			case FLIGHT:
 				if (newReservedId != null) {
 					log.debug("Rescheduling flight by id");
-					return rescheduleFlight(res, v, newReservedId, res.getStarttime(), 0);
+					return rescheduleFlight(res, v, newReservedId, res.getStartTime(), 0);
 				}
 				return rescheduleFlight(res, v, res.getReservedId(), startTime, 0);
 			default:
@@ -348,7 +348,7 @@ public class ReservationServiceImpl implements ReservationService {
 												// Set the reservation's new reservedId, price, start time, and name
 												res.setReservedId(newReservedId);
 												res.setCost(newFlight.getTicketPrice());
-												res.setStarttime(LocalDateTime.ofInstant(newFlight.getDepartingDate(),
+												res.setStartTime(LocalDateTime.ofInstant(newFlight.getDepartingDate(),
 														ZoneOffset.UTC));
 												res.setReservedName(newFlight.getAirline());
 
@@ -370,7 +370,7 @@ public class ReservationServiceImpl implements ReservationService {
 			Integer duration) {
 		log.debug("The reservation will be rescheduled");
 		// Change the start time
-		res.setStarttime(startTime);
+		res.setStartTime(startTime);
 
 		// Get the old duration and cost to change the vacation total
 		Integer oldDur = res.getDuration();
