@@ -7,12 +7,20 @@ import com.revature.beans.Car;
 import com.revature.beans.Flight;
 import com.revature.beans.Hotel;
 import com.revature.beans.Reservation;
+import com.revature.beans.ReservationType;
 import com.revature.beans.Vacation;
 
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 public interface ReservationService {
+	
+	/**
+	 * Get the reservations by type
+	 * @param type The type of reservation to get
+	 * @return All the reservations with that type
+	 */
+	public Flux<Reservation> getReservationsByType(ReservationType type);
 	/**
 	 * Create a reservation for a hotel
 	 * @param hotel The hotel being reserved

@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.mockito.Mockito.when;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Period;
 import java.util.UUID;
@@ -16,6 +17,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.springframework.http.ResponseEntity;
 
 import com.revature.beans.Car;
 import com.revature.beans.Flight;
@@ -23,7 +25,10 @@ import com.revature.beans.Hotel;
 import com.revature.beans.Reservation;
 import com.revature.beans.ReservationStatus;
 import com.revature.beans.ReservationType;
+import com.revature.beans.User;
+import com.revature.beans.UserType;
 import com.revature.beans.Vacation;
+import com.revature.controllers.UserController;
 import com.revature.data.CarDao;
 import com.revature.data.FlightDao;
 import com.revature.data.HotelDao;
@@ -1318,6 +1323,38 @@ class ReservationServiceTest {
 
 		// Check to make sure that an empty mono was sent back
 		StepVerifier.create(resMono).expectComplete().verify();
+	}
+	
+	@Test
+	void testGetReservationsByType() {
+		User staff = new User();
+		staff.setUsername("carTest");
+		staff.setPassword("password");
+		staff.setFirstName("Car");
+		staff.setLastName("User");
+		staff.setEmail("cartest@email.com");
+		staff.setBirthday(LocalDate.now());
+		staff.setType(UserType.CAR_STAFF);
+		
+		Reservation res = new Reservation();
+		res.setId(UUID.randomUUID());
+		res.setReservedId(car.getId());
+		res.setReservedName(car.getMake());
+		res.setStarttime(vac.getStartTime());
+		res.setCost(car.getCostPerDay());
+		res.setVacationId(vac.getId());
+		res.setDuration(vac.getDuration());
+		res.setUsername("test");
+		res.setType(ReservationType.CAR);
+		res.setStatus(ReservationStatus.CONFIRMED);	
+		
+		Mockito.when(resDao.findByType(res.getType().toString()))
+		.thenReturn(Flux.just(new ReservationDto(res)));
+		
+		Flux<Reservation> resFlux = service.getReservationsByType(res.getType());
+		
+		
+		StepVerifier.create(resFlux).expectNext(res).verifyComplete();
 	}
 }
 

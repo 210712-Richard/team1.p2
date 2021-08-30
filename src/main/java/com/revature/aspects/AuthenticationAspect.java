@@ -118,19 +118,19 @@ public class AuthenticationAspect {
 
 		// Make sure there is actually a session
 		if (session == null) {
-			return Mono.just(ResponseEntity.status(500).build());
+			return ResponseEntity.status(500).build();
 		}
 
 		// If the user is not logged in, return a 401
 		if (Boolean.FALSE.equals(isLoggedIn(pjp.getArgs()))) {
-			return Mono.just(ResponseEntity.status(401).build());
+			return ResponseEntity.status(401).build();
 		}
 
 		User loggedUser = session.getAttribute(UserController.LOGGED_USER);
 
 		// Need to make sure the user is a vacationer
 		if (loggedUser == null || UserType.VACATIONER.equals(loggedUser.getType())) {
-			return Mono.just(ResponseEntity.status(403).build());
+			return ResponseEntity.status(403).build();
 		}
 
 		return pjp.proceed();

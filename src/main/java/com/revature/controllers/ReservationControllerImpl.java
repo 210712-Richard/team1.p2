@@ -7,6 +7,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.WebSession;
 
 import com.revature.aspects.LoggedInMono;
+import com.revature.aspects.StaffCheck;
 import com.revature.beans.Car;
 import com.revature.beans.Flight;
 import com.revature.beans.Hotel;
@@ -32,6 +34,7 @@ import com.revature.services.HotelService;
 import com.revature.services.ReservationService;
 import com.revature.services.UserService;
 
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @RestController
@@ -278,5 +281,18 @@ class ReservationControllerImpl implements ReservationController {
 			log.debug("User cannot change startTime and duration for this reservation");
 			return Mono.just(ResponseEntity.status(403).build());
 		});
+	}
+	
+	@StaffCheck
+	@Override
+	@GetMapping
+	public ResponseEntity<Flux<Reservation>> getReservationsByType(WebSession session) {
+		User loggedUser = (User) session.getAttribute(UserController.LOGGED_USER);
+		if (loggedUser == null) {
+			return ResponseEntity.status(500).build();
+		}
+		ReservationType type = ReservationType.valueOf(loggedUser.getType().toString().split("_")[0]);
+		log.debug("Type of reservation: {}", type);
+		return ResponseEntity.ok(resService.getReservationsByType(type));
 	}
 }

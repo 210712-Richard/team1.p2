@@ -1,5 +1,7 @@
 package com.revature.controllers;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Period;
@@ -29,6 +31,7 @@ import com.revature.services.HotelService;
 import com.revature.services.ReservationService;
 import com.revature.services.UserService;
 
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
@@ -1044,6 +1047,53 @@ class ReservationControllerTest {
 		
 		StepVerifier.create(monoRes).expectNext(ResponseEntity.status(403).build()).expectComplete();
 
+	}
+	
+	@Test
+	void testGetReservationsByTypeValid() {
+		User staff = new User();
+		staff.setUsername("carTest");
+		staff.setPassword("password");
+		staff.setFirstName("Car");
+		staff.setLastName("User");
+		staff.setEmail("cartest@email.com");
+		staff.setBirthday(LocalDate.now());
+		staff.setType(UserType.CAR_STAFF);
+		
+		Reservation res = new Reservation();
+		res.setId(UUID.randomUUID());
+		res.setReservedId(car.getId());
+		res.setReservedName(car.getMake());
+		res.setStarttime(vac.getStartTime());
+		res.setCost(car.getCostPerDay());
+		res.setVacationId(vac.getId());
+		res.setDuration(vac.getDuration());
+		res.setUsername(user.getUsername());
+		res.setType(ReservationType.CAR);
+		res.setStatus(ReservationStatus.CONFIRMED);	
+		
+		Mockito.when(session.getAttribute(UserController.LOGGED_USER)).thenReturn(staff);
+		Mockito.when(resService.getReservationsByType(res.getType())).thenReturn(Flux.just(res));
+		
+		ResponseEntity<Flux<Reservation>> resFluxEntity = controller.getReservationsByType(session);
+		
+		assertEquals(200, resFluxEntity.getStatusCodeValue(), "Assert that the status code is 200");
+		
+		StepVerifier.create(resFluxEntity.getBody()).expectNext(res).verifyComplete();
+	}
+	
+	@Test
+	void testGetReservationsByTypeInvalid() {
+
+		
+		Mockito.when(session.getAttribute(UserController.LOGGED_USER)).thenReturn(null);
+		
+		ResponseEntity<Flux<Reservation>> resFluxEntity = controller.getReservationsByType(session);
+		
+		assertEquals(500, resFluxEntity.getStatusCodeValue(), "Assert that the status code is 200");
+		
+		Mockito.verifyNoInteractions(resService);
+		
 	}
 	
 }
