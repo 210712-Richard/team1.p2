@@ -1090,7 +1090,7 @@ class ReservationControllerTest {
 		
 		ResponseEntity<Flux<Reservation>> resFluxEntity = controller.getReservationsByType(session);
 		
-		assertEquals(500, resFluxEntity.getStatusCodeValue(), "Assert that the status code is 200");
+		assertEquals(500, resFluxEntity.getStatusCodeValue(), "Assert that the status code is 500");
 		
 		Mockito.verifyNoInteractions(resService);
 		
