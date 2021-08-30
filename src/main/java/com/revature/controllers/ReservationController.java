@@ -4,10 +4,21 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.server.WebSession;
 
 import com.revature.beans.Reservation;
+import com.revature.beans.ReservationType;
 
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 public interface ReservationController {
+	
+	/**
+	 * Gets all the reservations by type
+	 * @param type The type of the reservation
+	 * @param session The session
+	 * @return The reservations with the type
+	 */
+	public ResponseEntity<Flux<Reservation>> getReservationsByType(WebSession session);
+	
 	/**
 	 * Create a reservation from a valid reservable, valid vacation, and valid type
 	 * @param res The reservation with fields to add<br>

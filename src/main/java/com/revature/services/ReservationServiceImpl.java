@@ -385,4 +385,10 @@ public class ReservationServiceImpl implements ReservationService {
 		log.debug("New Reservation: {}", res);
 		return resDao.save(new ReservationDto(res)).zipWith(vacDao.save(vac)).map(t -> t.getT1().getReservation());
 	}
+
+	@Override
+	public Flux<Reservation> getReservationsByType(ReservationType type) {
+		
+		return resDao.findByType(type.toString()).map(rDto -> rDto.getReservation());
+	}
 }
