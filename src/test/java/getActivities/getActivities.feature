@@ -21,5 +21,4 @@ Given url 'http://localhost:8080/users/test/vacations/'+vacObj.id+'/activities'
 And cookie SESSION = loggedIn.sessionCookie
 When method get
 Then status 200
-And def acts = JSON.parse(karate.extractAll(response, "(\\{.*?\\})", 1))
-And match each acts contains { id: '#notnull' }
+And match response contains { id: '#notnull' }
