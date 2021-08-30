@@ -163,6 +163,7 @@ public class UserControllerImpl implements UserController {
 				.map(v -> ResponseEntity.status(204).build());
 	}
 
+	@VacationerCheck
 	@Override
 	@PostMapping("{username}/vacations/{vacationid}/activities")
 	public Mono<ResponseEntity<Activity>> chooseActivities(@RequestBody Activity activity,
@@ -174,11 +175,11 @@ public class UserControllerImpl implements UserController {
 			return Mono.just(ResponseEntity.badRequest().build());
 		}
 
-		return userService.chooseActivities(username, vacId, activity).flatMap(a -> {
+		return userService.chooseActivities(username, vacId, activity).map(a -> {
 			if (a.getId() == null) {
-				return Mono.just(ResponseEntity.status(409).build());
+				return ResponseEntity.status(409).build();
 			} else {
-				return Mono.just(ResponseEntity.status(200).body(a));
+				return ResponseEntity.status(200).body(a);
 			}
 		});
 
