@@ -4,7 +4,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.server.WebSession;
 
 import com.revature.beans.Reservation;
-import com.revature.beans.ReservationType;
 
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
