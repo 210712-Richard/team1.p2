@@ -122,7 +122,7 @@ class ReservationControllerTest {
 		res.setId(UUID.randomUUID());
 		res.setReservedId(hotel.getId());
 		res.setReservedName(hotel.getName());
-		res.setStarttime(vac.getStartTime());
+		res.setStartTime(vac.getStartTime());
 		res.setCost(hotel.getCostPerNight());
 		res.setVacationId(vac.getId());
 		res.setDuration(vac.getDuration());
@@ -146,7 +146,7 @@ class ReservationControllerTest {
 		res.setId(UUID.randomUUID());
 		res.setReservedId(hotel.getId());
 		res.setReservedName(hotel.getName());
-		res.setStarttime(vac.getStartTime());
+		res.setStartTime(vac.getStartTime());
 		res.setCost(hotel.getCostPerNight());
 		res.setVacationId(vac.getId());
 		res.setDuration(vac.getDuration());
@@ -171,7 +171,7 @@ class ReservationControllerTest {
 		res.setId(UUID.randomUUID());
 		res.setReservedId(hotel.getId());
 		res.setReservedName(hotel.getName());
-		res.setStarttime(vac.getStartTime());
+		res.setStartTime(vac.getStartTime());
 		res.setCost(hotel.getCostPerNight());
 		res.setVacationId(vac.getId());
 		res.setDuration(vac.getDuration());
@@ -196,7 +196,7 @@ class ReservationControllerTest {
 		res.setId(UUID.randomUUID());
 		res.setReservedId(car.getId());
 		res.setReservedName(car.getMake());
-		res.setStarttime(vac.getStartTime());
+		res.setStartTime(vac.getStartTime());
 		res.setCost(car.getCostPerDay());
 		res.setVacationId(vac.getId());
 		res.setDuration(vac.getDuration());
@@ -220,7 +220,7 @@ class ReservationControllerTest {
 		res.setId(UUID.randomUUID());
 		res.setReservedId(car.getId());
 		res.setReservedName(car.getMake());
-		res.setStarttime(vac.getStartTime());
+		res.setStartTime(vac.getStartTime());
 		res.setCost(car.getCostPerDay());
 		res.setVacationId(vac.getId());
 		res.setDuration(vac.getDuration());
@@ -245,7 +245,7 @@ class ReservationControllerTest {
 		res.setId(UUID.randomUUID());
 		res.setReservedId(car.getId());
 		res.setReservedName(car.getMake());
-		res.setStarttime(vac.getStartTime());
+		res.setStartTime(vac.getStartTime());
 		res.setCost(car.getCostPerDay());
 		res.setVacationId(vac.getId());
 		res.setDuration(vac.getDuration());
@@ -270,7 +270,7 @@ class ReservationControllerTest {
 		res.setId(UUID.randomUUID());
 		res.setReservedId(flight.getId());
 		res.setReservedName(flight.getAirline());
-		res.setStarttime(vac.getStartTime());
+		res.setStartTime(vac.getStartTime());
 		res.setCost(flight.getTicketPrice());
 		res.setVacationId(vac.getId());
 		res.setDuration(vac.getDuration());
@@ -294,7 +294,7 @@ class ReservationControllerTest {
 		res.setId(UUID.randomUUID());
 		res.setReservedId(flight.getId());
 		res.setReservedName(flight.getAirline());
-		res.setStarttime(vac.getStartTime());
+		res.setStartTime(vac.getStartTime());
 		res.setCost(flight.getTicketPrice());
 		res.setVacationId(vac.getId());
 		res.setDuration(vac.getDuration());
@@ -319,7 +319,7 @@ class ReservationControllerTest {
 		res.setId(UUID.randomUUID());
 		res.setReservedId(flight.getId());
 		res.setReservedName(flight.getAirline());
-		res.setStarttime(vac.getStartTime());
+		res.setStartTime(vac.getStartTime());
 		res.setCost(flight.getTicketPrice());
 		res.setVacationId(vac.getId());
 		res.setDuration(vac.getDuration());
@@ -359,7 +359,7 @@ class ReservationControllerTest {
 		res.setId(UUID.randomUUID());
 		res.setReservedId(flight.getId());
 		res.setReservedName(flight.getAirline());
-		res.setStarttime(vac.getStartTime());
+		res.setStartTime(vac.getStartTime());
 		res.setCost(flight.getTicketPrice());
 		res.setVacationId(vac.getId());
 		res.setDuration(vac.getDuration());
@@ -370,7 +370,7 @@ class ReservationControllerTest {
 		returnRes.setId(res.getId());
 		returnRes.setReservedName(flight.getAirline());
 		returnRes.setReservedId(null);
-		returnRes.setStarttime(vac.getStartTime().plus(Period.of(0, 0, 5)));
+		returnRes.setStartTime(vac.getStartTime().plus(Period.of(0, 0, 5)));
 		returnRes.setCost(flight.getTicketPrice());
 		returnRes.setVacationId(vac.getId());
 		returnRes.setDuration(vac.getDuration() + 1);
@@ -378,7 +378,7 @@ class ReservationControllerTest {
 		returnRes.setType(ReservationType.HOTEL);
 
 		Mockito.when(resService.getReservation(res.getId())).thenReturn(Mono.just(res));
-		Mockito.when(resService.rescheduleReservation(res, null, returnRes.getStarttime(), returnRes.getDuration()))
+		Mockito.when(resService.rescheduleReservation(res, null, returnRes.getStartTime(), returnRes.getDuration()))
 				.thenReturn(Mono.just(returnRes));
 
 		Mono<ResponseEntity<Reservation>> monoRes = controller.rescheduleReservation(returnRes, res.getId().toString(),
@@ -395,7 +395,7 @@ class ReservationControllerTest {
 		res.setId(UUID.randomUUID());
 		res.setReservedId(flight.getId());
 		res.setReservedName(flight.getAirline());
-		res.setStarttime(vac.getStartTime());
+		res.setStartTime(vac.getStartTime());
 		res.setCost(flight.getTicketPrice());
 		res.setVacationId(vac.getId());
 		res.setDuration(vac.getDuration());
@@ -406,7 +406,7 @@ class ReservationControllerTest {
 		returnRes.setId(res.getId());
 		returnRes.setReservedName(flight.getAirline());
 		returnRes.setReservedId(flight.getId());
-		returnRes.setStarttime(null);
+		returnRes.setStartTime(null);
 		returnRes.setCost(flight.getTicketPrice());
 		returnRes.setVacationId(vac.getId());
 		returnRes.setDuration(null);
@@ -414,7 +414,7 @@ class ReservationControllerTest {
 		returnRes.setType(ReservationType.FLIGHT);
 
 		Mockito.when(resService.getReservation(res.getId())).thenReturn(Mono.just(res));
-		Mockito.when(resService.rescheduleReservation(res, returnRes.getReservedId(), returnRes.getStarttime(), returnRes.getDuration()))
+		Mockito.when(resService.rescheduleReservation(res, returnRes.getReservedId(), returnRes.getStartTime(), returnRes.getDuration()))
 				.thenReturn(Mono.just(returnRes));
 
 		Mono<ResponseEntity<Reservation>> monoRes = controller.rescheduleReservation(returnRes, res.getId().toString(),
@@ -432,7 +432,7 @@ class ReservationControllerTest {
 		res.setId(UUID.randomUUID());
 		res.setReservedId(flight.getId());
 		res.setReservedName(flight.getAirline());
-		res.setStarttime(vac.getStartTime());
+		res.setStartTime(vac.getStartTime());
 		res.setCost(flight.getTicketPrice());
 		res.setVacationId(vac.getId());
 		res.setDuration(vac.getDuration());
@@ -443,7 +443,7 @@ class ReservationControllerTest {
 		returnRes.setId(res.getId());
 		returnRes.setReservedName(flight.getAirline());
 		returnRes.setReservedId(null);
-		returnRes.setStarttime(vac.getStartTime().plus(Period.of(0, 0, 5)));
+		returnRes.setStartTime(vac.getStartTime().plus(Period.of(0, 0, 5)));
 		returnRes.setCost(flight.getTicketPrice());
 		returnRes.setVacationId(vac.getId());
 		returnRes.setDuration(vac.getDuration() + 1);
@@ -451,7 +451,7 @@ class ReservationControllerTest {
 		returnRes.setType(ReservationType.HOTEL);
 
 		Mockito.when(resService.getReservation(res.getId())).thenReturn(Mono.just(res));
-		Mockito.when(resService.rescheduleReservation(res, null, returnRes.getStarttime(), returnRes.getDuration()))
+		Mockito.when(resService.rescheduleReservation(res, null, returnRes.getStartTime(), returnRes.getDuration()))
 				.thenReturn(Mono.just(returnRes));
 
 		Mono<ResponseEntity<Reservation>> monoRes = controller.rescheduleReservation(returnRes, res.getId().toString(),
@@ -467,7 +467,7 @@ class ReservationControllerTest {
 		res.setId(UUID.randomUUID());
 		res.setReservedId(flight.getId());
 		res.setReservedName(flight.getAirline());
-		res.setStarttime(vac.getStartTime());
+		res.setStartTime(vac.getStartTime());
 		res.setCost(flight.getTicketPrice());
 		res.setVacationId(vac.getId());
 		res.setDuration(vac.getDuration());
@@ -478,7 +478,7 @@ class ReservationControllerTest {
 		returnRes.setId(res.getId());
 		returnRes.setReservedName(flight.getAirline());
 		returnRes.setReservedId(null);
-		returnRes.setStarttime(vac.getStartTime().plus(Period.of(0, 0, 5)));
+		returnRes.setStartTime(vac.getStartTime().plus(Period.of(0, 0, 5)));
 		returnRes.setCost(flight.getTicketPrice());
 		returnRes.setVacationId(vac.getId());
 		returnRes.setDuration(vac.getDuration() + 1);
@@ -493,7 +493,7 @@ class ReservationControllerTest {
 
 
 		Mockito.when(resService.getReservation(res.getId())).thenReturn(Mono.just(res));
-		Mockito.when(resService.rescheduleReservation(res, null, returnRes.getStarttime(), returnRes.getDuration()))
+		Mockito.when(resService.rescheduleReservation(res, null, returnRes.getStartTime(), returnRes.getDuration()))
 				.thenReturn(Mono.just(returnRes));
 
 		Mono<ResponseEntity<Reservation>> monoRes = controller.rescheduleReservation(returnRes, res.getId().toString(),
@@ -510,7 +510,7 @@ class ReservationControllerTest {
 		res.setId(UUID.randomUUID());
 		res.setReservedId(flight.getId());
 		res.setReservedName(flight.getAirline());
-		res.setStarttime(vac.getStartTime());
+		res.setStartTime(vac.getStartTime());
 		res.setCost(flight.getTicketPrice());
 		res.setVacationId(vac.getId());
 		res.setDuration(vac.getDuration());
@@ -521,7 +521,7 @@ class ReservationControllerTest {
 		returnRes.setId(res.getId());
 		returnRes.setReservedName(flight.getAirline());
 		returnRes.setReservedId(null);
-		returnRes.setStarttime(vac.getStartTime().plus(Period.of(0, 0, 5)));
+		returnRes.setStartTime(vac.getStartTime().plus(Period.of(0, 0, 5)));
 		returnRes.setCost(flight.getTicketPrice());
 		returnRes.setVacationId(vac.getId());
 		returnRes.setDuration(vac.getDuration() + 1);
@@ -529,7 +529,7 @@ class ReservationControllerTest {
 		returnRes.setType(ReservationType.FLIGHT);
 
 		Mockito.when(resService.getReservation(res.getId())).thenReturn(Mono.just(res));
-		Mockito.when(resService.rescheduleReservation(res, null, returnRes.getStarttime(), returnRes.getDuration()))
+		Mockito.when(resService.rescheduleReservation(res, null, returnRes.getStartTime(), returnRes.getDuration()))
 				.thenReturn(Mono.just(returnRes));
 
 		Mono<ResponseEntity<Reservation>> monoRes = controller.rescheduleReservation(returnRes, res.getId().toString(),
@@ -546,7 +546,7 @@ class ReservationControllerTest {
 		res.setId(UUID.randomUUID());
 		res.setReservedId(flight.getId());
 		res.setReservedName(flight.getAirline());
-		res.setStarttime(vac.getStartTime());
+		res.setStartTime(vac.getStartTime());
 		res.setCost(flight.getTicketPrice());
 		res.setVacationId(vac.getId());
 		res.setDuration(vac.getDuration());
@@ -558,7 +558,7 @@ class ReservationControllerTest {
 		returnRes.setId(res.getId());
 		returnRes.setReservedName(flight.getAirline());
 		returnRes.setReservedId(null);
-		returnRes.setStarttime(vac.getStartTime().plus(Period.of(0, 0, 5)));
+		returnRes.setStartTime(vac.getStartTime().plus(Period.of(0, 0, 5)));
 		returnRes.setCost(flight.getTicketPrice());
 		returnRes.setVacationId(vac.getId());
 		returnRes.setDuration(vac.getDuration() + 1);
@@ -566,7 +566,7 @@ class ReservationControllerTest {
 		returnRes.setType(ReservationType.HOTEL);
 
 		Mockito.when(resService.getReservation(res.getId())).thenReturn(Mono.just(res));
-		Mockito.when(resService.rescheduleReservation(res, null, returnRes.getStarttime(), returnRes.getDuration()))
+		Mockito.when(resService.rescheduleReservation(res, null, returnRes.getStartTime(), returnRes.getDuration()))
 				.thenReturn(Mono.just(returnRes));
 
 		Mono<ResponseEntity<Reservation>> monoRes = controller.rescheduleReservation(returnRes, res.getId().toString(),
@@ -583,7 +583,7 @@ class ReservationControllerTest {
 		res.setId(UUID.randomUUID());
 		res.setReservedId(flight.getId());
 		res.setReservedName(flight.getAirline());
-		res.setStarttime(vac.getStartTime());
+		res.setStartTime(vac.getStartTime());
 		res.setCost(flight.getTicketPrice());
 		res.setVacationId(vac.getId());
 		res.setDuration(vac.getDuration());
@@ -594,7 +594,7 @@ class ReservationControllerTest {
 		returnRes.setId(res.getId());
 		returnRes.setReservedName(flight.getAirline());
 		returnRes.setReservedId(null);
-		returnRes.setStarttime(vac.getStartTime().plus(Period.of(0, 0, 5)));
+		returnRes.setStartTime(vac.getStartTime().plus(Period.of(0, 0, 5)));
 		returnRes.setCost(flight.getTicketPrice());
 		returnRes.setVacationId(vac.getId());
 		returnRes.setDuration(vac.getDuration() + 1);
@@ -602,7 +602,7 @@ class ReservationControllerTest {
 		returnRes.setType(ReservationType.HOTEL);
 
 		Mockito.when(resService.getReservation(res.getId())).thenReturn(Mono.just(res));
-		Mockito.when(resService.rescheduleReservation(res, null, returnRes.getStarttime(), returnRes.getDuration()))
+		Mockito.when(resService.rescheduleReservation(res, null, returnRes.getStartTime(), returnRes.getDuration()))
 				.thenReturn(Mono.empty());
 
 		Mono<ResponseEntity<Reservation>> monoRes = controller.rescheduleReservation(returnRes, res.getId().toString(),
@@ -619,7 +619,7 @@ class ReservationControllerTest {
 		res.setId(UUID.randomUUID());
 		res.setReservedId(flight.getId());
 		res.setReservedName(flight.getAirline());
-		res.setStarttime(vac.getStartTime());
+		res.setStartTime(vac.getStartTime());
 		res.setCost(flight.getTicketPrice());
 		res.setVacationId(vac.getId());
 		res.setDuration(vac.getDuration());
@@ -630,7 +630,7 @@ class ReservationControllerTest {
 		returnRes.setId(res.getId());
 		returnRes.setReservedName(flight.getAirline());
 		returnRes.setReservedId(null);
-		returnRes.setStarttime(null);
+		returnRes.setStartTime(null);
 		returnRes.setCost(flight.getTicketPrice());
 		returnRes.setVacationId(vac.getId());
 		returnRes.setDuration(vac.getDuration() + 1);
@@ -653,7 +653,7 @@ class ReservationControllerTest {
 		res.setId(UUID.randomUUID());
 		res.setReservedId(flight.getId());
 		res.setReservedName(flight.getAirline());
-		res.setStarttime(vac.getStartTime());
+		res.setStartTime(vac.getStartTime());
 		res.setCost(flight.getTicketPrice());
 		res.setVacationId(vac.getId());
 		res.setDuration(vac.getDuration());
@@ -664,7 +664,7 @@ class ReservationControllerTest {
 		returnRes.setId(res.getId());
 		returnRes.setReservedName(flight.getAirline());
 		returnRes.setReservedId(null);
-		returnRes.setStarttime(vac.getStartTime());
+		returnRes.setStartTime(vac.getStartTime());
 		returnRes.setCost(flight.getTicketPrice());
 		returnRes.setVacationId(vac.getId());
 		returnRes.setDuration(null);
@@ -688,7 +688,7 @@ class ReservationControllerTest {
 		res.setId(UUID.randomUUID());
 		res.setReservedId(flight.getId());
 		res.setReservedName(flight.getAirline());
-		res.setStarttime(vac.getStartTime());
+		res.setStartTime(vac.getStartTime());
 		res.setCost(flight.getTicketPrice());
 		res.setVacationId(vac.getId());
 		res.setDuration(vac.getDuration());
@@ -699,7 +699,7 @@ class ReservationControllerTest {
 		returnRes.setId(res.getId());
 		returnRes.setReservedName(flight.getAirline());
 		returnRes.setReservedId(null);
-		returnRes.setStarttime(null);
+		returnRes.setStartTime(null);
 		returnRes.setCost(flight.getTicketPrice());
 		returnRes.setVacationId(vac.getId());
 		returnRes.setDuration(null);
@@ -725,7 +725,7 @@ class ReservationControllerTest {
 		res.setId(UUID.randomUUID());
 		res.setReservedId(flight.getId());
 		res.setReservedName(flight.getAirline());
-		res.setStarttime(vac.getStartTime());
+		res.setStartTime(vac.getStartTime());
 		res.setCost(flight.getTicketPrice());
 		res.setVacationId(vac.getId());
 		res.setDuration(vac.getDuration());
@@ -736,7 +736,7 @@ class ReservationControllerTest {
 		returnRes.setId(res.getId());
 		returnRes.setReservedName(flight.getAirline());
 		returnRes.setReservedId(null);
-		returnRes.setStarttime(LocalDateTime.now().minus(Period.of(0, 0, 1)));
+		returnRes.setStartTime(LocalDateTime.now().minus(Period.of(0, 0, 1)));
 		returnRes.setCost(flight.getTicketPrice());
 		returnRes.setVacationId(vac.getId());
 		returnRes.setDuration(vac.getDuration() + 1);
@@ -759,7 +759,7 @@ class ReservationControllerTest {
 		res.setId(UUID.randomUUID());
 		res.setReservedId(flight.getId());
 		res.setReservedName(flight.getAirline());
-		res.setStarttime(vac.getStartTime());
+		res.setStartTime(vac.getStartTime());
 		res.setCost(flight.getTicketPrice());
 		res.setVacationId(vac.getId());
 		res.setDuration(vac.getDuration());
@@ -770,7 +770,7 @@ class ReservationControllerTest {
 		returnRes.setId(res.getId());
 		returnRes.setReservedName(flight.getAirline());
 		returnRes.setReservedId(null);
-		returnRes.setStarttime(vac.getStartTime());
+		returnRes.setStartTime(vac.getStartTime());
 		returnRes.setCost(flight.getTicketPrice());
 		returnRes.setVacationId(vac.getId());
 		returnRes.setDuration(-1);
@@ -793,7 +793,7 @@ class ReservationControllerTest {
 		res.setId(UUID.randomUUID());
 		res.setReservedId(flight.getId());
 		res.setReservedName(flight.getAirline());
-		res.setStarttime(vac.getStartTime());
+		res.setStartTime(vac.getStartTime());
 		res.setCost(flight.getTicketPrice());
 		res.setVacationId(vac.getId());
 		res.setDuration(vac.getDuration());
@@ -804,7 +804,7 @@ class ReservationControllerTest {
 		returnRes.setId(res.getId());
 		returnRes.setReservedName(flight.getAirline());
 		returnRes.setReservedId(null);
-		returnRes.setStarttime(vac.getStartTime().plus(Period.of(0, 0, 5)));
+		returnRes.setStartTime(vac.getStartTime().plus(Period.of(0, 0, 5)));
 		returnRes.setCost(flight.getTicketPrice());
 		returnRes.setVacationId(vac.getId());
 		returnRes.setDuration(vac.getDuration() + 1);
@@ -828,7 +828,7 @@ class ReservationControllerTest {
 		returnRes.setId(UUID.randomUUID());
 		returnRes.setReservedName(flight.getAirline());
 		returnRes.setReservedId(null);
-		returnRes.setStarttime(vac.getStartTime().plus(Period.of(0, 0, 5)));
+		returnRes.setStartTime(vac.getStartTime().plus(Period.of(0, 0, 5)));
 		returnRes.setCost(flight.getTicketPrice());
 		returnRes.setVacationId(vac.getId());
 		returnRes.setDuration(vac.getDuration() + 1);
@@ -851,7 +851,7 @@ class ReservationControllerTest {
 		res.setId(UUID.randomUUID());
 		res.setReservedId(car.getId());
 		res.setReservedName(car.getMake());
-		res.setStarttime(vac.getStartTime());
+		res.setStartTime(vac.getStartTime());
 		res.setCost(car.getCostPerDay());
 		res.setVacationId(vac.getId());
 		res.setDuration(vac.getDuration());
@@ -863,7 +863,7 @@ class ReservationControllerTest {
 		updatedRes.setId(res.getId());
 		updatedRes.setReservedId(car.getId());
 		updatedRes.setReservedName(car.getMake());
-		updatedRes.setStarttime(vac.getStartTime());
+		updatedRes.setStartTime(vac.getStartTime());
 		updatedRes.setCost(car.getCostPerDay());
 		updatedRes.setVacationId(vac.getId());
 		updatedRes.setDuration(vac.getDuration());
@@ -891,7 +891,7 @@ class ReservationControllerTest {
 		res.setId(UUID.randomUUID());
 		res.setReservedId(hotel.getId());
 		res.setReservedName(hotel.getName());
-		res.setStarttime(vac.getStartTime());
+		res.setStartTime(vac.getStartTime());
 		res.setCost(hotel.getCostPerNight());
 		res.setVacationId(vac.getId());
 		res.setDuration(vac.getDuration());
@@ -903,7 +903,7 @@ class ReservationControllerTest {
 		updatedRes.setId(res.getId());
 		updatedRes.setReservedId(hotel.getId());
 		updatedRes.setReservedName(hotel.getName());
-		updatedRes.setStarttime(vac.getStartTime());
+		updatedRes.setStartTime(vac.getStartTime());
 		updatedRes.setCost(hotel.getCostPerNight());
 		updatedRes.setVacationId(vac.getId());
 		updatedRes.setDuration(vac.getDuration());
@@ -931,7 +931,7 @@ class ReservationControllerTest {
 		res.setId(UUID.randomUUID());
 		res.setReservedId(flight.getId());
 		res.setReservedName(flight.getAirline());
-		res.setStarttime(vac.getStartTime());
+		res.setStartTime(vac.getStartTime());
 		res.setCost(flight.getTicketPrice());
 		res.setVacationId(vac.getId());
 		res.setDuration(vac.getDuration());
@@ -943,7 +943,7 @@ class ReservationControllerTest {
 		updatedRes.setId(res.getId());
 		updatedRes.setReservedId(flight.getId());
 		updatedRes.setReservedName(flight.getAirline());
-		updatedRes.setStarttime(vac.getStartTime());
+		updatedRes.setStartTime(vac.getStartTime());
 		updatedRes.setCost(flight.getTicketPrice());
 		updatedRes.setVacationId(vac.getId());
 		updatedRes.setDuration(vac.getDuration());
@@ -980,7 +980,7 @@ class ReservationControllerTest {
 		res.setId(UUID.randomUUID());
 		res.setReservedId(car.getId());
 		res.setReservedName(car.getMake());
-		res.setStarttime(vac.getStartTime());
+		res.setStartTime(vac.getStartTime());
 		res.setCost(car.getCostPerDay());
 		res.setVacationId(vac.getId());
 		res.setDuration(vac.getDuration());
@@ -993,7 +993,7 @@ class ReservationControllerTest {
 		updatedRes.setId(res.getId());
 		updatedRes.setReservedId(car.getId());
 		updatedRes.setReservedName(car.getMake());
-		updatedRes.setStarttime(vac.getStartTime());
+		updatedRes.setStartTime(vac.getStartTime());
 		updatedRes.setCost(car.getCostPerDay());
 		updatedRes.setVacationId(vac.getId());
 		updatedRes.setDuration(vac.getDuration());
@@ -1030,7 +1030,7 @@ class ReservationControllerTest {
 		res.setId(UUID.randomUUID());
 		res.setReservedId(flight.getId());
 		res.setReservedName(flight.getAirline());
-		res.setStarttime(vac.getStartTime());
+		res.setStartTime(vac.getStartTime());
 		res.setCost(flight.getTicketPrice());
 		res.setVacationId(vac.getId());
 		res.setDuration(vac.getDuration());
@@ -1064,7 +1064,7 @@ class ReservationControllerTest {
 		res.setId(UUID.randomUUID());
 		res.setReservedId(car.getId());
 		res.setReservedName(car.getMake());
-		res.setStarttime(vac.getStartTime());
+		res.setStartTime(vac.getStartTime());
 		res.setCost(car.getCostPerDay());
 		res.setVacationId(vac.getId());
 		res.setDuration(vac.getDuration());

@@ -227,11 +227,11 @@ class ReservationControllerImpl implements ReservationController {
 			@PathVariable("resId") String resId, WebSession session) {
 
 		// Make sure the start time, duration, and the reserved id is not null
-		if ((res.getStarttime() == null || res.getDuration() == null) && res.getReservedId() == null) {
+		if ((res.getStartTime() == null || res.getDuration() == null) && res.getReservedId() == null) {
 			return Mono.just(ResponseEntity.badRequest().build());
 		}
 		// Check to see if the duration is negative or if the
-		if (res.getReservedId() == null && (LocalDateTime.now().isAfter(res.getStarttime()) || res.getDuration() < 0)) {
+		if (res.getReservedId() == null && (LocalDateTime.now().isAfter(res.getStartTime()) || res.getDuration() < 0)) {
 			log.debug("Invalid time");
 			return Mono.just(ResponseEntity.badRequest().build());
 		}
@@ -271,7 +271,7 @@ class ReservationControllerImpl implements ReservationController {
 				log.debug("Reservation has been found and user can change startTime and duration");
 				
 				//Call the reschedule reservation service to change the reservation
-				return resService.rescheduleReservation(r, res.getReservedId(), res.getStarttime(), res.getDuration())
+				return resService.rescheduleReservation(r, res.getReservedId(), res.getStartTime(), res.getDuration())
 						.map(re -> ResponseEntity.ok(re))
 						// If an empty mono was returned, that means there is a scheduling conflict
 						.switchIfEmpty(Mono.just(ResponseEntity.status(409).build()));

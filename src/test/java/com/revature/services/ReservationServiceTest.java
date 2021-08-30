@@ -130,7 +130,7 @@ class ReservationServiceTest {
 		res.setDuration(vac.getDuration());
 		res.setCost(hotel.getCostPerNight() * res.getDuration());
 		res.setType(ReservationType.HOTEL);
-		res.setStarttime(vac.getStartTime());
+		res.setStartTime(vac.getStartTime());
 
 		// Set up the returns
 		when(resDao.save(Mockito.any())).thenReturn(Mono.just(new ReservationDto(res)));
@@ -144,7 +144,7 @@ class ReservationServiceTest {
 				.expectNextMatches(r -> r.getId() != null
 						&& r.getCost() == (vac.getDuration() * hotel.getCostPerNight())
 						&& hotel.getId().equals(r.getReservedId()) && vac.getDuration().equals(r.getDuration())
-						&& hotel.getName().equals(r.getReservedName()) && vac.getStartTime().equals(r.getStarttime())
+						&& hotel.getName().equals(r.getReservedName()) && vac.getStartTime().equals(r.getStartTime())
 						&& ReservationStatus.AWAITING.equals(r.getStatus())
 						&& ReservationType.HOTEL.equals(r.getType()))
 				.verifyComplete();
@@ -165,7 +165,7 @@ class ReservationServiceTest {
 		res.setDuration(vac.getDuration());
 		res.setCost(hotel.getCostPerNight() * res.getDuration());
 		res.setType(ReservationType.HOTEL);
-		res.setStarttime(vac.getStartTime());
+		res.setStartTime(vac.getStartTime());
 
 		Reservation setRes1 = new Reservation();
 		setRes1.setUsername("otherTest1");
@@ -176,7 +176,7 @@ class ReservationServiceTest {
 		setRes1.setDuration(vac.getDuration());
 		setRes1.setCost(19.99);
 		setRes1.setType(ReservationType.HOTEL);
-		setRes1.setStarttime(vac.getStartTime().minus(Period.of(0, 0, 1)));
+		setRes1.setStartTime(vac.getStartTime().minus(Period.of(0, 0, 1)));
 		setRes1.setStatus(ReservationStatus.AWAITING);
 
 		Reservation setRes2 = new Reservation();
@@ -188,7 +188,7 @@ class ReservationServiceTest {
 		setRes2.setDuration(1);
 		setRes2.setCost(19.99);
 		setRes2.setType(ReservationType.HOTEL);
-		setRes2.setStarttime(vac.getStartTime().plus(Period.of(0, 0, 1)));
+		setRes2.setStartTime(vac.getStartTime().plus(Period.of(0, 0, 1)));
 		setRes2.setStatus(ReservationStatus.AWAITING);
 
 		// This reservation is after the end time of the current reservation, so the
@@ -202,7 +202,7 @@ class ReservationServiceTest {
 		setRes3.setDuration(3);
 		setRes3.setCost(19.99);
 		setRes3.setType(ReservationType.HOTEL);
-		setRes3.setStarttime(vac.getStartTime().plus(Period.of(0, 0, res.getDuration() + 1)));
+		setRes3.setStartTime(vac.getStartTime().plus(Period.of(0, 0, res.getDuration() + 1)));
 		setRes3.setStatus(ReservationStatus.AWAITING);
 
 		ReservationDto[] resArray = { new ReservationDto(setRes1), new ReservationDto(setRes2),
@@ -220,7 +220,7 @@ class ReservationServiceTest {
 				.expectNextMatches(r -> r.getId() != null
 						&& r.getCost() == (vac.getDuration() * hotel.getCostPerNight())
 						&& hotel.getId().equals(r.getReservedId()) && vac.getDuration().equals(r.getDuration())
-						&& hotel.getName().equals(r.getReservedName()) && vac.getStartTime().equals(r.getStarttime())
+						&& hotel.getName().equals(r.getReservedName()) && vac.getStartTime().equals(r.getStartTime())
 						&& ReservationStatus.AWAITING.equals(r.getStatus())
 						&& ReservationType.HOTEL.equals(r.getType()))
 				.verifyComplete();
@@ -241,7 +241,7 @@ class ReservationServiceTest {
 		setRes1.setDuration(vac.getDuration());
 		setRes1.setCost(19.99);
 		setRes1.setType(ReservationType.HOTEL);
-		setRes1.setStarttime(vac.getStartTime().minus(Period.of(0, 0, 1)));
+		setRes1.setStartTime(vac.getStartTime().minus(Period.of(0, 0, 1)));
 		setRes1.setStatus(ReservationStatus.AWAITING);
 
 		Reservation setRes2 = new Reservation();
@@ -253,7 +253,7 @@ class ReservationServiceTest {
 		setRes2.setDuration(1);
 		setRes2.setCost(19.99);
 		setRes2.setType(ReservationType.HOTEL);
-		setRes2.setStarttime(vac.getStartTime().plus(Period.of(0, 0, 1)));
+		setRes2.setStartTime(vac.getStartTime().plus(Period.of(0, 0, 1)));
 		setRes2.setStatus(ReservationStatus.AWAITING);
 
 		Reservation setRes3 = new Reservation();
@@ -265,7 +265,7 @@ class ReservationServiceTest {
 		setRes3.setDuration(3);
 		setRes3.setCost(19.99);
 		setRes3.setType(ReservationType.HOTEL);
-		setRes3.setStarttime(vac.getStartTime().plus(Period.of(0, 0, 4)));
+		setRes3.setStartTime(vac.getStartTime().plus(Period.of(0, 0, 4)));
 		setRes3.setStatus(ReservationStatus.AWAITING);
 
 		ReservationDto[] resArray = { new ReservationDto(setRes1), new ReservationDto(setRes2),
@@ -280,7 +280,7 @@ class ReservationServiceTest {
 		res.setDuration(vac.getDuration());
 		res.setCost(19.99);
 		res.setType(ReservationType.HOTEL);
-		res.setStarttime(vac.getStartTime());
+		res.setStartTime(vac.getStartTime());
 
 		when(resDao.save(Mockito.any())).thenReturn(Mono.just(new ReservationDto(res)));
 		when(vacDao.save(Mockito.any())).thenReturn(Mono.just(new VacationDto(vac)));
@@ -306,7 +306,7 @@ class ReservationServiceTest {
 		res.setDuration(vac.getDuration());
 		res.setCost(car.getCostPerDay() * res.getDuration());
 		res.setType(ReservationType.CAR);
-		res.setStarttime(vac.getStartTime());
+		res.setStartTime(vac.getStartTime());
 
 		// Set up the returns
 		when(resDao.save(Mockito.any())).thenReturn(Mono.just(new ReservationDto(res)));
@@ -320,7 +320,7 @@ class ReservationServiceTest {
 				.expectNextMatches(r -> r.getId() != null && r.getCost() == (vac.getDuration() * car.getCostPerDay())
 						&& car.getId().equals(r.getReservedId()) && vac.getDuration().equals(r.getDuration())
 						&& r.getReservedName().equals(car.getMake() + car.getModel())
-						&& vac.getStartTime().equals(r.getStarttime())
+						&& vac.getStartTime().equals(r.getStartTime())
 						&& ReservationStatus.AWAITING.equals(r.getStatus()) && ReservationType.CAR.equals(r.getType()))
 				.verifyComplete();
 
@@ -340,7 +340,7 @@ class ReservationServiceTest {
 		res.setDuration(vac.getDuration());
 		res.setCost(car.getCostPerDay() * res.getDuration());
 		res.setType(ReservationType.CAR);
-		res.setStarttime(vac.getStartTime());
+		res.setStartTime(vac.getStartTime());
 
 		Reservation setRes1 = new Reservation();
 		setRes1.setUsername("otherTest1");
@@ -351,7 +351,7 @@ class ReservationServiceTest {
 		setRes1.setDuration(vac.getDuration());
 		setRes1.setCost(19.99);
 		setRes1.setType(ReservationType.CAR);
-		setRes1.setStarttime(vac.getStartTime().minus(Period.of(0, 0, 1)));
+		setRes1.setStartTime(vac.getStartTime().minus(Period.of(0, 0, 1)));
 		setRes1.setStatus(ReservationStatus.AWAITING);
 
 		Reservation setRes2 = new Reservation();
@@ -363,7 +363,7 @@ class ReservationServiceTest {
 		setRes2.setDuration(1);
 		setRes2.setCost(19.99);
 		setRes2.setType(ReservationType.CAR);
-		setRes2.setStarttime(vac.getStartTime().plus(Period.of(0, 0, 1)));
+		setRes2.setStartTime(vac.getStartTime().plus(Period.of(0, 0, 1)));
 		setRes2.setStatus(ReservationStatus.AWAITING);
 
 		// This reservation is after the end time of the current reservation, so the
@@ -377,7 +377,7 @@ class ReservationServiceTest {
 		setRes3.setDuration(3);
 		setRes3.setCost(19.99);
 		setRes3.setType(ReservationType.CAR);
-		setRes3.setStarttime(vac.getStartTime().plus(Period.of(0, 0, res.getDuration() + 1)));
+		setRes3.setStartTime(vac.getStartTime().plus(Period.of(0, 0, res.getDuration() + 1)));
 		setRes3.setStatus(ReservationStatus.AWAITING);
 
 		ReservationDto[] resArray = { new ReservationDto(setRes1), new ReservationDto(setRes2),
@@ -395,7 +395,7 @@ class ReservationServiceTest {
 				.expectNextMatches(r -> r.getId() != null && r.getCost() == (vac.getDuration() * car.getCostPerDay())
 						&& car.getId().equals(r.getReservedId()) && vac.getDuration().equals(r.getDuration())
 						&& r.getReservedName().equals(car.getMake() + car.getModel())
-						&& vac.getStartTime().equals(r.getStarttime())
+						&& vac.getStartTime().equals(r.getStartTime())
 						&& ReservationStatus.AWAITING.equals(r.getStatus()) && ReservationType.CAR.equals(r.getType()))
 				.verifyComplete();
 
@@ -415,7 +415,7 @@ class ReservationServiceTest {
 		res.setDuration(vac.getDuration());
 		res.setCost(19.99);
 		res.setType(ReservationType.CAR);
-		res.setStarttime(vac.getStartTime());
+		res.setStartTime(vac.getStartTime());
 
 		when(resDao.save(Mockito.any())).thenReturn(Mono.just(new ReservationDto(res)));
 		when(vacDao.save(Mockito.any())).thenReturn(Mono.just(new VacationDto(vac)));
@@ -441,7 +441,7 @@ class ReservationServiceTest {
 		res.setDuration(0);
 		res.setCost(flight.getTicketPrice());
 		res.setType(ReservationType.FLIGHT);
-		res.setStarttime(flight.getDepartingDate());
+		res.setStartTime(flight.getDepartingDate());
 
 		// Set up the returns
 		when(resDao.save(Mockito.any())).thenReturn(Mono.just(new ReservationDto(res)));
@@ -455,7 +455,7 @@ class ReservationServiceTest {
 				.expectNextMatches(r -> r.getId() != null && r.getCost() == (flight.getTicketPrice())
 						&& flight.getId().equals(r.getReservedId()) && r.getDuration() == 0
 						&& flight.getAirline().equals(r.getReservedName())
-						&& flight.getDepartingDate().equals(r.getStarttime())
+						&& flight.getDepartingDate().equals(r.getStartTime())
 						&& ReservationStatus.AWAITING.equals(r.getStatus())
 						&& ReservationType.FLIGHT.equals(r.getType()))
 				.verifyComplete();
@@ -476,7 +476,7 @@ class ReservationServiceTest {
 		res.setDuration(0);
 		res.setCost(flight.getTicketPrice());
 		res.setType(ReservationType.FLIGHT);
-		res.setStarttime(flight.getDepartingDate());
+		res.setStartTime(flight.getDepartingDate());
 
 		Reservation setRes1 = new Reservation();
 		setRes1.setUsername("otherTest1");
@@ -487,7 +487,7 @@ class ReservationServiceTest {
 		setRes1.setDuration(0);
 		setRes1.setCost(150.00);
 		setRes1.setType(ReservationType.FLIGHT);
-		setRes1.setStarttime(flight.getDepartingDate().minus(Period.of(0, 0, 1)));
+		setRes1.setStartTime(flight.getDepartingDate().minus(Period.of(0, 0, 1)));
 		setRes1.setStatus(ReservationStatus.AWAITING);
 
 		Reservation setRes2 = new Reservation();
@@ -499,7 +499,7 @@ class ReservationServiceTest {
 		setRes2.setDuration(0);
 		setRes2.setCost(150.00);
 		setRes2.setType(ReservationType.FLIGHT);
-		setRes2.setStarttime(flight.getDepartingDate().plus(Period.of(0, 0, 1)));
+		setRes2.setStartTime(flight.getDepartingDate().plus(Period.of(0, 0, 1)));
 		setRes2.setStatus(ReservationStatus.AWAITING);
 
 		// This reservation is after the end time of the current reservation, so the
@@ -513,7 +513,7 @@ class ReservationServiceTest {
 		setRes3.setDuration(0);
 		setRes3.setCost(150.00);
 		setRes3.setType(ReservationType.FLIGHT);
-		setRes3.setStarttime(flight.getDepartingDate().plus(Period.of(0, 0, res.getDuration() + 1)));
+		setRes3.setStartTime(flight.getDepartingDate().plus(Period.of(0, 0, res.getDuration() + 1)));
 		setRes3.setStatus(ReservationStatus.AWAITING);
 
 		ReservationDto[] resArray = { new ReservationDto(setRes1), new ReservationDto(setRes2),
@@ -531,7 +531,7 @@ class ReservationServiceTest {
 				.expectNextMatches(r -> r.getId() != null && r.getCost() == (flight.getTicketPrice())
 						&& flight.getId().equals(r.getReservedId()) && r.getDuration() == 0
 						&& flight.getAirline().equals(r.getReservedName())
-						&& flight.getDepartingDate().equals(r.getStarttime())
+						&& flight.getDepartingDate().equals(r.getStartTime())
 						&& ReservationStatus.AWAITING.equals(r.getStatus())
 						&& ReservationType.FLIGHT.equals(r.getType()))
 				.verifyComplete();
@@ -552,7 +552,7 @@ class ReservationServiceTest {
 		setRes1.setDuration(0);
 		setRes1.setCost(150.00);
 		setRes1.setType(ReservationType.FLIGHT);
-		setRes1.setStarttime(flight.getDepartingDate());
+		setRes1.setStartTime(flight.getDepartingDate());
 		setRes1.setStatus(ReservationStatus.AWAITING);
 
 		Reservation setRes2 = new Reservation();
@@ -564,7 +564,7 @@ class ReservationServiceTest {
 		setRes2.setDuration(0);
 		setRes2.setCost(150.00);
 		setRes2.setType(ReservationType.FLIGHT);
-		setRes2.setStarttime(flight.getDepartingDate());
+		setRes2.setStartTime(flight.getDepartingDate());
 		setRes2.setStatus(ReservationStatus.AWAITING);
 
 		Reservation setRes3 = new Reservation();
@@ -576,7 +576,7 @@ class ReservationServiceTest {
 		setRes3.setDuration(0);
 		setRes3.setCost(150.00);
 		setRes3.setType(ReservationType.FLIGHT);
-		setRes3.setStarttime(flight.getDepartingDate());
+		setRes3.setStartTime(flight.getDepartingDate());
 		setRes3.setStatus(ReservationStatus.AWAITING);
 
 		ReservationDto[] resArray = { new ReservationDto(setRes1), new ReservationDto(setRes2),
@@ -591,7 +591,7 @@ class ReservationServiceTest {
 		res.setDuration(0);
 		res.setCost(150.00);
 		res.setType(ReservationType.FLIGHT);
-		res.setStarttime(flight.getDepartingDate());
+		res.setStartTime(flight.getDepartingDate());
 
 		when(resDao.save(Mockito.any())).thenReturn(Mono.just(new ReservationDto(res)));
 		when(vacDao.save(Mockito.any())).thenReturn(Mono.just(new VacationDto(vac)));
@@ -615,7 +615,7 @@ class ReservationServiceTest {
 		res.setDuration(vac.getDuration());
 		res.setCost(19.99);
 		res.setType(ReservationType.HOTEL);
-		res.setStarttime(vac.getStartTime().minus(Period.of(0, 0, 1)));
+		res.setStartTime(vac.getStartTime().minus(Period.of(0, 0, 1)));
 		res.setStatus(ReservationStatus.AWAITING);
 
 		String newStatus = "CONFIRMED";
@@ -644,7 +644,7 @@ class ReservationServiceTest {
 		res.setDuration(vac.getDuration());
 		res.setCost(19.99);
 		res.setType(ReservationType.CAR);
-		res.setStarttime(vac.getStartTime());
+		res.setStartTime(vac.getStartTime());
 		res.setStatus(ReservationStatus.AWAITING);
 
 		String newStatus = "CLOSED";
@@ -671,7 +671,7 @@ class ReservationServiceTest {
 		res.setDuration(0);
 		res.setCost(flight.getTicketPrice());
 		res.setType(ReservationType.FLIGHT);
-		res.setStarttime(flight.getDepartingDate());
+		res.setStartTime(flight.getDepartingDate());
 		res.setStatus(ReservationStatus.AWAITING);
 
 		String newStatus = "CANCELLED";
@@ -697,7 +697,7 @@ class ReservationServiceTest {
 		res.setDuration(0);
 		res.setCost(150.00);
 		res.setType(ReservationType.FLIGHT);
-		res.setStarttime(flight.getDepartingDate());
+		res.setStartTime(flight.getDepartingDate());
 
 		Mockito.when(resDao.findByUuid(res.getId())).thenReturn(Mono.just(new ReservationDto(res)));
 
@@ -738,7 +738,7 @@ class ReservationServiceTest {
 		res.setDuration(vac.getDuration());
 		res.setCost(hotel.getCostPerNight() * res.getDuration());
 		res.setType(ReservationType.HOTEL);
-		res.setStarttime(vac.getStartTime());
+		res.setStartTime(vac.getStartTime());
 
 		Reservation setRes1 = new Reservation();
 		setRes1.setUsername("otherTest1");
@@ -749,7 +749,7 @@ class ReservationServiceTest {
 		setRes1.setDuration(vac.getDuration());
 		setRes1.setCost(19.99);
 		setRes1.setType(ReservationType.HOTEL);
-		setRes1.setStarttime(vac.getStartTime().minus(Period.of(0, 0, 1)));
+		setRes1.setStartTime(vac.getStartTime().minus(Period.of(0, 0, 1)));
 		setRes1.setStatus(ReservationStatus.AWAITING);
 
 		Reservation setRes2 = new Reservation();
@@ -761,7 +761,7 @@ class ReservationServiceTest {
 		setRes2.setDuration(1);
 		setRes2.setCost(19.99);
 		setRes2.setType(ReservationType.HOTEL);
-		setRes2.setStarttime(vac.getStartTime().plus(Period.of(0, 0, 1)));
+		setRes2.setStartTime(vac.getStartTime().plus(Period.of(0, 0, 1)));
 		setRes2.setStatus(ReservationStatus.AWAITING);
 
 		ReservationDto[] resArray = { new ReservationDto(setRes1), new ReservationDto(setRes2),
@@ -777,7 +777,7 @@ class ReservationServiceTest {
 		changedRes.setType(ReservationType.HOTEL);
 		changedRes.setDuration(vac.getDuration() + 2);
 		changedRes.setCost(hotel.getCostPerNight() * changedRes.getDuration());
-		changedRes.setStarttime(vac.getStartTime().plus(Period.of(0, 0, 5)));
+		changedRes.setStartTime(vac.getStartTime().plus(Period.of(0, 0, 5)));
 
 		// Set up the returns
 		when(resDao.save(Mockito.any())).thenReturn(Mono.just(new ReservationDto(res)));
@@ -789,13 +789,13 @@ class ReservationServiceTest {
 
 		when(resDao.findAll()).thenReturn(Flux.fromArray(resArray));
 
-		Mono<Reservation> resMono = service.rescheduleReservation(res, null, changedRes.getStarttime(),
+		Mono<Reservation> resMono = service.rescheduleReservation(res, null, changedRes.getStartTime(),
 				changedRes.getDuration());
 
 		// Check to make sure the reservation was set correctly
 		StepVerifier.create(resMono).expectNextMatches(r -> r.getId() != null && r.getCost() == changedRes.getCost()
 				&& hotel.getId().equals(r.getReservedId()) && changedRes.getDuration().equals(r.getDuration())
-				&& hotel.getName().equals(r.getReservedName()) && changedRes.getStarttime().equals(r.getStarttime())
+				&& hotel.getName().equals(r.getReservedName()) && changedRes.getStartTime().equals(r.getStartTime())
 				&& ReservationStatus.AWAITING.equals(r.getStatus()) && ReservationType.HOTEL.equals(r.getType()))
 				.verifyComplete();
 
@@ -813,7 +813,7 @@ class ReservationServiceTest {
 		res.setDuration(vac.getDuration());
 		res.setCost(hotel.getCostPerNight() * res.getDuration());
 		res.setType(ReservationType.HOTEL);
-		res.setStarttime(vac.getStartTime());
+		res.setStartTime(vac.getStartTime());
 
 		Reservation setRes1 = new Reservation();
 		setRes1.setUsername("otherTest1");
@@ -824,7 +824,7 @@ class ReservationServiceTest {
 		setRes1.setDuration(vac.getDuration());
 		setRes1.setCost(19.99);
 		setRes1.setType(ReservationType.HOTEL);
-		setRes1.setStarttime(vac.getStartTime().minus(Period.of(0, 0, 1)));
+		setRes1.setStartTime(vac.getStartTime().minus(Period.of(0, 0, 1)));
 		setRes1.setStatus(ReservationStatus.AWAITING);
 
 		Reservation setRes2 = new Reservation();
@@ -836,7 +836,7 @@ class ReservationServiceTest {
 		setRes2.setDuration(1);
 		setRes2.setCost(19.99);
 		setRes2.setType(ReservationType.HOTEL);
-		setRes2.setStarttime(vac.getStartTime().plus(Period.of(0, 0, 1)));
+		setRes2.setStartTime(vac.getStartTime().plus(Period.of(0, 0, 1)));
 		setRes2.setStatus(ReservationStatus.AWAITING);
 
 		Reservation setRes3 = new Reservation();
@@ -848,7 +848,7 @@ class ReservationServiceTest {
 		setRes3.setDuration(3);
 		setRes3.setCost(19.99);
 		setRes3.setType(ReservationType.HOTEL);
-		setRes3.setStarttime(vac.getStartTime().plus(Period.of(0, 0, res.getDuration() + 1)));
+		setRes3.setStartTime(vac.getStartTime().plus(Period.of(0, 0, res.getDuration() + 1)));
 		setRes3.setStatus(ReservationStatus.AWAITING);
 
 		ReservationDto[] resArray = { new ReservationDto(setRes1), new ReservationDto(setRes2),
@@ -864,7 +864,7 @@ class ReservationServiceTest {
 		changedRes.setType(ReservationType.HOTEL);
 		changedRes.setDuration(vac.getDuration() + 2);
 		changedRes.setCost(hotel.getCostPerNight() * changedRes.getDuration());
-		changedRes.setStarttime(vac.getStartTime().plus(Period.of(0, 0, 5)));
+		changedRes.setStartTime(vac.getStartTime().plus(Period.of(0, 0, 5)));
 
 		// Set up the returns
 		when(resDao.save(Mockito.any())).thenReturn(Mono.just(new ReservationDto(res)));
@@ -876,7 +876,7 @@ class ReservationServiceTest {
 
 		when(resDao.findAll()).thenReturn(Flux.fromArray(resArray));
 
-		Mono<Reservation> resMono = service.rescheduleReservation(res, null, changedRes.getStarttime(),
+		Mono<Reservation> resMono = service.rescheduleReservation(res, null, changedRes.getStartTime(),
 				changedRes.getDuration());
 
 		// Check to make sure that an empty mono was sent back
@@ -895,7 +895,7 @@ class ReservationServiceTest {
 		res.setDuration(vac.getDuration());
 		res.setCost(car.getCostPerDay() * res.getDuration());
 		res.setType(ReservationType.CAR);
-		res.setStarttime(vac.getStartTime());
+		res.setStartTime(vac.getStartTime());
 
 		ReservationDto[] resArray = { new ReservationDto(res) };
 
@@ -909,7 +909,7 @@ class ReservationServiceTest {
 		changedRes.setType(ReservationType.CAR);
 		changedRes.setDuration(vac.getDuration() + 2);
 		changedRes.setCost(car.getCostPerDay() * changedRes.getDuration());
-		changedRes.setStarttime(vac.getStartTime().plus(Period.of(0, 0, 5)));
+		changedRes.setStartTime(vac.getStartTime().plus(Period.of(0, 0, 5)));
 
 		// Set up the returns
 		when(resDao.save(Mockito.any())).thenReturn(Mono.just(new ReservationDto(res)));
@@ -921,13 +921,13 @@ class ReservationServiceTest {
 
 		when(resDao.findAll()).thenReturn(Flux.fromArray(resArray));
 
-		Mono<Reservation> resMono = service.rescheduleReservation(res, null, changedRes.getStarttime(),
+		Mono<Reservation> resMono = service.rescheduleReservation(res, null, changedRes.getStartTime(),
 				changedRes.getDuration());
 
 		// Check to make sure the reservation was set correctly
 		StepVerifier.create(resMono).expectNextMatches(r -> r.getId() != null && r.getCost() == changedRes.getCost()
 				&& car.getId().equals(r.getReservedId()) && changedRes.getDuration().equals(r.getDuration())
-				&& changedRes.getStarttime().equals(r.getStarttime())
+				&& changedRes.getStartTime().equals(r.getStartTime())
 				&& ReservationStatus.AWAITING.equals(r.getStatus()) && ReservationType.CAR.equals(r.getType()))
 				.verifyComplete();
 
@@ -944,7 +944,7 @@ class ReservationServiceTest {
 		res.setDuration(vac.getDuration());
 		res.setCost(car.getCostPerDay() * res.getDuration());
 		res.setType(ReservationType.CAR);
-		res.setStarttime(vac.getStartTime());
+		res.setStartTime(vac.getStartTime());
 
 		//This reservation will cause a conflict with the changed duration and start time
 		Reservation setRes1 = new Reservation();
@@ -956,7 +956,7 @@ class ReservationServiceTest {
 		setRes1.setDuration(vac.getDuration());
 		setRes1.setCost(19.99);
 		setRes1.setType(ReservationType.CAR);
-		setRes1.setStarttime(vac.getStartTime().plus(Period.of(0, 0, 6)));
+		setRes1.setStartTime(vac.getStartTime().plus(Period.of(0, 0, 6)));
 		setRes1.setStatus(ReservationStatus.AWAITING);
 
 		ReservationDto[] resArray = { new ReservationDto(setRes1), new ReservationDto(res) };
@@ -971,7 +971,7 @@ class ReservationServiceTest {
 		changedRes.setType(ReservationType.CAR);
 		changedRes.setDuration(vac.getDuration() + 2);
 		changedRes.setCost(car.getCostPerDay() * changedRes.getDuration());
-		changedRes.setStarttime(vac.getStartTime().plus(Period.of(0, 0, 5)));
+		changedRes.setStartTime(vac.getStartTime().plus(Period.of(0, 0, 5)));
 		
 		// Set up the returns
 		when(resDao.save(Mockito.any())).thenReturn(Mono.just(new ReservationDto(res)));
@@ -983,7 +983,7 @@ class ReservationServiceTest {
 
 		when(resDao.findAll()).thenReturn(Flux.fromArray(resArray));
 
-		Mono<Reservation> resMono = service.rescheduleReservation(res, null, changedRes.getStarttime(),
+		Mono<Reservation> resMono = service.rescheduleReservation(res, null, changedRes.getStartTime(),
 				changedRes.getDuration());
 
 		// Check to make sure that an empty mono was sent back
@@ -1002,7 +1002,7 @@ class ReservationServiceTest {
 		res.setDuration(0);
 		res.setCost(flight.getTicketPrice());
 		res.setType(ReservationType.FLIGHT);
-		res.setStarttime(flight.getDepartingDate());
+		res.setStartTime(flight.getDepartingDate());
 
 		Reservation setRes1 = new Reservation();
 		setRes1.setUsername("otherTest1");
@@ -1013,7 +1013,7 @@ class ReservationServiceTest {
 		setRes1.setDuration(vac.getDuration());
 		setRes1.setCost(19.99);
 		setRes1.setType(ReservationType.FLIGHT);
-		setRes1.setStarttime(flight.getDepartingDate());
+		setRes1.setStartTime(flight.getDepartingDate());
 		setRes1.setStatus(ReservationStatus.AWAITING);
 
 		Reservation setRes2 = new Reservation();
@@ -1025,7 +1025,7 @@ class ReservationServiceTest {
 		setRes2.setDuration(1);
 		setRes2.setCost(19.99);
 		setRes2.setType(ReservationType.FLIGHT);
-		setRes2.setStarttime(flight.getDepartingDate());
+		setRes2.setStartTime(flight.getDepartingDate());
 		setRes2.setStatus(ReservationStatus.AWAITING);
 
 		ReservationDto[] resArray = { new ReservationDto(setRes1), new ReservationDto(setRes2),
@@ -1041,7 +1041,7 @@ class ReservationServiceTest {
 		changedRes.setType(ReservationType.FLIGHT);
 		changedRes.setDuration(0);
 		changedRes.setCost(flight.getTicketPrice());
-		changedRes.setStarttime(flight.getDepartingDate());
+		changedRes.setStartTime(flight.getDepartingDate());
 
 		// Set up the returns
 		when(resDao.save(Mockito.any())).thenReturn(Mono.just(new ReservationDto(res)));
@@ -1053,13 +1053,13 @@ class ReservationServiceTest {
 
 		when(resDao.findAll()).thenReturn(Flux.fromArray(resArray));
 
-		Mono<Reservation> resMono = service.rescheduleReservation(res, null, changedRes.getStarttime(),
+		Mono<Reservation> resMono = service.rescheduleReservation(res, null, changedRes.getStartTime(),
 				changedRes.getDuration());
 
 		// Check to make sure the reservation was set correctly
 		StepVerifier.create(resMono).expectNextMatches(r -> r.getId() != null && r.getCost() == changedRes.getCost()
 				&& flight.getId().equals(r.getReservedId()) && changedRes.getDuration().equals(r.getDuration())
-				&& flight.getAirline().equals(r.getReservedName()) && changedRes.getStarttime().equals(r.getStarttime())
+				&& flight.getAirline().equals(r.getReservedName()) && changedRes.getStartTime().equals(r.getStartTime())
 				&& ReservationStatus.AWAITING.equals(r.getStatus()) && ReservationType.FLIGHT.equals(r.getType()))
 				.verifyComplete();
 
@@ -1077,7 +1077,7 @@ class ReservationServiceTest {
 		res.setDuration(0);
 		res.setCost(flight.getTicketPrice());
 		res.setType(ReservationType.FLIGHT);
-		res.setStarttime(flight.getDepartingDate());
+		res.setStartTime(flight.getDepartingDate());
 
 		Reservation setRes1 = new Reservation();
 		setRes1.setUsername("otherTest1");
@@ -1088,7 +1088,7 @@ class ReservationServiceTest {
 		setRes1.setDuration(0);
 		setRes1.setCost(19.99);
 		setRes1.setType(ReservationType.FLIGHT);
-		setRes1.setStarttime(flight.getDepartingDate());
+		setRes1.setStartTime(flight.getDepartingDate());
 		setRes1.setStatus(ReservationStatus.AWAITING);
 
 		Reservation setRes2 = new Reservation();
@@ -1100,7 +1100,7 @@ class ReservationServiceTest {
 		setRes2.setDuration(0);
 		setRes2.setCost(19.99);
 		setRes2.setType(ReservationType.FLIGHT);
-		setRes2.setStarttime(flight.getDepartingDate());
+		setRes2.setStartTime(flight.getDepartingDate());
 		setRes2.setStatus(ReservationStatus.AWAITING);
 
 		Reservation setRes3 = new Reservation();
@@ -1112,7 +1112,7 @@ class ReservationServiceTest {
 		setRes3.setDuration(0);
 		setRes3.setCost(19.99);
 		setRes3.setType(ReservationType.FLIGHT);
-		setRes3.setStarttime(flight.getDepartingDate());
+		setRes3.setStartTime(flight.getDepartingDate());
 		setRes3.setStatus(ReservationStatus.AWAITING);
 
 		ReservationDto[] resArray = { new ReservationDto(setRes1), new ReservationDto(setRes2),
@@ -1128,7 +1128,7 @@ class ReservationServiceTest {
 		changedRes.setType(ReservationType.FLIGHT);
 		changedRes.setDuration(0);
 		changedRes.setCost(flight.getTicketPrice());
-		changedRes.setStarttime(flight.getDepartingDate());
+		changedRes.setStartTime(flight.getDepartingDate());
 
 		// Set up the returns
 		when(resDao.save(Mockito.any())).thenReturn(Mono.just(new ReservationDto(res)));
@@ -1140,7 +1140,7 @@ class ReservationServiceTest {
 
 		when(resDao.findAll()).thenReturn(Flux.fromArray(resArray));
 
-		Mono<Reservation> resMono = service.rescheduleReservation(res, null, changedRes.getStarttime(),
+		Mono<Reservation> resMono = service.rescheduleReservation(res, null, changedRes.getStartTime(),
 				changedRes.getDuration());
 
 		// Check to make sure that an empty mono was sent back
@@ -1168,7 +1168,7 @@ class ReservationServiceTest {
 		res.setDuration(0);
 		res.setCost(flight.getTicketPrice());
 		res.setType(ReservationType.FLIGHT);
-		res.setStarttime(flight.getDepartingDate());
+		res.setStartTime(flight.getDepartingDate());
 
 		Reservation setRes1 = new Reservation();
 		setRes1.setUsername("otherTest1");
@@ -1179,7 +1179,7 @@ class ReservationServiceTest {
 		setRes1.setDuration(0);
 		setRes1.setCost(19.99);
 		setRes1.setType(ReservationType.FLIGHT);
-		setRes1.setStarttime(flight2.getDepartingDate());
+		setRes1.setStartTime(flight2.getDepartingDate());
 		setRes1.setStatus(ReservationStatus.AWAITING);
 
 		Reservation setRes2 = new Reservation();
@@ -1191,7 +1191,7 @@ class ReservationServiceTest {
 		setRes2.setDuration(0);
 		setRes2.setCost(19.99);
 		setRes2.setType(ReservationType.FLIGHT);
-		setRes2.setStarttime(flight2.getDepartingDate());
+		setRes2.setStartTime(flight2.getDepartingDate());
 		setRes2.setStatus(ReservationStatus.AWAITING);
 
 		ReservationDto[] resArray = { new ReservationDto(setRes1), new ReservationDto(setRes2), new ReservationDto(res) };
@@ -1206,7 +1206,7 @@ class ReservationServiceTest {
 		changedRes.setType(ReservationType.FLIGHT);
 		changedRes.setDuration(0);
 		changedRes.setCost(flight2.getTicketPrice());
-		changedRes.setStarttime(flight2.getDepartingDate());
+		changedRes.setStartTime(flight2.getDepartingDate());
 
 		// Set up the returns
 		when(resDao.save(Mockito.any())).thenReturn(Mono.just(new ReservationDto(res)));
@@ -1226,7 +1226,7 @@ class ReservationServiceTest {
 		// Check to make sure the reservation was set correctly
 		StepVerifier.create(resMono).expectNextMatches(r -> r.getId() != null && r.getCost() == changedRes.getCost()
 				&& flight2.getId().equals(r.getReservedId()) && changedRes.getDuration().equals(r.getDuration())
-				&& flight2.getAirline().equals(r.getReservedName()) && changedRes.getStarttime().equals(r.getStarttime())
+				&& flight2.getAirline().equals(r.getReservedName()) && changedRes.getStartTime().equals(r.getStartTime())
 				&& ReservationStatus.AWAITING.equals(r.getStatus()) && ReservationType.FLIGHT.equals(r.getType()))
 				.verifyComplete();
 
@@ -1252,7 +1252,7 @@ class ReservationServiceTest {
 		res.setDuration(0);
 		res.setCost(flight.getTicketPrice());
 		res.setType(ReservationType.FLIGHT);
-		res.setStarttime(flight.getDepartingDate());
+		res.setStartTime(flight.getDepartingDate());
 
 		Reservation setRes1 = new Reservation();
 		setRes1.setUsername("otherTest1");
@@ -1263,7 +1263,7 @@ class ReservationServiceTest {
 		setRes1.setDuration(0);
 		setRes1.setCost(19.99);
 		setRes1.setType(ReservationType.FLIGHT);
-		setRes1.setStarttime(flight2.getDepartingDate());
+		setRes1.setStartTime(flight2.getDepartingDate());
 		setRes1.setStatus(ReservationStatus.AWAITING);
 
 		Reservation setRes2 = new Reservation();
@@ -1275,7 +1275,7 @@ class ReservationServiceTest {
 		setRes2.setDuration(0);
 		setRes2.setCost(19.99);
 		setRes2.setType(ReservationType.FLIGHT);
-		setRes2.setStarttime(flight2.getDepartingDate());
+		setRes2.setStartTime(flight2.getDepartingDate());
 		setRes2.setStatus(ReservationStatus.AWAITING);
 
 		Reservation setRes3 = new Reservation();
@@ -1287,7 +1287,7 @@ class ReservationServiceTest {
 		setRes3.setDuration(0);
 		setRes3.setCost(19.99);
 		setRes3.setType(ReservationType.FLIGHT);
-		setRes3.setStarttime(flight2.getDepartingDate());
+		setRes3.setStartTime(flight2.getDepartingDate());
 		setRes3.setStatus(ReservationStatus.AWAITING);
 
 		ReservationDto[] resArray = { new ReservationDto(setRes1), new ReservationDto(setRes2),
@@ -1303,7 +1303,7 @@ class ReservationServiceTest {
 		changedRes.setType(ReservationType.FLIGHT);
 		changedRes.setDuration(0);
 		changedRes.setCost(flight2.getTicketPrice());
-		changedRes.setStarttime(flight2.getDepartingDate());
+		changedRes.setStartTime(flight2.getDepartingDate());
 
 		// Set up the returns
 		when(resDao.save(Mockito.any())).thenReturn(Mono.just(new ReservationDto(res)));
@@ -1340,7 +1340,7 @@ class ReservationServiceTest {
 		res.setId(UUID.randomUUID());
 		res.setReservedId(car.getId());
 		res.setReservedName(car.getMake());
-		res.setStarttime(vac.getStartTime());
+		res.setStartTime(vac.getStartTime());
 		res.setCost(car.getCostPerDay());
 		res.setVacationId(vac.getId());
 		res.setDuration(vac.getDuration());

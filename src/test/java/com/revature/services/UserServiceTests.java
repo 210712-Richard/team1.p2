@@ -284,7 +284,7 @@ class UserServiceTests {
 		res.setId(UUID.randomUUID());
 		res.setDuration(vac.getDuration());
 		res.setType(ReservationType.HOTEL);
-		res.setStarttime(vac.getStartTime());
+		res.setStartTime(vac.getStartTime());
 
 		vac.getReservations().add(res);
 
