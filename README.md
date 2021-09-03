@@ -16,6 +16,15 @@
 * AWS Keyspaces
 
 ## Features
-* Users can register for an account
-* Users can login to an account
-* 
+* Users can register for an account.
+* Users can login to an account.
+* Users can create vacation.
+* Users can Reserve Flight, Hotel & Car.
+* Users can Reschedule Flight, Hotel & Car reservation.
+* Users can cancel Flight and Hote reservation.
+* Users can Check out from Hotel.
+* Users can choose activities for vacation.
+* Users can view chosen activities and available activities for vacation.
+* Users can Delete their account.
+* Users can Logout.
+
